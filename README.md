@@ -1,3 +1,3 @@
-# GWENapp
+# GWENA
 
-Gene Whole co-Expression Network augmented process pipeline
+Gene Whole co-Expression Network Analysis
