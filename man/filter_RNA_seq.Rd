@@ -4,13 +4,18 @@
 \alias{filter_RNA_seq}
 \title{Filtering of low counts}
 \usage{
-filter_RNA_seq(data_expr, min_count = 5)
+filter_RNA_seq(data_expr, min_count = 5, method = c("at least one",
+  "mean", "all"))
 }
 \arguments{
-\item{min_count}{}
+\item{data_expr}{matrix of RNA-seq data to be filtered, with genes as column and samples as row.}
+
+\item{min_count}{minimal number of count to be considered in method}
+
+\item{method}{name of the method for filtering. Must be one of "at least one", "mean", or " all", above min_count.}
 }
 \description{
-Remove genes with low counts in matrix coming from RNA-seq data.
+Keeping genes with at least one sample with count above min_count.
 }
 \details{
 Low counts in RNA-seq can bring noise to gene co-expression module building, so filtering them help to improve quality.
