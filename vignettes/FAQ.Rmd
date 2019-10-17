@@ -1,0 +1,24 @@
+---
+title: "GWENA Frequently Asked Questions"
+author: "Gwenaëlle Lemoine"
+date: "`r Sys.Date()`"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Why did you wrapped multiple functions of WGCNA like `pickSoftThreshold` or `adjacency` ? Wasn't they already working ?
+
+Short answer is "Yes they were". However, the parameters of these functions and their syntax didn't eased its use. Moreover, the current succession of functions to built modules repeated multiple times the correlation computation. Also, I took the opportunity to integrate native sperman correlation.
+
+## 2. Why forcing expression datasets to have no NA values ?
+
+As you may know in R, missing values in cor and cov function by default propagate missing values in each column and row where there are found. Multiple options are available in these function to manage missing values. However some of them are not available for all type of correlations available, and not all imputations methods are wise to use (take a look at this article: [Pairwise-complete correlation considered dangerous](https://bwlewis.github.io/covar/missing.html)).
+Since WGCNA running requires no missing values, I prefere forcing to have a complete dataset. You have therefore the full understanding of the imputation you compute for your missing values. If you have no idea how to do it, see [Dealing with missing data:  Key assumptions andmethods for applied analysis](https://www.bu.edu/sph/files/2014/05/Marina-tech-report.pdf) for general information about missing values imputation, and [Dealing with missing values in large-scale studies: microarray data imputation and beyond](https://academic.oup.com/bib/article/11/2/253/216449) for more transcriptomic-specific imputation.
+
+
