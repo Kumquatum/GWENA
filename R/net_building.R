@@ -1,3 +1,32 @@
+#' Match a correlation function based on a name
+#'
+#' Translate a function name into a usable function in code.
+#' TODO finish
+#'
+#' @param cor_name string of the name of the correlation to be use
+#'
+#' @return A function corresponding to the correlation required
+#' @examples
+#'
+#' @import WGCNA
+
+cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
+  # Checks
+  if (is.null(cor_func)) stop("cor_func must be a character vector representing one of the supported correlation functions. See ?cor_func_match for more information.")
+  cor_func <- match.arg(cor_func)
+
+  # Function assignation
+  if (cor_func == "pearson") {
+    cor_func <- function(x) WGCNA::cor(x, method = "pearson", use = "e")
+  } else if (cor_func == "spearman") {
+    cor_func <- function(x) stats::cor(x, method = "spearman", use = "e")
+  } else if (cor_func == "bicor") {
+    cor_func <- function(x) WGCNA::bicor(x, use = "e")
+  } else {
+    stop("Should never be triggered")
+  }
+}
+
 #' Calculating best fit of a power low on correlation matrix computed on expression data
 #'
 #' Adjust a correlation matrix depending of the type of network, then try to parameter a power law for best fit
@@ -117,26 +146,20 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' @details
 #' \item{which should have been adequatly normalized and filtered if pertinant. ATTENTION : it is not recommended to filter by differential
-#'  expression (cf. \link(https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html)}
+#'  expression (cf. \link(https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html)}.
+#' Warning : saving adjacency increase the final return size. Working withtom is usually suffisant since it's the only value used for the
+#' next step \code{\link{modules_detection}}.
 #' @return list containing
 #' @examples
 #'
 #' @import WGCNA
-#' @importFrom dynamicTreeCut cutreeDynamic
 #'
 #' @export
 
-
-# Version complexe
-# net_building <- function(data_expr, power = NULL, power_cut_off = NULL, cor_name = "spearman",
-#                          TOMType = "signed", minModuleSize = min(20, ncol(data_expr)/2 ),
-#                          mergeCutHeight = 0.15, pamRespectsDendro = TRUE,
-#                          saveTOMs = FALSE, verbose = 0, n_threads = 1)
-# Version simplifiée
 net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
                          power_value = NULL, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid", "none"),
-                         tom_type = c("unsigned", "signed", "signed Nowick"), min_module_size = min(20, ncol(data_expr) / 2),
-                         merge_cut_height = 0.25, save_adjacency = FALSE, save_tom = FALSE, n_threads = 0, detailled_result = FALSE, ...)
+                         tom_type = c("unsigned", "signed", "signed Nowick"), save_adjacency = FALSE, n_threads = 0, # TODO program the mclapply version
+                         detailled_result = FALSE, ...)
 {
   # Checking
   # TODO add check
@@ -159,39 +182,84 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
 
   ### Network building
   message("Adjacency")
-  adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat, type = network_type, power = power_value)
+  adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat, type = network_type, power = fit$power_value)
   message("TOM")
   tom = 1 - WGCNA::TOMsimilarity(adj, TOMType = tom_type)
-  message("Hierarchical clustering")
-  gene_tree = hclust(as.dist(tom), method = "average")
-  message("Tree cut")
-  dynamicMods = dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = tom,
-                              deepSplit = 2, pamRespectsDendro = FALSE,
-                              minClusterSize = min_module_size)
-  message("Merging closest modules")
-  merge = mergeCloseModules(data_expr, dynamicMods, cutHeight = merge_cut_height, verbose = 0, relabel = TRUE)
 
-  # Reporting
+
+  # Return
   if (detailled_result) {
-    # TODO : check if suffisent info is here and if not too much
     net = list(
-      adjacency = if (save_adjacency) adj else NULL,
-      tom = if (save_tom) tom else NULL,
       power = fit$power_value,
       fit_power = fit$fit_table[fit$power_value, "SFT.R.sq"],
       cor_func = cor_func,
-      modules = merge$colors,
-      modules_premerge = dynamicMods,
-      modules_eigengenes = merge$newMEs,
-      dendrograms = hclust(as.dist(1 - cor(merge$newMEs)), method = "average")
+      network_type = network_type,
+      adjacency = if (save_adjacency) adj else NULL,
+      tom = tom
     )
   } else {
     net = list(
-      power = fit$power_value,
-      modules = merge$colors,
-      modules_eigengenes = merge$newMEs,
+      cor_func = cor_func,
+      network_type = network_type,
+      tom_type = tom_type,
+      tom = tom
     )
   }
 
   return(net)
+}
+
+
+
+#' Modules detection from a network matrix
+#'
+#' Detect the modules by hierarchical clustering .
+#'
+#' @param data_expr matrix of expression data with genes as column and samples as row.
+#' @param tom
+#' TODO finish
+#'
+#' @details
+#' TODO
+#' @return
+#' TODO
+#'
+#' @examples
+#' TODO
+#' @import WGCNA
+#' @importFrom dynamicTreeCut cutreeDynamic
+#'
+#' @export
+
+modules_detection <- function(data_expr, tom, min_module_size = min(20, ncol(data_expr) / 2), merge_cut_height = 0.25,
+                              detailled_result = FALSE, ...) {
+  # Checks
+
+
+  # Detection
+  message("Hierarchical clustering")
+  gene_tree = stats::hclust(as.dist(tom), method = "average")
+  message("Tree cut")
+  dynamicMods = dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = tom,
+                                              deepSplit = 2, pamRespectsDendro = FALSE,
+                                              minClusterSize = min_module_size)
+  message("Merging closest modules")
+  merge = WGCNA::mergeCloseModules(data_expr, dynamicMods, cutHeight = merge_cut_height, relabel = TRUE, ...)
+
+  # Return
+  if (detailled_result) {
+    detection <- list(
+      modules = setNames(merge$colors, colnames(data_expr)),
+      modules_premerge = dynamicMods,
+      modules_eigengenes = merge$newMEs,
+      dendrograms = stats::hclust(as.dist(1 - cor(merge$newMEs)), method = "average")
+    )
+  } else {
+    detection <- list(
+      modules = merge$colors,
+      modules_eigengenes = merge$newMEs
+    )
+  }
+
+  return(detection)
 }
