@@ -12,7 +12,7 @@
 #' @examples
 #' TODO Add example
 #'
-#' @import WGCNA
+#' @importFrom WGCNA pickSoftThreshold.fromSimilarity
 #'
 #' @export
 
@@ -33,10 +33,10 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
     (1 + cor_mat) / 2
   } else if (network_type == "signed hybrid") {
     cor_mat[cor_mat < 0] = 0
-  } else # Meaning "none" : do nothing
+  } # else = "none" : do nothing
 
   # Getting fit
-  sft_fit = WGCNA::pickSoftThreshold.fromSimilarity(similarity = similarity, ...)
+  sft_fit <- WGCNA::pickSoftThreshold.fromSimilarity(similarity = similarity, ...)
 
   # Final list with all infos
   fit <- list(
@@ -73,7 +73,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' @export
 
 get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"),
-                     your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid"), ...){
+                     your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid", "none"), ...){
   # Checking args
   # TODO ajouter autres checks
   if (any(is.na(data_expr))) stop("data_expr must not contain any missing value. To approximate them, see FAQ answer on this subject.")
@@ -134,12 +134,15 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #                          saveTOMs = FALSE, verbose = 0, n_threads = 1)
 # Version simplifiée
 net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
-                         power_value = NULL, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid"),
+                         power_value = NULL, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid", "none"),
                          tom_type = c("unsigned", "signed", "signed Nowick"), min_module_size = min(20, ncol(data_expr) / 2),
                          merge_cut_height = 0.25, save_adjacency = FALSE, save_tom = FALSE, n_threads = 0, detailled_result = FALSE, ...)
 {
   # Checking
   # TODO add check
+  cor_func <- match.arg(cor_func)
+  network_type < match.arg(network_type)
+  tom_type <- match.arg(tom_type)
 
   # Correlation selection and correlation matrix computation
   if (cor_func == "other") {
@@ -152,7 +155,6 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
   # Getting power
   if (is.null(power_value)) {
     fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off, network_type = network_type, ...)
-    power_value <- fit$power_value
   } else {fit <- "None. Custom power_value provided"}
 
   ### Network building
@@ -170,12 +172,13 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
   merge = mergeCloseModules(data_expr, dynamicMods, cutHeight = merge_cut_height, verbose = 0, relabel = TRUE)
 
   # Reporting
-  if (detailled_result){
+  if (detailled_result) {
     # TODO : check if suffisent info is here and if not too much
     net = list(
       adjacency = if (save_adjacency) adj else NULL,
       tom = if (save_tom) tom else NULL,
-      power = power_value,
+      power = fit$power_value,
+      fit_power = fit$fit_table[fit$power_value, "SFT.R.sq"],
       cor_func = cor_func,
       modules = merge$colors,
       modules_premerge = dynamicMods,
@@ -184,7 +187,7 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
     )
   } else {
     net = list(
-      power = power_value,
+      power = fit$power_value,
       modules = merge$colors,
       modules_eigengenes = merge$newMEs,
     )
