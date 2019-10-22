@@ -153,6 +153,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @examples
 #'
 #' @import WGCNA
+#' @import magrittr
 #'
 #' @export
 
@@ -184,7 +185,9 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
   message("Adjacency")
   adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat, type = network_type, power = fit$power_value)
   message("TOM")
-  tom = 1 - WGCNA::TOMsimilarity(adj, TOMType = tom_type)
+  tom = 1 - WGCNA::TOMsimilarity(adj, TOMType = tom_type) %>%
+    magrittr::set_colnames(colnames(adj)) %>%
+    magrittr::set_rownames(rownames(adj))
 
 
   # Return
@@ -256,7 +259,7 @@ modules_detection <- function(data_expr, tom, min_module_size = min(20, ncol(dat
     )
   } else {
     detection <- list(
-      modules = merge$colors,
+      modules = setNames(merge$colors, colnames(data_expr)),
       modules_eigengenes = merge$newMEs
     )
   }
