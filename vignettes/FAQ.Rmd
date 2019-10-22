@@ -6,6 +6,10 @@ output:
   prettydoc::html_pretty:
     theme: cayman
     toc: true
+vignette: >
+  %\VignetteIndexEntry{FAQ}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}

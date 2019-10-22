@@ -17,7 +17,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  warning = FALSE,
+  comment = "#>",
+  cache = TRUE
 )
 ```
 
@@ -25,6 +27,7 @@ GWENA is a pipeline performing a co-expression analysis and helping to its biolo
 
 ```{r, message=FALSE, warning=FALSE}
 library(GWENA)
+library(dplyr)
 ```
 
 
@@ -70,7 +73,8 @@ kuehne_traits[1:5,]
 ## 2. Filtration
 
 This step need to be carefully studied as it will impact the modules building. 
-The authors of WGCNA advise against using differentialy expressed (DE) genes as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
+The authors of WGCNA advise against usin
+g differentialy expressed (DE) genes as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
 
 Multiple types of filtration have been natively implemented :
 
@@ -91,28 +95,95 @@ kuehne_expr_filtered <- filter_low_var(kuehne_expr, pct = 0.7, type = "median")
 
 # Remaining number of genes
 ncol(kuehne_expr_filtered)
+
+# In order to fasten the example process here, we only take a sample of the genes
+kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 ```
 
-## 3. Network building
+## 3. Network building and modules detection
 
 ```{r net_building}
-net <- 
-
-
-
+net <- net_building(kuehne_expr_filtered, cor_func = "spearman", detailled_result = TRUE)
 ```
 
+* Power selected : `r net$power`
+* Fit of the power law to data ($R^2$) : `r net$fit_power`
 
 ## 4. Modules detection
+
+```{r modules_detection}
+detection <- modules_detection(kuehne_expr_filtered, net$tom, detailled_result = TRUE)
+```
+
+* Number of modules before merging : `r length(unique(detection$modules_premerge))-1` 
+* Number of modules after merging : `r length(unique(detection$modules))-1`
+* Modules profiles
+
+```{r plot_modules_repartition}
+barplot(table(detection$modules)[-1], xlab = "Modules", ylab = "Number of genes")
+```
 
 ## 5. Biological integration
 
 ### 5.1. Functionnal enrichment
 
+```{r modules_enrichment}
+library(gprofiler2)
+enrichment <- modules_enrichment(detection$modules)
+```
+
+* Example of  module 2 enrichment plot
+```{r plot_enrichment, message = FALSE}
+gprofiler2::gostplot(enrichment$`2`)
+```
+
 ### 5.2. Phenotypic association
 
-### 5.3. Differentially expressed genes (maybe ?)
+```{r modules_phenotype}
+phenotype_association <- modules_phenotype(detection$modules_eigengenes, kuehne_traits %>% select(Condition, Age, Slide))
+```
+
+```{r plot_modules_phenotype}
+plot_modules_phenotype(phenotype_association)
+```
+
+<!-- ### 5.3. Differentially expressed genes (maybe ?) -->
 
 ## 6. Graph analysis
 
+```{r graph}
+# TODO
+
+```
+
+
 ## 7. Modules comparison
+
+```{r redo_by_condition}
+kuehne_traits$sample = apply(kuehne_traits, 1, function(line) paste(line["Slide"], line["Exp"], sep = "_"))
+data_list <- list(
+  kuehne_young = kuehne_expr_filtered[rownames(kuehne_expr_filtered) %in% kuehne_traits[which(kuehne_traits$Condition == "young"), "sample"],],
+  kuehne_old = kuehne_expr_filtered[rownames(kuehne_expr_filtered) %in% kuehne_traits[which(kuehne_traits$Condition == "old"), "sample"],]  
+)
+
+net_list <- lapply(data_list, net_building, kuehne_expr_filtered, cor_func = "spearman", save_adjacency = TRUE, detailled_result = TRUE)
+detection_list <- mapply(modules_detection, data_list, lapply(net_list, function(condition) condition$tom), SIMPLIFY = FALSE)
+```
+
+```{r modules_preservation}
+preservation <- modules_preservation(data_list, net_list, detection_list, "kuehne_young", "kuehne_old")
+preserved_modules <- which(apply(preservation$p.value, 1, max) < 0.999) # Fake value here, just to show the result
+```
+
+* Preservation statistics
+
+`r knitr::kable(preservation$p.values)`
+
+* Modules preserved : `r paste(preserved_modules, collapse = ", ")`
+
+
+
+
+______
+
+If you have any question or misunderstanding, take a look at GWENA's general documentation (package?GWENA) or send an email to lemoine.gwenaelle[@t)gmail{d0t]com
