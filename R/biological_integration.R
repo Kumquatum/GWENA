@@ -21,7 +21,7 @@ modules_enrichment <- function(modules, custom_gmt = NULL, ...) {
   # Checks
 
   # Splitting genes by module
-  modules_list <- base::split(names(modules), modules)
+  modules_list <- split(names(modules), modules)
 
   # Enrichment
   enriched_modules <- lapply(modules_list, function(module){
@@ -59,7 +59,7 @@ modules_phenotype <- function(eigengenes, phenotypes) {
   # Design matrix (dummy variable formation for qualitative variables)
   dummies_var <- lapply(colnames(phenotypes), function(dummy_name) {
     df <- phenotypes %>% dplyr::select(dummy_name)
-    if (!is.numeric(df[1,])){
+    if (!is.numeric(df[1,])) {
       model_mat <- stats::model.matrix(
         stats::formula(paste("~ ", dummy_name, "+ 0")),
         data = df
@@ -70,7 +70,7 @@ modules_phenotype <- function(eigengenes, phenotypes) {
       return(df)
     }
   })
-  design_mat <- base::as.data.frame(dummies_var, check.names = FALSE)
+  design_mat <- as.data.frame(dummies_var, check.names = FALSE)
 
   # Correlations
   association <- stats::cor(eigengenes, design_mat)
@@ -81,8 +81,8 @@ modules_phenotype <- function(eigengenes, phenotypes) {
   # TODO Check if a correction for multiple testing shouldn't be performed here...
 
   return(list(
-    association = association %>% base::as.data.frame,
-    pval = pval_association %>% base::as.data.frame
+    association = association %>% as.data.frame,
+    pval = pval_association %>% as.data.frame
   ))
 }
 
