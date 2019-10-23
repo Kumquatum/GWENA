@@ -8,7 +8,7 @@
 #' @return A function corresponding to the correlation required
 #' @examples
 #'
-#' @import WGCNA
+#' @importFrom WGCNA bicor cor
 
 cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
   # Checks
@@ -88,9 +88,9 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #'
 #' @param data_expr matrix of data only normalized for constructor specificities, with genes as column and samples as row.
 #' @param power_cut_off integer by which R^2 (coefficient of determination) will be thresholded
-#' @param cor_func
-#' @param your_func
-#' @param network_type
+#' @param cor_func TODO
+#' @param your_func TODO
+#' @param network_type TODO
 #' @param ...
 #' TODO filling info on params
 #'
@@ -98,6 +98,8 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #'
 #' @examples
 #' TODO write example
+#'
+#' @importFrom magrittr %>%
 #'
 #' @export
 
@@ -152,8 +154,8 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @return list containing
 #' @examples
 #'
-#' @import WGCNA
-#' @import magrittr
+#' @importFrom WGCNA adjacency.fromSimilarity TOMsimilarity
+#' @importFrom magrittr %>% set_colnames set_rownames
 #'
 #' @export
 
@@ -229,7 +231,7 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
 #'
 #' @examples
 #' TODO
-#' @import WGCNA
+#' @importFrom WGCNA mergeCloseModules
 #' @importFrom dynamicTreeCut cutreeDynamic
 #'
 #' @export

@@ -13,8 +13,8 @@
 #' @examples
 #' TODO
 #'
-#' @import NetRep
-#' @import dplyr
+#' @importFrom NetRep modulePreservation
+#' @importFrom magrittr %>%
 #'
 #' @export
 

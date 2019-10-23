@@ -13,8 +13,7 @@
 #'
 #' @examples
 #' TODO
-#' @import WGCNA
-#' @import gprofiler2
+#' @importFrom gprofiler2 gost
 #'
 #' @export
 
@@ -49,8 +48,8 @@ modules_enrichment <- function(modules, custom_gmt = NULL, ...) {
 #'
 #' @examples
 #' TODO
-#' @import WGCNA
-#' @import dplyr
+#' @importFrom WGCNA corPvalueStudent
+#' @importFrom dplyr select
 #'
 #' @export
 
@@ -59,10 +58,10 @@ modules_phenotype <- function(eigengenes, phenotypes) {
 
   # Design matrix (dummy variable formation for qualitative variables)
   dummies_var <- lapply(colnames(phenotypes), function(dummy_name) {
-    df <- phenotypes %>% select(dummy_name)
+    df <- phenotypes %>% dplyr::select(dummy_name)
     if (!is.numeric(df[1,])){
-      model_mat <- model.matrix(
-        formula(paste("~ ", dummy_name, "+ 0")),
+      model_mat <- stats::model.matrix(
+        stats::formula(paste("~ ", dummy_name, "+ 0")),
         data = df
       )
       colnames(model_mat) <- gsub(dummy_name, "", colnames(model_mat))
@@ -71,10 +70,10 @@ modules_phenotype <- function(eigengenes, phenotypes) {
       return(df)
     }
   })
-  design_mat <- as.data.frame(dummies_var, check.names = FALSE)
+  design_mat <- base::as.data.frame(dummies_var, check.names = FALSE)
 
   # Correlations
-  association <- cor(eigengenes, design_mat)
+  association <- stats::cor(eigengenes, design_mat)
 
   # P value associated
   pval_association <- WGCNA::corPvalueStudent(association, nrow(phenotypes))
@@ -82,8 +81,8 @@ modules_phenotype <- function(eigengenes, phenotypes) {
   # TODO Check if a correction for multiple testing shouldn't be performed here...
 
   return(list(
-    association = association %>% as.data.frame,
-    pval = pval_association %>% as.data.frame
+    association = association %>% base::as.data.frame,
+    pval = pval_association %>% base::as.data.frame
   ))
 }
 
@@ -103,10 +102,11 @@ modules_phenotype <- function(eigengenes, phenotypes) {
 #'
 #' @examples
 #' TODO
-#' @import ggplot2
-#' @import dplyr
-#' @import tibble
-#' @import tidyr
+#' @importFrom ggplot2 ggplot geom_tile geom_point scale_color_gradient2 theme_bw xlab ylab
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#' @importFrom tidyr pivot_longer
+#' @importFrom dplyr mutate select bind_cols
 #'
 #' @export
 
@@ -123,15 +123,15 @@ plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
     tibble::rownames_to_column(var = "eigengene") %>%
     tidyr::pivot_longer(-eigengene, names_to = "phenotype", values_to = "pval")
 
-  df_total <- bind_cols(df_cor, df_pval %>% select(pval)) %>%
-    mutate(signif = ifelse(pval > signif_th, FALSE, TRUE))
+  df_total <- dplyr::bind_cols(df_cor, df_pval %>% dplyr::select(pval)) %>%
+    dplyr::mutate(signif = ifelse(pval > signif_th, FALSE, TRUE))
 
   # Plotting
-  ggplot2::ggplot(df_total, aes(x = factor(eigengene), y = factor(phenotype))) +
-    geom_tile(fill = "white") +
-    geom_point(aes(colour = cor, size = signif)) +
-    scale_color_gradient2() +
-    theme_bw() +
-    xlab("Module") +
-    ylab("Phenotype")
+  ggplot2::ggplot(df_total, ggplot2::aes(x = factor(eigengene), y = factor(phenotype))) +
+    ggplot2::geom_tile(fill = "white") +
+    ggplot2::geom_point(ggplot2::aes(colour = cor, size = signif)) +
+    ggplot2::scale_color_gradient2() +
+    ggplot2::theme_bw() +
+    ggplot2::xlab("Module") +
+    ggplot2::ylab("Phenotype")
 }

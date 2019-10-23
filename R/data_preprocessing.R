@@ -6,7 +6,8 @@
 #' @param pct number in 0 and 1 specifying the percentage of gene to keep
 #' @param type string which should be either "mean" or "median"
 #'
-#' @import dplyr
+#' @importFrom dplyr select
+#' @importFrom magrittr %>%
 #'
 #' @export
 
@@ -22,7 +23,7 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 
   # Filtering
   top_pct <- data.frame(gene = names(var), var = unlist(var), stringsAsFactors = FALSE) %>% top_frac(pct, var)
-  filtered_data_expr <- data_expr %>% select(one_of(top_pct$gene))
+  filtered_data_expr <- data_expr %>% dplyr::select(one_of(top_pct$gene))
 
   return(filtered_data_expr)
 }
@@ -38,7 +39,8 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 #'
 #' @details Low counts in RNA-seq can bring noise to gene co-expression module building, so filtering them help to improve quality.
 #'
-#' @import dplyr
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select
 #'
 #' @export
 
@@ -58,7 +60,7 @@ filter_RNA_seq <- function(data_expr, min_count = 5, method = c("at least one", 
     }
     }) %>% unlist %>% .[which(. == TRUE)] %>% names
 
-  filtered_data_expr <- data_expr %>% select(one_of(good_gene))
+  filtered_data_expr <- data_expr %>% dplyr::select(one_of(good_gene))
 
   return(filtered_data_expr)
 }
