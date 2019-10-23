@@ -27,6 +27,6 @@ modules_preservation <- function(data_expr_list, net_list, modules_list, referen
     data = lapply(data_expr_list, function(condition) condition %>% as.matrix),
     correlation = lapply(net_list, function(condition) condition$adjacency %>% as.matrix),
     moduleAssignments = modules_list[[1]]$modules, discovery = reference, test = test,
-    nPerm = 10000
+    nPerm = 10000, verbose = FALSE
   ) # TODO Check if it's adj/tom/cor for network and/or cor
 }
