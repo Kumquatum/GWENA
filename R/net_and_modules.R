@@ -39,7 +39,7 @@ cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
 #' @return A list containing power of the law for best fit, fit table, and metadata about the arguments used.
 #' @author  Gwenaëlle Lemoine <lemoine.gwenaelle@@gmail.com>
 #' @examples
-#' TODO Add example
+#' # TODO Add example
 #'
 #' @importFrom WGCNA pickSoftThreshold.fromSimilarity
 #'
@@ -97,7 +97,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' @return A list containing power of the law for best fit, fit table, and metadata about the arguments used.
 #'
 #' @examples
-#' TODO write example
+#' #TODO write example
 #'
 #' @importFrom magrittr %>%
 #'
