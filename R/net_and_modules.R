@@ -147,10 +147,13 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' TODO finish
 #'
 #' @details
-#' \item{which should have been adequatly normalized and filtered if pertinant. ATTENTION : it is not recommended to filter by differential
-#'  expression (cf. \link(https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html)}.
-#' Warning : saving adjacency increase the final return size. Working withtom is usually suffisant since it's the only value used for the
-#' next step \code{\link{modules_detection}}.
+#' \enumerate{
+#'   \item{data_expr}{Must have been adequatly normalized and filtered if pertinant. ATTENTION : it is not recommended to filter by differential
+#'   expression (cf. \href{https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html}{Peter Langfelder and Steve Horvath FAQ on WGCNA}}.
+#'   \item{save_adjacency}{Saving adjacency increase the final return size. Working with tom is usually suffisant since it's the only value used for the
+#' next step \code{\link{modules_detection}}.}
+#' }
+#'
 #' @return list containing
 #' @examples
 #'
