@@ -73,8 +73,7 @@ kuehne_traits[1:5,]
 ## 2. Filtration
 
 This step need to be carefully studied as it will impact the modules building. 
-The authors of WGCNA advise against usin
-g differentialy expressed (DE) genes as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
+The authors of WGCNA advise against using differentialy expressed (DE) genes as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
 
 Multiple types of filtration have been natively implemented :
 

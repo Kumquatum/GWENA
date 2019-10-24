@@ -11,6 +11,12 @@ get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 \arguments{
 \item{data_expr}{matrix of data only normalized for constructor specificities, with genes as column and samples as row.}
 
+\item{cor_func}{TODO}
+
+\item{your_func}{TODO}
+
+\item{network_type}{TODO}
+
 \item{...}{TODO filling info on params}
 
 \item{power_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded}
@@ -23,6 +29,6 @@ Computes correlation matrix of the gene expression data, adjust it depending of 
 parameter a power law for best fit
 }
 \examples{
-TODO write example
+#TODO write example
 
 }

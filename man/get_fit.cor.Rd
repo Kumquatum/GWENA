@@ -21,7 +21,7 @@ A list containing power of the law for best fit, fit table, and metadata about t
 Adjust a correlation matrix depending of the type of network, then try to parameter a power law for best fit
 }
 \examples{
-TODO Add example
+# TODO Add example
 
 }
 \author{
