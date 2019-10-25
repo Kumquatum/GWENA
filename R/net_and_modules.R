@@ -170,7 +170,7 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
   # Checking
   # TODO add check
   cor_func <- match.arg(cor_func)
-  network_type < match.arg(network_type)
+  network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
 
   # Correlation selection and correlation matrix computation
