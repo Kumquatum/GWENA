@@ -4,11 +4,7 @@
 \name{kuehne_expr}
 \alias{kuehne_expr}
 \title{Transcriptomic data from the Kuehne et al. publication}
-\format{A data frame with 48 rows and 20672 columns :
-\describe{
-  \item{rows}{samples, reference combining the microarray slide, the condition, and the array}
-  \item{columns}{genes, IDs are gene names (also called gene symbols)}
-}}
+\format{A data frame with 48 rows and 20672 columns :}
 \source{
 \url{https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3}
 }

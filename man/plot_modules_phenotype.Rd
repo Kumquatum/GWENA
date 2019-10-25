@@ -20,5 +20,5 @@ Plot a heatmap of the correlation between all modules and the phenotypic variabl
 TODO
 }
 \examples{
-TODO
+#TODO
 }

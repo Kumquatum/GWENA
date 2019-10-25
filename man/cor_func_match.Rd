@@ -7,7 +7,7 @@
 cor_func_match(cor_func = c("pearson", "spearman", "bicor"))
 }
 \arguments{
-\item{cor_name}{string of the name of the correlation to be use}
+\item{cor_func}{string of the name of the correlation to be use}
 }
 \value{
 A function corresponding to the correlation required

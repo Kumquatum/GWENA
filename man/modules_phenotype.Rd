@@ -22,5 +22,5 @@ Compute the correlation between all modules and the phenotypic variables
 TODO
 }
 \examples{
-TODO
+#TODO
 }

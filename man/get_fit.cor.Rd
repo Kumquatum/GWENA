@@ -10,9 +10,10 @@ get_fit.cor(cor_mat, fit_cut_off = 0.9, network_type = c("unsigned",
 \arguments{
 \item{cor_mat}{matrix or data.frame of genes correlation.}
 
-\item{network_type}{TODO finish params}
+\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded.}
 
-\item{power_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded.}
+\item{network_type}{TODO
+TODO finish params}
 }
 \value{
 A list containing power of the law for best fit, fit table, and metadata about the arguments used.
@@ -23,7 +24,4 @@ Adjust a correlation matrix depending of the type of network, then try to parame
 \examples{
 # TODO Add example
 
-}
-\author{
-Gwenaëlle Lemoine <lemoine.gwenaelle@gmail.com>
 }

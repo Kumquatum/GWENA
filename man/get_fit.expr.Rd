@@ -11,6 +11,8 @@ get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 \arguments{
 \item{data_expr}{matrix of data only normalized for constructor specificities, with genes as column and samples as row.}
 
+\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded}
+
 \item{cor_func}{TODO}
 
 \item{your_func}{TODO}
@@ -18,8 +20,6 @@ get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 \item{network_type}{TODO}
 
 \item{...}{TODO filling info on params}
-
-\item{power_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded}
 }
 \value{
 A list containing power of the law for best fit, fit table, and metadata about the arguments used.
