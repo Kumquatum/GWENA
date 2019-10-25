@@ -3,10 +3,6 @@
 #' A dataset containing the expression levels collapsed to the gene level.
 #'
 #' @format A data frame with 48 rows and 20672 columns :
-#' \describe{
-#'   \item{rows}{samples, reference combining the microarray slide, the condition, and the array}
-#'   \item{columns}{genes, IDs are gene names (also called gene symbols)}
-#' }
 #'
 #' @source \url{https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3}
 "kuehne_expr"
