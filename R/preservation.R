@@ -11,7 +11,7 @@
 #' TODO
 #'
 #' @examples
-#' TODO
+#' #TODO
 #'
 #' @importFrom NetRep modulePreservation
 #' @importFrom magrittr %>%

@@ -12,7 +12,7 @@
 #' TODO
 #'
 #' @examples
-#' TODO
+#' #TODO
 #' @importFrom gprofiler2 gost
 #'
 #' @export
@@ -47,7 +47,7 @@ modules_enrichment <- function(modules, custom_gmt = NULL, ...) {
 #' TODO
 #'
 #' @examples
-#' TODO
+#' #TODO
 #' @importFrom WGCNA corPvalueStudent
 #' @importFrom dplyr select
 #'
@@ -101,7 +101,7 @@ modules_phenotype <- function(eigengenes, phenotypes) {
 #' TODO
 #'
 #' @examples
-#' TODO
+#' #TODO
 #' @importFrom ggplot2 ggplot geom_tile geom_point scale_color_gradient2 theme_bw xlab ylab
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column

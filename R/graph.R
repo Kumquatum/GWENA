@@ -11,9 +11,8 @@
 #' TODO
 #'
 #' @examples
-#' TODO
+#' #TODO
 #'
-#' ?@import
 #'
 #' @export
 

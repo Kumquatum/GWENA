@@ -3,7 +3,7 @@
 #' Translate a function name into a usable function in code.
 #' TODO finish
 #'
-#' @param cor_name string of the name of the correlation to be use
+#' @param cor_func string of the name of the correlation to be use
 #'
 #' @return A function corresponding to the correlation required
 #' @examples
@@ -32,8 +32,8 @@ cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
 #' Adjust a correlation matrix depending of the type of network, then try to parameter a power law for best fit
 #'
 #' @param cor_mat matrix or data.frame of genes correlation.
-#' @param power_cut_off integer by which R^2 (coefficient of determination) will be thresholded.
-#' @param network_type
+#' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded.
+#' @param network_type TODO
 #' TODO finish params
 #'
 #' @return A list containing power of the law for best fit, fit table, and metadata about the arguments used.
@@ -86,7 +86,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' parameter a power law for best fit
 #'
 #' @param data_expr matrix of data only normalized for constructor specificities, with genes as column and samples as row.
-#' @param power_cut_off integer by which R^2 (coefficient of determination) will be thresholded
+#' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded
 #' @param cor_func TODO
 #' @param your_func TODO
 #' @param network_type TODO
@@ -232,7 +232,7 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
 #' TODO
 #'
 #' @examples
-#' TODO
+#' #TODO
 #' @importFrom WGCNA mergeCloseModules
 #' @importFrom dynamicTreeCut cutreeDynamic
 #'
