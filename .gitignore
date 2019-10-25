@@ -48,3 +48,5 @@ vignettes/*.pdf
 ### Personal dev ###
 Draft/*
 Sandbox/*
+doc
+Meta
