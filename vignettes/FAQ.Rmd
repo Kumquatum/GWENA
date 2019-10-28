@@ -1,5 +1,5 @@
 ---
-title: "GWENA Frequently Asked Questions"
+title: "GWENA - Frequently Asked Questions"
 author: "Gwenaëlle Lemoine"
 date: "`r Sys.Date()`"
 output: 
@@ -23,6 +23,14 @@ Short answer is "Yes they were". However, the parameters of these functions and 
 ## 2. Why forcing expression datasets to have no NA values ?
 
 As you may know in R, missing values in cor and cov function by default propagate missing values in each column and row where there are found. Multiple options are available in these function to manage missing values. However some of them are not available for all type of correlations available, and not all imputations methods are wise to use (take a look at this article: [Pairwise-complete correlation considered dangerous](https://bwlewis.github.io/covar/missing.html)).
-Since WGCNA running requires no missing values, I prefere forcing to have a complete dataset. You have therefore the full understanding of the imputation you compute for your missing values. If you have no idea how to do it, see [Dealing with missing data:  Key assumptions andmethods for applied analysis](https://www.bu.edu/sph/files/2014/05/Marina-tech-report.pdf) for general information about missing values imputation, and [Dealing with missing values in large-scale studies: microarray data imputation and beyond](https://academic.oup.com/bib/article/11/2/253/216449) for more transcriptomic-specific imputation.
+Since WGCNA running requires no missing values, I prefere forcing to have a complete dataset. You have therefore the full understanding of the imputation you compute for your missing values. If you have no idea how to do it, see [Dealing with missing data:  Key assumptions and methods for applied analysis](https://www.bu.edu/sph/files/2014/05/Marina-tech-report.pdf) for general information about missing values imputation, and [Dealing with missing values in large-scale studies: microarray data imputation and beyond](https://academic.oup.com/bib/article/11/2/253/216449) for more transcriptomic-specific imputation.
 
+## 3. How can I resume my transcriptomic data to the gene level ?
 
+### Microarray 
+
+Microarrays are designed 
+
+### RNA-seq
+
+Gold
