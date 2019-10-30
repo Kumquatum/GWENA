@@ -1,5 +1,5 @@
 ---
-title: "GWENA package guide"
+title: "GWENA - Guide"
 author: "Gwenaëlle Lemoine"
 date: "`r Sys.Date()`"
 output: 
@@ -23,42 +23,48 @@ knitr::opts_chunk$set(
 )
 ```
 
-GWENA is a pipeline performing a co-expression analysis and helping to its biological interpretation through multiple side analysis.
+*Citation: TODO quand le DOI de la publi sera dispo*
+
+## Presentation
+
+Comprehension of complex biological systems now require an approach based on interactions between each actor, meaning a network. Their interpretation often involve both a knowledge-driven and a data driven analysis. Current methods respectively focus on functional enrichment and hub genes detection. Combining them with the comparison of conditions and an extended topology analysis within a single pipeline can lead to better results exploitation. 
+
+This document gives an overview of the R package **GWENA** (Gene Whole co-Expression Network Analysis) which regroups this process into a single pipeline and tool to ease the work of bioinformaticians in their analysis of multiple conditions through the co-expression spectrum, therefore helping the discovery of meaningful biological conclusions.
+
+Current pipeline involves steps in Figure 1 and will be detailed in each following section.
+
+.
+
+![pipeline_schema](figure_pipeline_schema.png)
+
+> Figure 1.
+
+<!-- It can be performed using the function wrapping all steps `TODO nom fonction full analysis`, or using each function for each step. -->
+
+
+## Loading
 
 ```{r, message=FALSE, warning=FALSE}
 library(GWENA)
-library(dplyr)
 ```
 
+<!-- ## Quick start  -->
+<!-- `# TODO : script avec fonction full analysis` -->
 
-Steps are described in the figure below and will be detailed in each following section.
-![pipeline_schema](figure_pipeline_schema.png)
+<!-- ```{r setup, eval = FALSE} -->
+<!-- # TODO: ajouter wrapper -->
+<!-- ``` -->
 
+## Steps detail
 
-It can be performed using the function wrapping all steps `TODO nom fonction full analysis`, or using each function for each step.
+### 1. Input data
 
-## 0. Quick start 
-`# TODO : script avec fonction full analysis`
+Input data supported by this package can be either from RNA-seq or microarray. They must have been resumed to the gene level (if you have no idea how to do so, see [How can I resume my transcriptomic data to the gene level ?](FAQ.html/#how-can-i-resume-my-transcriptomic-data-to-the-gene-level) from the [FAQ](FAQ.html)) . 
 
+<!-- TODO Si le package n'implémente pas de méthode, laisser cette phrase et la compléter en indiquant dans la section en question les moyens de résumé à l'échelle gene comme collapseRows de WGCNA, ou ... ? RSEM ? RNA-SeQC ? etc. -->
 
+In this vignette, we will be using the dataset [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) which come from [Kuehne and al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3). It has been processed along the R script given in Additionnal data n°10 and will be our example data set here. The aim in this study was to investigate the role of the transcriptomics, the metabolomics and the junction of them in the skin aging.
 
-
-```{r setup, eval = FALSE}
-# TODO: ajouter wrapper
-```
-
-
-## 1. Input data
-
-Data can be either from RNA-seq or microarray. They must have been resumed to the gene level (if you have no idea how to do so, see the "Resuming at gene level" section) 
-
-> Si le package n'implémente pas de méthode, laisser cette phrase et la compléter en indiquant dans la section en question les moyens de résumé à l'échelle gene comme collapseRows de WGCNA, ou ... ? RSEM ? RNA-SeQC ? etc.
-
-[GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) is a data set from [Kuehne and al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3). It has been processed along R script given in supplementary data and will be our example data set here.
-
-Informations about data set :
-
-* Context: skin aging
 * Data type: microarray
 * `r ncol(kuehne_expr)` genes
 * `r nrow(kuehne_expr)` samples
@@ -70,7 +76,7 @@ kuehne_expr[1:5,1:5]
 kuehne_traits[1:5,]
 ```
 
-## 2. Filtration
+### 2. Filtration
 
 This step need to be carefully studied as it will impact the modules building. 
 The authors of WGCNA advise against using differentialy expressed (DE) genes as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
@@ -79,7 +85,6 @@ Multiple types of filtration have been natively implemented :
 
 * For all :
   * Filtration on low variation
-  * TODO
 * For RNA-seq data :
   * at least one : only one sample need to have a value above min_count in the gene
   * mean : the mean of all samples for the gene need to be above min_count
@@ -87,44 +92,112 @@ Multiple types of filtration have been natively implemented :
 * For microarray
   * TODO
 
+<!-- Remettre le TODO sous For all car il faudra ajouter d'autres méthodes de filtration ? -->
+
+In this example, we'll be filtering the low variating genes.
+
 ```{r filtration}
 kuehne_expr_filtered <- filter_low_var(kuehne_expr, pct = 0.7, type = "median")
-
-# TODO: plot de la variation (avec ou sans fonction intégrée au package ?)
-
-# Remaining number of genes
-ncol(kuehne_expr_filtered)
-
-# In order to fasten the example process here, we only take a sample of the genes
-kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 ```
 
-## 3. Network building and modules detection
+Remaining number of genes : `r ncol(kuehne_expr_filtered)`
+
+<!-- ```{r plot_expr} -->
+<!-- library(ggplot2) -->
+<!-- tit = kuehne_expr %>% t %>% -->
+<!--   apply(1, var) %>% -->
+<!--   data.frame(gene = names(.), var_nofilter = .) %>% -->
+<!--   bind_cols(kuehne_expr_filtered %>% t %>% -->
+<!--               apply(1, var) %>% -->
+<!--               data.frame(gene = names(.), var_filter = .)) %>% -->
+<!--   tibble::rownames_to_column(var = gene) %>% -->
+<!--   tidyr::pivot_longer(-gene, names_to = "filter", values_to = "variation") %>% -->
+<!--   ggplot(aes(x = variation, colour = filter)) + geom_density()  -->
+
+
+<!-- tut <- kuehne_expr %>%  -->
+<!--   tibble::rownames_to_column(var = "sample") %>% -->
+<!--   tidyr::pivot_longer(-sample, names_to = "gene", values_to = "expression") -->
+<!-- ggplot(tut, aes(expression, colour = sample)) + geom_density() -->
+<!-- ``` -->
+
+
+
+### 3. Network building and modules detection
+
+Gene co-expression networks consist in an ensemble of genes (nodes) linked to each other (edges) according to the strengh of their relation. This strengh estimation begins by the computation of a **similarity score**. It can be a distance (euclidian, minkowski, ...) but is usually a correlation. Among these, Pearson's one is the more popular. However in GWENA we chosed Spearman correlation by default since it is less sensible to outliers which are frequent in transcriptomics.
+
+This first score can then be adjusted to reflect the reality. It's the case of WGCNA which base its adjustement on the [scale-free](https://en.wikipedia.org/wiki/Scale-free_network) property of gene networks. The distribution of the nodes degree in these networks follows a power law. Next step consists to select the best fitting power law to the correlations, so they can be adjusted by it in the end.
+
+Another adjustement takes into account the [topology of the network](https://en.wikipedia.org/wiki/Network_topology). It holds trails to understand the underlying biological processes. In this case, it's the topological overlap[^1] of two nodes which is used to reflect it.
+
+<!-- The built of our co-expression network goes through this sub-steps : -->
+<!-- 1. Computing correlation between each pair of genes. -->
+<!-- 2. Trying to fit a power law to the distribution of this correlations to adjust them by it. This results in a similarity score for each pair of genes. -->
+<!-- 3. This score is itselft re-adjust by taking into acount the topology of the network. -->
 
 ```{r net_building}
+# In order to fasten the example process here, we only take a sample of the genes
+kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
+
 net <- net_building(kuehne_expr_filtered, cor_func = "spearman", detailled_result = TRUE)
 ```
 
 * Power selected : `r net$power`
 * Fit of the power law to data ($R^2$) : `r net$fit_power`
 
-## 4. Modules detection
+### 4. Modules detection
+
+At this point, our network is a [complete graph](https://en.wikipedia.org/wiki/Complete_graph) : all nodes are connected to all other nodes with different strengh. Some strong links are often localized around the same genes, allowing to observe groups of genes closely related. In co-expression networks this groups are called modules and assumed to be representatives of genes working together to a same set of function.
+
+They can be detected using unsupervised learning (here hierarchical clustering) or other adapted clustering method. 
 
 ```{r modules_detection}
-detection <- modules_detection(kuehne_expr_filtered, net$tom, detailled_result = TRUE)
+detection <- modules_detection(kuehne_expr_filtered, net$tom, merge_cut_height = 0.997, detailled_result = TRUE)
 ```
+
+Since this operation tend to create some modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), these can be merged into one.
 
 * Number of modules before merging : `r length(unique(detection$modules_premerge))-1` 
 * Number of modules after merging : `r length(unique(detection$modules))-1`
-* Modules profiles
 
-```{r plot_modules_repartition}
-barplot(table(detection$modules)[-1], xlab = "Modules", ylab = "Number of genes")
+```{r bipartite_graph_merge, echo=FALSE}
+g <- data.frame(before = detection$modules_premerge , after = detection$modules, stringsAsFactors = FALSE) %>% 
+  distinct %>% 
+  arrange(before) %>% 
+  igraph::graph_from_data_frame()
+igraph::V(g)$type <- lapply(igraph::V(g) %>% names %>% as.numeric, function(x) ifelse(x %in% unique(detection$modules), TRUE, FALSE)) %>% unlist
+g %>% igraph::add_layout_(igraph::as_bipartite()) %>% plot()
 ```
 
-## 5. Biological integration
+```{r plot_modules_gene_distribution}
+ggplot2::ggplot(data.frame(module = detection$modules), ggplot2::aes(x = module)) + ggplot2::stat_count() +
+  ylab("Number of genes")
+```
 
-### 5.1. Functionnal enrichment
+As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below.
+
+```{r plot_module_profile}
+df <- data.frame(gene = names(detection$modules), module = detection$modules, stringsAsFactors = FALSE) %>%
+  # left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) %>% #vanilla
+  # left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene") %>% apply(1, function(x) scale(x[, -1])) ) %>%
+  left_join(kuehne_expr_filtered %>% apply(2, function(x) setNames(scale(x), names(x))) %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) %>%
+  tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression")
+
+ggplot2::ggplot(df, ggplot2::aes(x=sample, y=expression, group=gene)) + 
+  ggplot2::geom_line(alpha = 0.3) + 
+  ggplot2::facet_grid(~module) + 
+  ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90,vjust=0.5)) + ggplot2::theme(legend.position="none")
+
+```
+
+
+
+
+
+### 5. Biological integration
+
+#### 5.1. Functionnal enrichment
 
 ```{r modules_enrichment}
 library(gprofiler2)
@@ -136,7 +209,7 @@ enrichment <- modules_enrichment(detection$modules)
 gprofiler2::gostplot(enrichment$`2`)
 ```
 
-### 5.2. Phenotypic association
+#### 5.2. Phenotypic association
 
 ```{r modules_phenotype}
 phenotype_association <- modules_phenotype(detection$modules_eigengenes, kuehne_traits %>% select(Condition, Age, Slide))
@@ -148,7 +221,7 @@ plot_modules_phenotype(phenotype_association)
 
 <!-- ### 5.3. Differentially expressed genes (maybe ?) -->
 
-## 6. Graph analysis
+### 6. Graph analysis
 
 ```{r graph}
 # TODO
@@ -156,9 +229,9 @@ plot_modules_phenotype(phenotype_association)
 ```
 
 
-## 7. Modules comparison
+### 7. Modules comparison
 
-```{r redo_by_condition}
+```{r redo_by_condition, message=FALSE, results='hide'}
 kuehne_traits$sample = apply(kuehne_traits, 1, function(line) paste(line["Slide"], line["Exp"], sep = "_"))
 data_list <- list(
   kuehne_young = kuehne_expr_filtered[rownames(kuehne_expr_filtered) %in% kuehne_traits[which(kuehne_traits$Condition == "young"), "sample"],],
@@ -182,7 +255,11 @@ preserved_modules <- which(apply(preservation$p.value, 1, max) < 0.999) # Fake v
 
 
 
+<div style="text-align:center; font-size:70%; margin-top:50px"> 
+  ______
+  If you have any question or misunderstanding, take a look at GWENA's general documentation (`package?GWENA`) or send an email to lemoine.gwenaelle[@t)gmail{d0t]com
+</div>
 
-______
+<!-- ______ -->
 
-If you have any question or misunderstanding, take a look at GWENA's general documentation (package?GWENA) or send an email to lemoine.gwenaelle[@t)gmail{d0t]com
+[^1]: [RAVASZ, Erzsébet, SOMERA, Anna Lisa, MONGRU, Dale A., et al. Hierarchical organization of modularity in metabolic networks. science, 2002, vol. 297, no 5586, p. 1551-1555.](https://doi.org/10.1126/science.1073374)
