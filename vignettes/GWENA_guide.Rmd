@@ -172,12 +172,34 @@ g %>% igraph::add_layout_(igraph::as_bipartite()) %>% plot()
 
 ```{r plot_modules_gene_distribution}
 ggplot2::ggplot(data.frame(module = detection$modules), ggplot2::aes(x = module)) + ggplot2::stat_count() +
-  ylab("Number of genes")
+  ggplot2::ylab("Number of genes")
 ```
 
 As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below.
 
 ```{r plot_module_profile}
+# Facon WGCNA
+eigen <- WGCNA::moduleEigengenes(kuehne_expr_filtered, detection$modules)$eigengenes %>%
+  t %>%
+  as.data.frame %>%
+  tibble::rownames_to_column(var = "module") %>%
+  mutate(module = stringr::str_extract(module, "\\d+")) %>%
+  mutate(gene = "eigengene") %>%
+  tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression")
+  
+# Facon pca classique
+mini <- data.frame(gene = names(detection$modules), module = detection$modules, stringsAsFactors = FALSE) %>%
+  left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) # temporaire, a virer ici ou dans le debut de df en dessous
+  # left_join(kuehne_expr_filtered %>% apply(2, function(x) setNames(scale(x), names(x))) %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) # temporaire, a virer ici ou dans le debut de df en dessous
+  
+eigen2 <- split.data.frame(mini, mini$module) %>% 
+  lapply(function(y) y[,c(-1,-2)] %>% t %>% prcomp(center = TRUE, scale.=TRUE) %>% .$x %>% .[, "PC1"] %>% scale) %>%
+  # lapply(function(y) y[,c(-1,-2)] %>% t %>% prcomp %>% .$x %>% .[, "PC1"]) %>% 
+  as.data.frame(check.names=FALSE) %>%
+  tibble::rownames_to_column(var="sample") %>%
+  mutate(gene = "eigengene") %>%
+  tidyr::pivot_longer(c(-gene, -sample), names_to = "module", values_to = "expression")
+
 df <- data.frame(gene = names(detection$modules), module = detection$modules, stringsAsFactors = FALSE) %>%
   # left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) %>% #vanilla
   # left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene") %>% apply(1, function(x) scale(x[, -1])) ) %>%
@@ -187,7 +209,8 @@ df <- data.frame(gene = names(detection$modules), module = detection$modules, st
 ggplot2::ggplot(df, ggplot2::aes(x=sample, y=expression, group=gene)) + 
   ggplot2::geom_line(alpha = 0.3) + 
   ggplot2::facet_grid(~module) + 
-  ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90,vjust=0.5)) + ggplot2::theme(legend.position="none")
+  ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90,vjust=0.5)) + ggplot2::theme(legend.position="none") +
+  ggplot2::geom_line(data=eigen, ggplot2::aes(x = sample, y = expression), color = "red")
 
 ```
 
