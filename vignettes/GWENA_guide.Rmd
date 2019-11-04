@@ -172,6 +172,7 @@ ggplot2::ggplot(data.frame(module = detection$modules), ggplot2::aes(x = module)
 
 As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below.
 
+
 ```{r plot_module_profile}
 plot_expression_profiles(kuehne_expr_filtered, detection)
 ```
