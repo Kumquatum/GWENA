@@ -270,3 +270,92 @@ modules_detection <- function(data_expr, tom, min_module_size = min(20, ncol(dat
 
   return(detection)
 }
+
+
+
+#' Merging modules' plot
+#'
+#' Plot a bipartite graph to see in which modules all modules have been merged
+#'
+#' @param
+#' TODO finish
+#'
+#' @details
+#' TODO
+#' @return
+#' TODO
+#'
+#' @examples
+#' #TODO
+#' @importFrom igraph graph_from_data_frame V add_layout_ as_bipartite
+#' @importFrom magrittr %>%
+#'
+#' @export
+
+plot_modules_merge <- function(modules) {
+  g <- data.frame(before = modules$modules_premerge , after = modules$modules, stringsAsFactors = FALSE) %>%
+    distinct %>%
+    arrange(before) %>%
+    igraph::graph_from_data_frame()
+  igraph::V(g)$type <- lapply(igraph::V(g) %>% names %>% as.numeric, function(x) ifelse(x %in% unique(modules$modules), TRUE, FALSE)) %>% unlist
+  g %>% igraph::add_layout_(igraph::as_bipartite()) %>%
+    plot(vertex.label.color = "gray20",
+         vertex.label.family = "Helvetica",
+         vertex.label.cex = 1,
+         vertex.color = "lightskyblue",
+         vertex.frame.color = "white")
+}
+
+
+#' Plot all modules expression profiles
+#'
+#' f
+#'
+#' @param
+#' TODO finish
+#'
+#' @details
+#' TODO
+#' @return
+#' TODO
+#'
+#' @examples
+#' #TODO
+#' @importFrom ggplot2 ggplot aes geom_line facet_grid theme element_text
+#' @importFrom tibble rownames_to_column
+#' @importFrom tidyr pivot_longer
+#' @importFrom magrittr %>%
+#'
+#' @export
+
+plot_expression_profiles <- function(data_expr, modules) {
+  df <- data.frame(gene = names(modules$modules), module = modules$modules, stringsAsFactors = FALSE)
+
+  eigengenes <- df %>%
+    left_join(data_expr %>% t %>% as.data.frame %>%
+                tibble::rownames_to_column(var = "gene"), by = "gene") %>%
+    split.data.frame(.$module) %>%
+    lapply(function(y) y[,c(-1,-2)] %>% t %>% prcomp(center = TRUE, scale.=TRUE) %>% .$x %>% .[, "PC1"] %>% scale) %>%
+    as.data.frame(check.names = FALSE) %>%
+    tibble::rownames_to_column(var="sample") %>%
+    mutate(gene = "eigengene") %>%
+    tidyr::pivot_longer(c(-gene, -sample), names_to = "module", values_to = "expression", names_ptypes = list(module = numeric()))
+
+  plot_table <- df %>%
+    left_join(data_expr %>% scale %>% as.data.frame %>% t %>% as.data.frame %>%
+                tibble::rownames_to_column(var = "gene"), by = "gene") %>%
+    tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression") %>%
+    left_join(eigengenes, c("module", "sample"), suffix = c("_gene", "_eigengene")) %>%
+    group_by(gene_gene) %>%
+    mutate(cor_sign = ifelse(cor(expression_gene, expression_eigengene) >= 0, "+", "-")) %>%
+    mutate(expression_eigengene = ifelse(cor_sign == "-", -(expression_eigengene), expression_eigengene)) %>%
+    rename(gene = gene_gene) %>%
+    rename(expression = expression_gene) %>%
+    select(gene, module, sample, expression, cor_sign, expression_eigengene)
+
+  ggplot2::ggplot(plot_table, ggplot2::aes(x=sample, y=expression, group=gene)) +
+    ggplot2::geom_line(alpha = 0.3) +
+    ggplot2::facet_grid(cor_sign ~ module) +
+    ggplot2::theme(axis.text.x=ggplot2::element_text(angle = 90,vjust = 0.5)) + ggplot2::theme(legend.position = "none") +
+    ggplot2::geom_line(ggplot2::aes(x = sample, y = expression_eigengene), color = "red")
+}
