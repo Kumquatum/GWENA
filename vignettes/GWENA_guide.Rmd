@@ -179,39 +179,62 @@ As explain before, each module regroups genes which have a strong similarity. Th
 
 ```{r plot_module_profile}
 # Facon WGCNA
-eigen <- WGCNA::moduleEigengenes(kuehne_expr_filtered, detection$modules)$eigengenes %>%
-  t %>%
-  as.data.frame %>%
-  tibble::rownames_to_column(var = "module") %>%
-  mutate(module = stringr::str_extract(module, "\\d+")) %>%
-  mutate(gene = "eigengene") %>%
-  tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression")
+# eigen <- WGCNA::moduleEigengenes(kuehne_expr_filtered, detection$modules)$eigengenes %>%
+#   t %>%
+#   as.data.frame %>%
+#   tibble::rownames_to_column(var = "module") %>%
+#   mutate(module = stringr::str_extract(module, "\\d+")) %>%
+#   mutate(gene = "eigengene") %>%
+#   tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression")
   
 # Facon pca classique
-mini <- data.frame(gene = names(detection$modules), module = detection$modules, stringsAsFactors = FALSE) %>%
-  left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) # temporaire, a virer ici ou dans le debut de df en dessous
-  # left_join(kuehne_expr_filtered %>% apply(2, function(x) setNames(scale(x), names(x))) %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) # temporaire, a virer ici ou dans le debut de df en dessous
+df <- data.frame(gene = names(detection$modules), module = detection$modules, stringsAsFactors = FALSE)
   
-eigen2 <- split.data.frame(mini, mini$module) %>% 
+eigen <- df %>%
+  left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% 
+              tibble::rownames_to_column(var = "gene")) %>%
+  split.data.frame(.$module) %>% 
   lapply(function(y) y[,c(-1,-2)] %>% t %>% prcomp(center = TRUE, scale.=TRUE) %>% .$x %>% .[, "PC1"] %>% scale) %>%
   # lapply(function(y) y[,c(-1,-2)] %>% t %>% prcomp %>% .$x %>% .[, "PC1"]) %>% 
   as.data.frame(check.names=FALSE) %>%
   tibble::rownames_to_column(var="sample") %>%
   mutate(gene = "eigengene") %>%
-  tidyr::pivot_longer(c(-gene, -sample), names_to = "module", values_to = "expression")
+  tidyr::pivot_longer(c(-gene, -sample), names_to = "module", values_to = "expression", names_ptypes = list(module = numeric()))
 
-df <- data.frame(gene = names(detection$modules), module = detection$modules, stringsAsFactors = FALSE) %>%
-  # left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) %>% #vanilla
-  # left_join(kuehne_expr_filtered %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene") %>% apply(1, function(x) scale(x[, -1])) ) %>%
-  left_join(kuehne_expr_filtered %>% apply(2, function(x) setNames(scale(x), names(x))) %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene")) %>%
-  tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression")
+plot_table <- df %>% 
+  left_join(kuehne_expr_filtered %>% scale %>% as.data.frame %>% t %>% as.data.frame %>%
+              tibble::rownames_to_column(var = "gene")) %>%
+  tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression") %>%
+  left_join(eigen, c("module", "sample"), suffix = c("_gene", "_eigengene")) %>%
+  group_by(gene_gene) %>%
+  mutate(cor_sign = ifelse(cor(expression_gene, expression_eigengene) >= 0, "+", "-")) %>%
+  mutate(expression_eigengene = ifelse(cor_sign == "-", -(expression_eigengene), expression_eigengene)) %>%
+  # ungroup %>%
+  # group_by(module) %>%
+  # group_by(sample) %>%
+  # mutate(expression_scaled = scale(expression_gene)) %>%
+  rename(gene = gene_gene) %>%
+  rename(expression = expression_gene) %>%
+  select(gene, module, sample, expression, cor_sign, expression_eigengene)
 
-ggplot2::ggplot(df, ggplot2::aes(x=sample, y=expression, group=gene)) + 
+ggplot2::ggplot(plot_table, ggplot2::aes(x=sample, y=expression, group=gene)) + 
   ggplot2::geom_line(alpha = 0.3) + 
-  ggplot2::facet_grid(~module) + 
+  ggplot2::facet_grid(cor_sign ~ module) + 
   ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90,vjust=0.5)) + ggplot2::theme(legend.position="none") +
-  ggplot2::geom_line(data=eigen, ggplot2::aes(x = sample, y = expression), color = "red")
-
+  ggplot2::geom_line(ggplot2::aes(x = sample, y = expression_eigengene), color = "red") # fonctionne
+ 
+# # Autre version. A retravailler ?
+# eigen2 <- eigen %>% 
+#   mutate(expression_neg = -expression) %>% 
+#   bind_rows(., setNames(.[, c("sample", "gene", "module", "expression_neg", "expression")], c("sample", "gene", "module", "expression", "expression_neg")))
+# 
+# ggplot2::ggplot(plot_table, ggplot2::aes(x=sample, y=expression, group=gene)) + 
+#   ggplot2::geom_line(alpha = 0.3) + 
+#   ggplot2::facet_grid(cor_sign ~ module) + 
+#   ggplot2::theme(axis.text.x=ggplot2::element_text(angle=90,vjust=0.5)) + ggplot2::theme(legend.position="none") +
+#   ggplot2::geom_line(data=eigen2, ggplot2::aes(y = expression), color = "red")
+#   
+  
 ```
 
 
