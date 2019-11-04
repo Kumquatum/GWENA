@@ -301,7 +301,7 @@ plot_modules_merge <- function(modules) {
   g %>% igraph::add_layout_(igraph::as_bipartite()) %>%
     plot(vertex.label.color = "gray20",
          vertex.label.family = "Helvetica",
-         vertex.label.cex = 1,
+         vertex.label.cex = 0.9,
          vertex.color = "lightskyblue",
          vertex.frame.color = "white")
 }

@@ -156,12 +156,12 @@ They can be detected using unsupervised learning (here hierarchical clustering) 
 detection <- modules_detection(kuehne_expr_filtered, net$tom, merge_cut_height = 0.997, detailled_result = TRUE)
 ```
 
-Since this operation tend to create some modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), these can be merged into one.
+Since this operation tend to create multiple little modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), they are ussually merged into one.
 
 * Number of modules before merging : `r length(unique(detection$modules_premerge))-1` 
 * Number of modules after merging : `r length(unique(detection$modules))-1`
 
-```{r bipartite_graph_merge, echo=FALSE}
+```{r bipartite_graph_merge}
 plot_modules_merge(detection)
 ```
 

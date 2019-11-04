@@ -40,4 +40,6 @@ Gold
 
 ## 5. Why do the first modules have so many genes as the last ones have very few?
 
-Hierarchical clustering
+* **Resolution** is usually the main answer. As the number of sample by conditions decrease, the correlations tend to increase. This leads to highly correlated genes that ends up in the same modules. You could try another clustering method to split these huge modules, however, they often turn out to be artificial split which won't give significant biological integration.
+* **Expression drivers** can also impact it. If you have phenotipic variables strongly impacting your expression, this may result in a huge variation factor that will regroup genes impacted by it together
+<!-- Hierarchical clustering -->
