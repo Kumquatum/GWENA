@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-*Citation: TODO quand le DOI de la publi sera dispo*
+*Citation: TODO quand la ref + DOI de la publi sera dispo*
 
 ## Presentation
 
@@ -35,9 +35,7 @@ Current pipeline involves steps in Figure 1 and will be detailed in each followi
 
 .
 
-![pipeline_schema](figure_pipeline_schema.png)
-
-> Figure 1.
+> ![Figure 1. Analysis pipeline for GWENA, from raw data to full characterization of the modules and comparison of conditions.](figure_pipeline_schema.png)
 
 <!-- It can be performed using the function wrapping all steps `TODO nom fonction full analysis`, or using each function for each step. -->
 
@@ -63,9 +61,9 @@ Input data supported by this package can be either from RNA-seq or microarray. T
 
 <!-- TODO Si le package n'implémente pas de méthode, laisser cette phrase et la compléter en indiquant dans la section en question les moyens de résumé à l'échelle gene comme collapseRows de WGCNA, ou ... ? RSEM ? RNA-SeQC ? etc. -->
 
-In this vignette, we will be using the dataset [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) which come from [Kuehne and al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3). It has been processed along the R script given in Additionnal data n°10 and will be our example data set here. The aim in this study was to investigate the role of the transcriptomics, the metabolomics and the junction of them in the skin aging.
+In this vignette, we will be using the transcriptomic dataset [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) from the [Kuehne et al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3) and the associated phenotipic traits matrix. Data has been processed along with the R script given in Additionnal data n°10 and will be our example data set here. The aim of this study was the investigation of the roles of transcriptomics, metabolomics and their junction in skin aging.
 
-* Data type: microarray
+* Transcriptomic data type: microarray (Agilent-039494 SurePrint G3 Human GE v2 8x60K, mono channel)
 * `r ncol(kuehne_expr)` genes
 * `r nrow(kuehne_expr)` samples
 * `r length(table(kuehne_traits$Condition))` conditions : `r unique(kuehne_traits$Condition)[1]` et `r unique(kuehne_traits$Condition)[2]`
@@ -165,49 +163,62 @@ Since this operation tend to create multiple little modules with highly similar 
 plot_modules_merge(detection)
 ```
 
-```{r plot_modules_gene_distribution}
+```{r plot_modules_gene_distribution, fig.height=3}
 ggplot2::ggplot(data.frame(module = detection$modules), ggplot2::aes(x = module)) + ggplot2::stat_count() +
   ggplot2::ylab("Number of genes")
 ```
 
-As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below.
-
+<!-- As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below. -->
+Each of the modules now present a specific profile, with an eigengene representing it wich acts like a signature. These informations along to the genes sets inside modules are now usefull to relate external gene information, or more generally, biological information.
 
 ```{r plot_module_profile}
 plot_expression_profiles(kuehne_expr_filtered, detection)
 ```
 
-
-
-
-
 ### 5. Biological integration
 
 #### 5.1. Functionnal enrichment
 
+A popular way to explore the modules consist to link know biological gene sets to it. Among the available ones, Gene Ontology (GO) and the Kyoto Encyclopedia of Genes and Genomes (KEGG) are the more used. Along with WikiPathways, Reactome, Human Phenotype Ontology (HPO), they give a systemic aspects to the gene sets from the modules. In oppositions, references like TRANSFAC, miRTarBase, Human Protein Atlas (HPA), and CORUM give a more linear point of view but with a larger scale information like tissue/cell/condition information.
+
+Using the over-representation analysis (ORA) function GOSt implemented in the g:Profiler tool, we can retieve the biological association for each module and plot it as follow.
+
 ```{r modules_enrichment}
 library(gprofiler2)
 enrichment <- modules_enrichment(detection$modules)
+# Example with module 2
+gprofiler2::gostplot(enrichment$`1`)
 ```
 
-* Example of  module 2 enrichment plot
-```{r plot_enrichment, message = FALSE}
-gprofiler2::gostplot(enrichment$`2`)
-```
+In these module, the functionnal activity seems to be linked to the processes of membrane communication. Moreover, the type of processes suggest an activity about cell cycle of life (differentiation, autophagy and content degradation).
 
 #### 5.2. Phenotypic association
 
+If phenotypic informations are available about the samples provided, an association test can help to determine if a module is specifically linked to a trait. In this cas, the module 1 seems to be strongly linked to the `Age` trait.
+
 ```{r modules_phenotype}
 phenotype_association <- modules_phenotype(detection$modules_eigengenes, kuehne_traits %>% select(Condition, Age, Slide))
-```
-
-```{r plot_modules_phenotype}
 plot_modules_phenotype(phenotype_association)
 ```
+
+The combination of information with the previous functionnal enrichment can orientate further analysis. Aging is a condition related to the variations of the cell potential : the progressive degradation of quality in cell proliferation and differentiation is the first steps towards malfunctions which induce tissue degradation. Multiple genes are known to be affected or related to these mechanisms, however they can't fully explain this phenomenon. 
 
 <!-- ### 5.3. Differentially expressed genes (maybe ?) -->
 
 ### 6. Graph analysis
+
+missing informations
+looking to neighboor genes
+adding data driven information with less bias
+hubgenes
+
+
+To recover this missing information, a common method in co-expression analysis is to use topology information. Neighborhood genes, patterns of interactions and other graph infromations can retrieve information yet to be biologicaly confirmed. Neighborhood genes have already be founded to be regulators or indirect factors of a condition (like gene-coded protein which would be catalyzed and from whom the product would impact the condition). 
+
+To recover this missing information, a common method is to look to the genes linked to the known one inside co-expression networks. These neighborhood genes may act as regulators or indirect factors of the condition (like gene-coded protein which would be catalyzed and from whom the product would impact the condition). Multiple metrics, in the sens of graph theory, exist to assess the closely lineked genes.
+
+Moreover, information can itself come from the network, meaning data-driven information, by opposition to the functionnal enrichment which is knowledge driven (information from biological databases is "matched" onto studied data). For example, hub genes are genes which are central in the network in terms of centrality and 
+
 
 ```{r graph}
 # TODO
