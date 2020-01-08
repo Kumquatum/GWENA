@@ -2,7 +2,7 @@
 #'
 #' Remove low variating genes based on the percentage given and the type of variation specified.
 #'
-#' @param data_expr matrix of data to be filtered, with genes as column and samples as row
+#' @param data_expr matrix of data (either microarray or RNA-seq) to be filtered, with genes as column and samples as row
 #' @param pct number in 0 and 1 specifying the percentage of gene to keep
 #' @param type string which should be either "mean" or "median"
 #'
@@ -31,7 +31,7 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 
 #' Filtering of low counts
 #'
-#' Keeping genes with at least one sample with count above min_count.
+#' Keeping genes with at least one sample with count above min_count in RNA-seq data.
 #'
 #' @param data_expr matrix of RNA-seq data to be filtered, with genes as column and samples as row.
 #' @param min_count minimal number of count to be considered in method
