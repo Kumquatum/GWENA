@@ -44,7 +44,7 @@ Gold
 * **Expression drivers** can also impact it. If you have phenotipic variables strongly impacting your expression, this may result in a huge variation factor that will regroup genes impacted by it together
 <!-- Hierarchical clustering -->
 
-# Why GWENA doesn't provide normalization methods ?
+## Why GWENA doesn't provide normalization methods ?
 
 <!-- TODO : détailler les points -->
 * Different normalization depending on the technology
@@ -54,3 +54,11 @@ Gold
 # Why didn't you use S3 class to create objects usable by your functions ?
 
 In order to keep GWENA modular and usable by other tools in the simplest way, I prefere to use native type of R.
+
+________________________________
+
+# Advanced questions
+
+## Why the arg `network_type = "signed"` implies a modification of the similarity score ?
+
+Since a correlation matrix is already signed, one could as what is this `similarity <- (1 + cor_mat) / 2` operation. It is simply because ulterior steps of estimating a scale-free index in WGCNA implies a log10 transformation. Therefore you can't have negative numbers. Because a correlation matrix have values in [0;1], the operation will keep the distribution and avoid negative values.
