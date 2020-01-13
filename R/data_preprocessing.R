@@ -15,7 +15,8 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
   # Checking args
   if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix")
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name")
-  if (!is.numeric(pct) || pct <= 0 || pct >= 1) stop("pct should be between 0 and 1")
+  if (!is.numeric(pct) || length(pct) != 1) stop("pct should be a single number")
+  if (pct <= 0 || pct >= 1) stop("pct should be between 0 and 1")
   type <- match.arg(type)
 
   # Convert to data.frame if matrix
@@ -51,7 +52,8 @@ filter_RNA_seq <- function(data_expr, min_count = 5, method = c("at least one", 
   # Checking args
   if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix")
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name")
-  if (!is.numeric(min_count) || min_count <= 1) stop("min_count should be superior to 1")
+  if (!is.numeric(min_count) || length(min_count) != 1) stop("min_count should be a single number")
+  if (min_count <= 1) stop("min_count should be superior to 1")
   method <- match.arg(method)
 
   # Convert to data.frame if matrix
