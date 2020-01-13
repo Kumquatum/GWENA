@@ -15,7 +15,7 @@ filter_RNA_seq(data_expr, min_count = 5, method = c("at least one",
 \item{method}{name of the method for filtering. Must be one of "at least one", "mean", or " all", above min_count.}
 }
 \description{
-Keeping genes with at least one sample with count above min_count.
+Keeping genes with at least one sample with count above min_count in RNA-seq data.
 }
 \details{
 Low counts in RNA-seq can bring noise to gene co-expression module building, so filtering them help to improve quality.
