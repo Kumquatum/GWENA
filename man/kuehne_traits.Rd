@@ -4,7 +4,7 @@
 \name{kuehne_traits}
 \alias{kuehne_traits}
 \title{Traits data linked to samples in transcriptomic data from the Kuehne et al. publication}
-\format{A data frame with 48 rows and 5 columns :
+\format{A data frame with 48 rows (samples) and 5 columns :
 \describe{
   \item{Slide}{Reference number of the microarray's slide.}
   \item{Array}{Array number, 8 by slide usually}
