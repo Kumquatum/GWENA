@@ -44,7 +44,7 @@ cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
 #'
 #' @export
 
-get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid", "none"), ...){
+get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid"), block_size = NULL, ...){
   # Checking args
   # TODO Add other checks
   if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number") # TODO : A revoir
@@ -55,16 +55,20 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
   if (nrow(cor_mat) != ncol(cor_mat)) stop("cor_mat should be a squared matrix")
 
   # Calculating similairty
-  similarity <- if (network_type == "unsigned") {
-    abs(cor_mat)
+
+  # Calculating similarity
+  similarity <- matrix()
+  if (network_type == "unsigned") {
+    similarity <- abs(cor_mat)
   } else if (network_type == "signed") {
-    (1 + cor_mat) / 2
+    similarity <- (1 + cor_mat) / 2
   } else if (network_type == "signed hybrid") {
-    cor_mat[cor_mat < 0] = 0
-  } # else = "none" : do nothing
+    cor_mat[cor_mat < 0] <- 0
+    similarity <- cor_mat
+  }
 
   # Getting fit
-  sft_fit <- WGCNA::pickSoftThreshold.fromSimilarity(similarity = similarity, ...)
+  sft_fit <- quiet(WGCNA::pickSoftThreshold.fromSimilarity(similarity = similarity, RsquaredCut = fit_cut_off, blockSize = block_size, ...))
 
   # Final list with all infos
   fit <- list(
@@ -103,7 +107,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' @export
 
 get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"),
-                     your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid", "none"), ...){
+                     your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid"), ...){
   # Checking args
   # TODO ajouter autres checks
   if (any(is.na(data_expr))) stop("data_expr must not contain any missing value. To approximate them, see FAQ answer on this subject.")
@@ -162,7 +166,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @export
 
 net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
-                         power_value = NULL, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid", "none"),
+                         power_value = NULL, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid"),
                          tom_type = c("unsigned", "signed", "signed Nowick"), save_adjacency = FALSE, n_threads = 0, # TODO program the mclapply version
                          detailled_result = FALSE, ...)
 {
