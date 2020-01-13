@@ -47,14 +47,14 @@ cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
 get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid"), block_size = NULL, ...){
   # Checking args
   # TODO Add other checks
-  if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number") # TODO : A revoir
+  if (!is.matrix(cor_mat)) stop("cor_mat should be a matrix")
+  if (any(cor_mat > 1) || any(cor_mat < -1)) stop("cor_mat should be filled with value in the [-1,1] range")
+  if (nrow(cor_mat) != ncol(cor_mat)) stop("cor_mat should be a squared matrix")
+  if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number")
   if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1")
   network_type <- match.arg(network_type)
   if (any(is.na(cor_mat))) stop("cor_mat must not contain any missing value. To approximate them, see FAQ answer on this subject.")
-  if (any(cor_mat > 1) || any(cor_mat < -1)) stop("cor_mat should be filled with value in the [-1,1] range")
-  if (nrow(cor_mat) != ncol(cor_mat)) stop("cor_mat should be a squared matrix")
 
-  # Calculating similairty
 
   # Calculating similarity
   similarity <- matrix()
