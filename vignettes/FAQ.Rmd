@@ -16,16 +16,16 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 1. Why did you wrapped multiple functions of WGCNA like `pickSoftThreshold` or `adjacency` ? Wasn't they already working?
+## Why did you wrapped multiple functions of WGCNA like `pickSoftThreshold` or `adjacency` ? Wasn't they already working?
 
 Short answer is "Yes they were". However, the parameters of these functions and their syntax didn't eased its use. Moreover, the current succession of functions to built modules repeated multiple times the correlation computation. Also, I took the opportunity to integrate native sperman correlation.
 
-## 2. Why forcing expression datasets to have no NA values?
+## Why forcing expression datasets to have no NA values?
 
 As you may know in R, missing values in cor and cov function by default propagate missing values in each column and row where there are found. Multiple options are available in these function to manage missing values. However some of them are not available for all type of correlations available, and not all imputations methods are wise to use (take a look at this article: [Pairwise-complete correlation considered dangerous](https://bwlewis.github.io/covar/missing.html)).
 Since WGCNA running requires no missing values, I prefere forcing to have a complete dataset. You have therefore the full understanding of the imputation you compute for your missing values. If you have no idea how to do it, see [Dealing with missing data:  Key assumptions and methods for applied analysis](https://www.bu.edu/sph/files/2014/05/Marina-tech-report.pdf) for general information about missing values imputation, and [Dealing with missing values in large-scale studies: microarray data imputation and beyond](https://academic.oup.com/bib/article/11/2/253/216449) for more transcriptomic-specific imputation.
 
-## 3. How can I resume my transcriptomic data to the gene level?
+## How can I resume my transcriptomic data to the gene level?
 
 ### Microarray 
 
@@ -36,10 +36,21 @@ Microarrays are designed
 Gold
 
 
-## 4. What is an eigengene?
+## What is an eigengene?
 
-## 5. Why do the first modules have so many genes as the last ones have very few?
+## Why do the first modules have so many genes as the last ones have very few?
 
 * **Resolution** is usually the main answer. As the number of sample by conditions decrease, the correlations tend to increase. This leads to highly correlated genes that ends up in the same modules. You could try another clustering method to split these huge modules, however, they often turn out to be artificial split which won't give significant biological integration.
 * **Expression drivers** can also impact it. If you have phenotipic variables strongly impacting your expression, this may result in a huge variation factor that will regroup genes impacted by it together
 <!-- Hierarchical clustering -->
+
+# Why GWENA doesn't provide normalization methods ?
+
+<!-- TODO : détailler les points -->
+* Different normalization depending on the technology
+* For microarray, too many variable : plateform, manufacturer, fabrication technology, number of channels, etc.
+
+
+# Why didn't you use S3 class to create objects usable by your functions ?
+
+In order to keep GWENA modular and usable by other tools in the simplest way, I prefere to use native type of R.
