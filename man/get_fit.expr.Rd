@@ -6,7 +6,7 @@
 \usage{
 get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
   "spearman", "bicor", "other"), your_func = NULL,
-  network_type = c("unsigned", "signed", "signed hybrid", "none"), ...)
+  network_type = c("unsigned", "signed", "signed hybrid"), ...)
 }
 \arguments{
 \item{data_expr}{matrix of data only normalized for constructor specificities, with genes as column and samples as row.}

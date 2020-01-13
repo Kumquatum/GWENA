@@ -6,7 +6,7 @@
 \usage{
 net_building(data_expr, cor_func = c("pearson", "spearman", "bicor",
   "other"), your_func = NULL, power_value = NULL, fit_cut_off = 0.9,
-  network_type = c("unsigned", "signed", "signed hybrid", "none"),
+  network_type = c("unsigned", "signed", "signed hybrid"),
   tom_type = c("unsigned", "signed", "signed Nowick"),
   save_adjacency = FALSE, n_threads = 0, detailled_result = FALSE,
   ...)
