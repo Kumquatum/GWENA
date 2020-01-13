@@ -24,6 +24,7 @@ test_that("badly formatted input throw an error", {
   expect_error(filter_low_var(df_microarray, pct = 42))
   expect_error(filter_low_var(df_microarray, pct = 0))
   expect_error(filter_low_var(df_microarray, pct = 1))
+  expect_error(filter_low_var(df_microarray, pct = c(0.1, 1.5, 0.9)))
   # type should be a char from allowed ones
   expect_error(filter_low_var(df_microarray, type = 42))
   expect_error(filter_low_var(df_microarray, type = "this is not a function available"))
@@ -63,6 +64,7 @@ test_that("badly formatted input throw an error", {
   expect_error(filter_RNA_seq(df_rnaseq, min_count = "this is not a numeric value"))
   expect_error(filter_RNA_seq(df_rnaseq, min_count = -1.5))
   expect_error(filter_RNA_seq(df_rnaseq, min_count = 1))
+  expect_error(filter_RNA_seq(df_rnaseq, min_count = 1:10))
   # method should be a char from allowed ones
   expect_error(filter_RNA_seq(df_rnaseq, method = 42))
   expect_error(filter_RNA_seq(df_rnaseq, method = "this is not a function available"))
