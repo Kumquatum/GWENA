@@ -74,6 +74,8 @@ kuehne_expr[1:5,1:5]
 kuehne_traits[1:5,]
 ```
 
+> Note : GWENA doesn't provide normalization methods. Explaination can be found in FAQ at [Why GWENA doesn't provide normalization methods ?](FAQ.html/#)
+
 ### 2. Filtration
 
 This step need to be carefully studied as it will impact the modules building. 
