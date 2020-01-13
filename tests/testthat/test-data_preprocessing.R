@@ -18,6 +18,7 @@ test_that("badly formatted input throw an error", {
   expect_error(filter_low_var(data_expr = df_microarray %>% as.matrix), NA)
   expect_error(filter_low_var(data_expr = "this is not a data.frame nor a matrix"))
   expect_error(filter_low_var(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
+  expect_warning(filter_low_var(data_expr = df_microarray %>% t))
   # pct should be in ]0;1[
   expect_error(filter_low_var(df_microarray, pct = "this is not a numeric value"))
   expect_error(filter_low_var(df_microarray, pct = -1.5))
@@ -60,6 +61,7 @@ test_that("badly formatted input throw an error", {
   expect_error(filter_RNA_seq(data_expr = df_rnaseq %>% as.matrix), NA)
   expect_error(filter_RNA_seq(data_expr = "this is not a data.frame nor a matrix"))
   expect_error(filter_RNA_seq(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
+  expect_warning(filter_low_var(data_expr = df_microarray %>% t))
   # min_count should be > 1
   expect_error(filter_RNA_seq(df_rnaseq, min_count = "this is not a numeric value"))
   expect_error(filter_RNA_seq(df_rnaseq, min_count = -1.5))
