@@ -55,6 +55,15 @@ Gold
 
 In order to keep GWENA modular and usable by other tools in the simplest way, I prefere to use native type of R.
 
+# What should I do if I get warning/error "No fitting power could be found for provided fit_cut_off" ?
+
+You should first verify your data. This implies :
+* Your data are RNA-seq or microarray data
+* You have gene names as columns and samples as row or if you use `get_fit.cor` you had it when you computed your correlation matrix on it
+* You didn't filtered your data in a way that breaks the scale-free property. Classic wrong filter is usign only differentially expressed genes (see [question 2. from WGCNA package FAQ](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html))
+
+If you verified these causes, you may have set a fit_cut_off too high (default is 0.9 default).
+
 ________________________________
 
 # Advanced questions
