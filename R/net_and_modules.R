@@ -68,11 +68,18 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 
   # Getting fit
   sft_fit <- quiet(WGCNA::pickSoftThreshold.fromSimilarity(similarity = similarity, RsquaredCut = fit_cut_off, blockSize = block_size, ...))
+  fit_above_cut_off <- TRUE
+  if (is.na(sft_fit$powerEstimate)) { # If no fit, taking maximum fitting power
+    warning("No fitting power could be found for provided fit_cut_off. Taking power for maximum fit. See FAQ for known causes.")
+    sft_fit$powerEstimate <- sft_fit$fitIndice %>% top_n(1, SFT.R.sq) %>% select(Power) %>% as.numeric()
+    fit_above_cut_off <- FALSE
+  }
 
   # Final list with all infos
   fit <- list(
     power_value = sft_fit$powerEstimate,
     fit_table = sft_fit$fitIndice,
+    fit_above_cut_off = fit_above_cut_off,
     metadata = list(
       net_type = network_type
     )
