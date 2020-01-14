@@ -34,7 +34,7 @@ cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
 #' @param cor_mat matrix or data.frame of genes correlation.
 #' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded.
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
-#' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers.
+#' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
 #'
 #' @details
 #' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
@@ -63,6 +63,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
   if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number")
   if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1")
   network_type <- match.arg(network_type)
+  if (!is.null(block_size) && (block_size < 2 || block_size %% 1 != 0)) stop("If not NULL, block_size must be a whole number > 1")
 
 
   # Calculating similarity
@@ -110,7 +111,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' @param cor_func string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
-#' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers.
+#' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
 #'
 #' @details
 #' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
@@ -136,11 +137,12 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
   if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
   if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
-  if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
-  if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
+  # No need to check in theory because checked in get_fit.cor
+  # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
+  # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
   cor_func <- match.arg(cor_func)
   if (cor_func == "other" && (is.null(your_func) || !is.function(your_func))) stop("If you specify other, your_func must be a function.")
-  network_type <- match.arg(network_type)
+  # network_type <- match.arg(network_type)
 
   # Cor selection
   if (cor_func == "other") {
@@ -179,12 +181,12 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @param cor_func string, name of the correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
 #' @param power_value integer, power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.
-#' @param block_size integer, size of blocks by which operations can be proceed. Helping if working with low capacity computers.
+#' @param block_size integer, size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
 #' @param stop_if_no_fit boolean, does not finding a fit above fit_cut_off should stop process, or just print a warning and return the highest fitting power.
 #' @param network_type string, type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
 #' @param tom_type string, type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
 #' and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
-#' @param save_adjacency string, directory's path where adjacency matrix will be saved. If NULL, it is not saved.
+#' @param save_adjacency string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.
 #' @param n_threads integer, number of threads that can be used to paralellise the computing
 #'
 #' @return list containing network matrix, metadata of input parameters and power fitting information.
@@ -202,10 +204,21 @@ net_building <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
                          n_threads = 0, ...)  # TODO program the mclapply version
 {
   # Checking
-  # TODO add check
+  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
+  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
+  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
+  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
+  # No need to check in theory because checked in get_fit.cor
+  # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
+  # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
   cor_func <- match.arg(cor_func)
+  if (cor_func == "other" && (is.null(your_func) || !is.function(your_func))) stop("If you specify other, your_func must be a function.")
+  if (!is.null(power_value) && (power_value < 1 || power_value %% 1 != 0)) stop("If not NULL, power_value must be a whole number >= 1.")
   network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
+  if (!is.null(save_adjacency) && grepl(".+\\.\\w+$", save_adjacency)) warning("Provided path in save_adjacency looks like a filename. Remember save_adjacency must be a folder name.")
+  if (!is.null(save_adjacency) && !file.exists(save_adjacency)) stop("Provided path in save_adjacency doesn't exists.")
+  if (!is.numeric(n_threads) || n_threads < 0 || n_threads %% 1 != 0) stop("n_threads must be a whole number >= 0")
 
   # Correlation selection and correlation matrix computation
   if (cor_func == "other") {
@@ -233,7 +246,7 @@ net_building <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 
   # Topological overlap matrix
   if (tom_type != "none") {
-    tom <- 1 - WGCNA::TOMsimilarity(adj, TOMType = tom_type) %>%
+    tom <- 1 - quiet(WGCNA::TOMsimilarity(adj, TOMType = tom_type)) %>%
       magrittr::set_colnames(colnames(adj)) %>%
       magrittr::set_rownames(rownames(adj))
   } else { tom <- adj }
