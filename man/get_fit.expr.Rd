@@ -6,20 +6,21 @@
 \usage{
 get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
   "spearman", "bicor", "other"), your_func = NULL,
-  network_type = c("unsigned", "signed", "signed hybrid"), ...)
+  network_type = c("unsigned", "signed", "signed hybrid"),
+  block_size = NULL, ...)
 }
 \arguments{
 \item{data_expr}{matrix of data only normalized for constructor specificities, with genes as column and samples as row.}
 
-\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded}
+\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded.}
 
-\item{cor_func}{TODO}
+\item{cor_func}{string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided}
 
-\item{your_func}{TODO}
+\item{your_func}{function returning correlation values. Final values must be in [-1;1]}
 
-\item{network_type}{TODO}
+\item{network_type}{string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
 
-\item{...}{TODO filling info on params}
+\item{block_size}{integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers.}
 }
 \value{
 A list containing power of the law for best fit, fit table, and metadata about the arguments used.
@@ -28,7 +29,15 @@ A list containing power of the law for best fit, fit table, and metadata about t
 Computes correlation matrix of the gene expression data, adjust it depending of the type of network, then try to
 parameter a power law for best fit
 }
+\details{
+network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
+\describe{
+  \item{signed}{will modify the range [-1;1] to [0.5;1.5] (because of log10 beeing used for scale free index computation)}
+  \item{unsigned}{will return absolute value (moving from [-1;1] to [0;1])}
+  \item{signed hybrid}{will replace all negative values by 0 (moving from [-1;1] to [0;1])}
+}
+}
 \examples{
-#TODO write example
+get_fit.expr(data_expr = kuehne_expr[, 1:100])
 
 }

@@ -1,12 +1,12 @@
 #' Match a correlation function based on a name
 #'
-#' Translate a function name into a usable function in code.
-#' TODO finish
+#' Translate a function name into an R function.
 #'
 #' @param cor_func string of the name of the correlation to be use
 #'
 #' @return A function corresponding to the correlation required
 #' @examples
+#' cor_func_match("pearson")
 #'
 #' @importFrom WGCNA bicor cor
 
@@ -33,14 +33,24 @@ cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
 #'
 #' @param cor_mat matrix or data.frame of genes correlation.
 #' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded.
-#' @param network_type TODO
-#' TODO finish params
+#' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
+#' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers.
+#'
+#' @details
+#' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
+#' \describe{
+#'   \item{signed}{will modify the range [-1;1] to [0.5;1.5] (because of log10 beeing used for scale free index computation)}
+#'   \item{unsigned}{will return absolute value (moving from [-1;1] to [0;1])}
+#'   \item{signed hybrid}{will replace all negative values by 0 (moving from [-1;1] to [0;1])}
+#' }
 #'
 #' @return A list containing power of the law for best fit, fit table, and metadata about the arguments used.
 #' @examples
-#' # TODO Add example
+#' get_fit.cor(cor_mat = cor(kuehne_expr[, 1:100]))
 #'
 #' @importFrom WGCNA pickSoftThreshold.fromSimilarity
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select top_n
 #'
 #' @export
 
@@ -96,30 +106,38 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' parameter a power law for best fit
 #'
 #' @param data_expr matrix of data only normalized for constructor specificities, with genes as column and samples as row.
-#' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded
-#' @param cor_func TODO
-#' @param your_func TODO
-#' @param network_type TODO
-#' @param ...
-#' TODO filling info on params
+#' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded.
+#' @param cor_func string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
+#' @param your_func function returning correlation values. Final values must be in [-1;1]
+#' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
+#' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers.
+#'
+#' @details
+#' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
+#' \describe{
+#'   \item{signed}{will modify the range [-1;1] to [0.5;1.5] (because of log10 beeing used for scale free index computation)}
+#'   \item{unsigned}{will return absolute value (moving from [-1;1] to [0;1])}
+#'   \item{signed hybrid}{will replace all negative values by 0 (moving from [-1;1] to [0;1])}
+#' }
 #'
 #' @return A list containing power of the law for best fit, fit table, and metadata about the arguments used.
 #'
 #' @examples
-#' #TODO write example
+#' get_fit.expr(data_expr = kuehne_expr[, 1:100])
 #'
 #' @importFrom magrittr %>%
 #'
 #' @export
 
 get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"),
-                     your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid"), ...){
+                     your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid"), block_size = NULL, ...){
   # Checking args
-  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix")
-  if (any(is.na(data_expr))) stop("data_expr must not contain any missing value. To approximate them, see FAQ answer on this subject.")
-  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name")
-  if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number")
-  if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1")
+  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
+  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
+  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
+  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
+  if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
+  if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
   cor_func <- match.arg(cor_func)
   if (cor_func == "other" && (is.null(your_func) || !is.function(your_func))) stop("If you specify other, your_func must be a function.")
   network_type <- match.arg(network_type)
@@ -140,12 +158,12 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
   }
 
   # Getting fit
-  fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off, network_type = network_type, ...)
+  fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off, network_type = network_type, block_size = block_size, ...)
 
   # Final list with all infos
-  fit$metadata$func_used = ifelse(cor_func == "other",
-                                  paste("other:", deparse(substitute(your_func))),
-                                  cor_func)
+  fit$metadata$cor_func = ifelse(cor_func == "other",
+                                 paste("other:", deparse(substitute(your_func))),
+                                 cor_func)
 
   return(fit)
 }
@@ -156,32 +174,32 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
 #'
-#' @param data_expr matrix of expression data with genes as column and samples as row.
-#' @param power_value soft-thresolding, meaning power which will be applied to the adjacency matrix.
-#' @param power_cut_off if no power provided, computes power and thresold it by this value.
-#' @param cor_func string specifying correlation function to be used. Must be one of pearson, spearman, bicor.
-#' TODO finish
+#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#' @param fit_cut_off integer, cut off by which R^2 (coefficient of determination) will be thresholded.
+#' @param cor_func string, name of the correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
+#' @param your_func function returning correlation values. Final values must be in [-1;1]
+#' @param power_value integer, power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.
+#' @param block_size integer, size of blocks by which operations can be proceed. Helping if working with low capacity computers.
+#' @param stop_if_no_fit boolean, does not finding a fit above fit_cut_off should stop process, or just print a warning and return the highest fitting power.
+#' @param network_type string, type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
+#' @param tom_type string, type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
+#' and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
+#' @param save_adjacency string, directory's path where adjacency matrix will be saved. If NULL, it is not saved.
+#' @param n_threads integer, number of threads that can be used to paralellise the computing
 #'
-#' @details
-#' \enumerate{
-#'   \item{data_expr}{Must have been adequatly normalized and filtered if pertinant. ATTENTION : it is not recommended to filter by differential
-#'   expression (cf. \href{https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html}{Peter Langfelder and Steve Horvath FAQ on WGCNA}}.
-#'   \item{save_adjacency}{Saving adjacency increase the final return size. Working with tom is usually suffisant since it's the only value used for the
-#' next step \code{\link{modules_detection}}.}
-#' }
-#'
-#' @return list containing
+#' @return list containing network matrix, metadata of input parameters and power fitting information.
 #' @examples
+#' net_building(kuehne_expr[, 1:1000])
 #'
 #' @importFrom WGCNA adjacency.fromSimilarity TOMsimilarity
 #' @importFrom magrittr %>% set_colnames set_rownames
 #'
 #' @export
 
-net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
-                         power_value = NULL, fit_cut_off = 0.90, stop_if_no_fit = FALSE, network_type = c("unsigned", "signed", "signed hybrid"),
-                         tom_type = c("unsigned", "signed", "signed Nowick"), save_adjacency = FALSE, n_threads = 0, # TODO program the mclapply version
-                         detailled_result = FALSE, ...)
+net_building <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
+                         power_value = NULL, block_size = NULL, stop_if_no_fit = FALSE, network_type = c("unsigned", "signed", "signed hybrid"),
+                         tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"), save_adjacency = NULL,
+                         n_threads = 0, ...)  # TODO program the mclapply version
 {
   # Checking
   # TODO add check

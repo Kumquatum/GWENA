@@ -4,22 +4,33 @@
 \alias{net_building}
 \title{Network build and modules detection}
 \usage{
-net_building(data_expr, cor_func = c("pearson", "spearman", "bicor",
-  "other"), your_func = NULL, power_value = NULL, fit_cut_off = 0.9,
+net_building(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
+  "spearman", "bicor", "other"), your_func = NULL, power_value = NULL,
+  block_size = NULL, stop_if_no_fit = FALSE,
   network_type = c("unsigned", "signed", "signed hybrid"),
   tom_type = c("unsigned", "signed", "signed Nowick"),
   save_adjacency = FALSE, n_threads = 0, detailled_result = FALSE,
   ...)
 }
 \arguments{
-\item{data_expr}{matrix of expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame of expression data with genes as column and samples as row.}
 
-\item{cor_func}{string specifying correlation function to be used. Must be one of pearson, spearman, bicor.
-TODO finish}
+\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded.}
 
-\item{power_value}{soft-thresolding, meaning power which will be applied to the adjacency matrix.}
+\item{cor_func}{string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided}
 
-\item{power_cut_off}{if no power provided, computes power and thresold it by this value.}
+\item{your_func}{function returning correlation values. Final values must be in [-1;1]}
+
+\item{power_value}{integer of power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.}
+
+\item{block_size}{integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers.}
+
+\item{stop_if_no_fit}{boolean indicating if not finding a fit above fit_cut_off should stop process, or just print a warning and return the highest fitting power.}
+
+\item{network_type}{string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
+
+\item{tom_type}{string giving type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
+and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.}
 }
 \value{
 list containing
@@ -28,9 +39,7 @@ list containing
 Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
 }
 \details{
-\enumerate{
-  \item{data_expr}{Must have been adequatly normalized and filtered if pertinant. ATTENTION : it is not recommended to filter by differential
-  expression (cf. \href{https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html}{Peter Langfelder and Steve Horvath FAQ on WGCNA}}.
+\describe{
   \item{save_adjacency}{Saving adjacency increase the final return size. Working with tom is usually suffisant since it's the only value used for the
 next step \code{\link{modules_detection}}.}
 }

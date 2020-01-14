@@ -13,9 +13,9 @@ cor_func_match(cor_func = c("pearson", "spearman", "bicor"))
 A function corresponding to the correlation required
 }
 \description{
-Translate a function name into a usable function in code.
-TODO finish
+Translate a function name into an R function.
 }
 \examples{
+cor_func_match("pearson")
 
 }
