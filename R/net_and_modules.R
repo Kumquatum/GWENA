@@ -179,7 +179,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @export
 
 net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
-                         power_value = NULL, fit_cut_off = 0.90, network_type = c("unsigned", "signed", "signed hybrid"),
+                         power_value = NULL, fit_cut_off = 0.90, stop_if_no_fit = FALSE, network_type = c("unsigned", "signed", "signed hybrid"),
                          tom_type = c("unsigned", "signed", "signed Nowick"), save_adjacency = FALSE, n_threads = 0, # TODO program the mclapply version
                          detailled_result = FALSE, ...)
 {
@@ -201,6 +201,7 @@ net_building <- function(data_expr, cor_func = c("pearson", "spearman", "bicor",
   if (is.null(power_value)) {
     fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off, network_type = network_type, ...)
   } else {fit <- "None. Custom power_value provided"}
+  if (stop_if_no_fit && fit$fit_above_cut_off == FALSE) stop("No fitting power could be found for provided fit_cut_off. You should verify your data (or lower fit_cut_off). See FAQ.")
 
   ### Network building
   message("Adjacency")
