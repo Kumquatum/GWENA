@@ -115,12 +115,14 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"),
                      your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid"), ...){
   # Checking args
-  # TODO ajouter autres checks
+  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix")
   if (any(is.na(data_expr))) stop("data_expr must not contain any missing value. To approximate them, see FAQ answer on this subject.")
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name")
+  if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number")
+  if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1")
   cor_func <- match.arg(cor_func)
   if (cor_func == "other" && (is.null(your_func) || !is.function(your_func))) stop("If you specify other, your_func must be a function.")
-
+  network_type <- match.arg(network_type)
 
   # Cor selection
   if (cor_func == "other") {
@@ -131,6 +133,11 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 
   # Calculating correlation matrix
   cor_mat <- cor_to_use(data_expr %>% as.matrix)
+
+  # If personnal function, checking it returns a matrix with values in [-1;1]
+  if (cor_func == "other"){
+    if (min(cor_mat) < -1 || max(cor_mat) > 1) stop("your_func must be a function which returns values in [-1;1]")
+  }
 
   # Getting fit
   fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off, network_type = network_type, ...)
