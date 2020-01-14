@@ -218,43 +218,43 @@ net_building <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
   # Getting power
   if (is.null(power_value)) {
     fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off, network_type = network_type, ...)
-  } else {fit <- "None. Custom power_value provided"}
-  if (stop_if_no_fit && fit$fit_above_cut_off == FALSE) stop("No fitting power could be found for provided fit_cut_off. You should verify your data (or lower fit_cut_off). See FAQ.")
-
-  ### Network building
-  message("Adjacency")
-  adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat, type = network_type, power = fit$power_value)
-  message("TOM")
-  tom = 1 - WGCNA::TOMsimilarity(adj, TOMType = tom_type) %>%
-    magrittr::set_colnames(colnames(adj)) %>%
-    magrittr::set_rownames(rownames(adj))
-
-
-  # Return
-  if (detailled_result) {
-    net = list(
-      power = fit$power_value,
-      fit_power = fit$fit_table[fit$power_value, "SFT.R.sq"],
-      cor_func = cor_func,
-      network_type = network_type,
-      adjacency = if (save_adjacency) adj else NULL,
-      tom = tom
-    )
+    if (stop_if_no_fit && fit$fit_above_cut_off == FALSE) stop("No fitting power could be found for provided fit_cut_off. You should verify your data (or lower fit_cut_off). See FAQ.")
   } else {
-    net = list(
+    fit <- list(
+      power_value = power_value,
+      fit_table = "None. Custom power_value provided")
+    }
+
+  # Adjacency
+  adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat, type = network_type, power = fit$power_value)
+  if (!is.null(save_adjacency)) {
+    write.csv(adj, file = file.path(save_adjacency, "adjacency_matrix.csv"))
+  }
+
+  # Topological overlap matrix
+  if (tom_type != "none") {
+    tom <- 1 - WGCNA::TOMsimilarity(adj, TOMType = tom_type) %>%
+      magrittr::set_colnames(colnames(adj)) %>%
+      magrittr::set_rownames(rownames(adj))
+  } else { tom <- adj }
+
+  net = list(
+    network = tom,
+    metadata = list(
       cor_func = cor_func,
       network_type = network_type,
       tom_type = tom_type,
-      tom = tom
+      power = fit$power_value,
+      fit_power_table = fit$fit_table
     )
-  }
+  )
 
   return(net)
 }
 
 
 
-#' Modules detection from a network matrix
+#' Modules detection in a network
 #'
 #' Detect the modules by hierarchical clustering .
 #'
