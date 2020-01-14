@@ -81,7 +81,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
   fit_above_cut_off <- TRUE
   if (is.na(sft_fit$powerEstimate)) { # If no fit, taking maximum fitting power
     warning("No fitting power could be found for provided fit_cut_off. Taking power for maximum fit. See FAQ for known causes.")
-    sft_fit$powerEstimate <- sft_fit$fitIndice %>% top_n(1, SFT.R.sq) %>% select(Power) %>% as.numeric()
+    sft_fit$powerEstimate <- sft_fit$fitIndice %>% dplyr::top_n(1, SFT.R.sq) %>% dplyr::select(Power) %>% as.numeric()
     fit_above_cut_off <- FALSE
   }
 
