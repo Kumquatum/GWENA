@@ -2,7 +2,7 @@
 % Please edit documentation in R/net_and_modules.R
 \name{modules_detection}
 \alias{modules_detection}
-\title{Modules detection from a network matrix}
+\title{Modules detection in a network}
 \usage{
 modules_detection(data_expr, tom, min_module_size = min(20,
   ncol(data_expr)/2), merge_cut_height = 0.25,

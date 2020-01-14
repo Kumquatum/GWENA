@@ -8,42 +8,40 @@ net_building(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
   "spearman", "bicor", "other"), your_func = NULL, power_value = NULL,
   block_size = NULL, stop_if_no_fit = FALSE,
   network_type = c("unsigned", "signed", "signed hybrid"),
-  tom_type = c("unsigned", "signed", "signed Nowick"),
-  save_adjacency = FALSE, n_threads = 0, detailled_result = FALSE,
-  ...)
+  tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2",
+  "signed 2", "none"), save_adjacency = NULL, n_threads = 0, ...)
 }
 \arguments{
-\item{data_expr}{matrix or data.frame of expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
 
-\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded.}
+\item{fit_cut_off}{integer, cut off by which R^2 (coefficient of determination) will be thresholded.}
 
-\item{cor_func}{string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided}
+\item{cor_func}{string, name of the correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided}
 
 \item{your_func}{function returning correlation values. Final values must be in [-1;1]}
 
-\item{power_value}{integer of power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.}
+\item{power_value}{integer, power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.}
 
-\item{block_size}{integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers.}
+\item{block_size}{integer, size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.}
 
-\item{stop_if_no_fit}{boolean indicating if not finding a fit above fit_cut_off should stop process, or just print a warning and return the highest fitting power.}
+\item{stop_if_no_fit}{boolean, does not finding a fit above fit_cut_off should stop process, or just print a warning and return the highest fitting power.}
 
-\item{network_type}{string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
+\item{network_type}{string, type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
 
-\item{tom_type}{string giving type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
+\item{tom_type}{string, type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
 and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.}
+
+\item{save_adjacency}{string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.}
+
+\item{n_threads}{integer, number of threads that can be used to paralellise the computing}
 }
 \value{
-list containing
+list containing network matrix, metadata of input parameters and power fitting information.
 }
 \description{
 Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
 }
-\details{
-\describe{
-  \item{save_adjacency}{Saving adjacency increase the final return size. Working with tom is usually suffisant since it's the only value used for the
-next step \code{\link{modules_detection}}.}
-}
-}
 \examples{
+net_building(kuehne_expr[, 1:1000])
 
 }
