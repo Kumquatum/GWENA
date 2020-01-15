@@ -153,7 +153,7 @@ At this point, our network is a [complete graph](https://en.wikipedia.org/wiki/C
 They can be detected using unsupervised learning (here hierarchical clustering) or other adapted clustering method. 
 
 ```{r modules_detection}
-detection <- modules_detection(kuehne_expr_filtered, res_net$net, merge_cut_height = 0.997, detailled_result = TRUE)
+detection <- detect_modules(kuehne_expr_filtered, res_net$net, merge_cut_height = 0.997, detailled_result = TRUE)
 ```
 
 Since this operation tend to create multiple little modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), they are ussually merged into one.

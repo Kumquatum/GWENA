@@ -107,7 +107,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
     fit_table = sft_fit$fitIndice,
     fit_above_cut_off = fit_above_cut_off,
     metadata = list(
-      net_type = network_type
+      network_type = network_type
     )
   )
 
