@@ -27,6 +27,21 @@
   }
 }
 
+
+#' Run all checks on expression data
+#'
+#' Check that it is a matrix or data frame,
+#'
+#' @return A boolean, indicate if all checks were good
+
+.check_data_expr <- function(data_expr){
+  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
+  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
+  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
+  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
+}
+
+
 #' Calculating best fit of a power low on correlation matrix computed on expression data
 #'
 #' Adjust a correlation matrix depending of the type of network, then try to parameter a power law for best fit
@@ -65,7 +80,6 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
   network_type <- match.arg(network_type)
   if (!is.null(block_size) && (block_size < 2 || block_size %% 1 != 0)) stop("If not NULL, block_size must be a whole number > 1")
 
-
   # Calculating similarity
   similarity <- matrix()
   if (network_type == "unsigned") {
@@ -100,7 +114,6 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 }
 
 
-
 #' Calculating best fit of a power low on expression data
 #'
 #' Computes correlation matrix of the gene expression data, adjust it depending of the type of network, then try to
@@ -133,10 +146,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"),
                      your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid"), block_size = NULL, ...){
   # Checking args
-  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
-  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
-  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
-  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
+  .check_data_expr(data_expr)
   # No need to check in theory because checked in get_fit.cor
   # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
   # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
@@ -203,10 +213,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
                          n_threads = 0, ...)  # TODO program the mclapply version
 {
   # Checking
-  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
-  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
-  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
-  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
+  .check_data_expr(data_expr)
   # No need to check in theory because checked in get_fit.cor
   # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
   # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
