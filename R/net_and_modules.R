@@ -6,13 +6,13 @@
 #'
 #' @return A function corresponding to the correlation required
 #' @examples
-#' cor_func_match("pearson")
+#' .cor_func_match("pearson")
 #'
 #' @importFrom WGCNA bicor cor
 
-cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
+.cor_func_match <- function(cor_func = c("pearson", "spearman", "bicor")){
   # Checks
-  if (is.null(cor_func)) stop("cor_func must be a character vector representing one of the supported correlation functions. See ?cor_func_match for more information.")
+  if (is.null(cor_func)) stop("cor_func must be a character vector representing one of the supported correlation functions.")
   cor_func <- match.arg(cor_func)
 
   # Function assignation
@@ -148,7 +148,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
   if (cor_func == "other") {
     cor_to_use <- your_func
   } else {
-    cor_to_use <- cor_func_match(cor_func)
+    cor_to_use <- .cor_func_match(cor_func)
   }
 
   # Calculating correlation matrix
@@ -171,8 +171,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 }
 
 
-
-#' Network build and modules detection
+#' Network building by co-expression score computation
 #'
 #' Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
 #'
@@ -198,7 +197,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' @export
 
-net_building <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
+build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
                          power_value = NULL, block_size = NULL, stop_if_no_fit = FALSE, network_type = c("unsigned", "signed", "signed hybrid"),
                          tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"), save_adjacency = NULL,
                          n_threads = 0, ...)  # TODO program the mclapply version
@@ -224,7 +223,7 @@ net_building <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
   if (cor_func == "other") {
     cor_to_use <- your_func
   } else {
-    cor_to_use <- cor_func_match(cor_func)
+    cor_to_use <- .cor_func_match(cor_func)
   }
   cor_mat <- cor_to_use(data_expr %>% as.matrix)
 
@@ -287,16 +286,16 @@ net_building <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' @export
 
-modules_detection <- function(data_expr, tom, min_module_size = min(20, ncol(data_expr) / 2), merge_cut_height = 0.25,
+modules_detection <- function(data_expr, net, min_module_size = min(20, ncol(data_expr) / 2), merge_cut_height = 0.25,
                               detailled_result = FALSE, ...) {
   # Checks
 
 
   # Detection
   message("Hierarchical clustering")
-  gene_tree = stats::hclust(as.dist(tom), method = "average")
+  gene_tree = stats::hclust(as.dist(net), method = "average")
   message("Tree cut")
-  dynamicMods = dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = tom,
+  dynamicMods = dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = net,
                                               deepSplit = 2, pamRespectsDendro = FALSE,
                                               minClusterSize = min_module_size)
   message("Merging closest modules")
