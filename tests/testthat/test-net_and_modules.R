@@ -13,15 +13,15 @@ df_expr <- list(df_microarray = kuehne_expr[,1:100],
 test_that("badly formatted input throw an error", {
   # cor_func should be one of the string allowed to design the correlation function
   lapply(arg_cor_func, function(arg){
-    expect_error(cor_func_match(cor_func = arg), NA)
-    expect_error(cor_func_match(cor_func = 42))
-    expect_error(cor_func_match(cor_func = "this is not a function available"))
+    expect_error(.cor_func_match(cor_func = arg), NA)
+    expect_error(.cor_func_match(cor_func = 42))
+    expect_error(.cor_func_match(cor_func = "this is not a function available"))
   })
 })
 test_that("output format is ok", {
   # Return a data.frame
   lapply(arg_cor_func, function(arg) {
-    expect_true(is.function(cor_func_match(cor_func = arg)))
+    expect_true(is.function(.cor_func_match(cor_func = arg)))
   })
 })
 
@@ -103,13 +103,13 @@ test_that("output format is ok", {
 
 # ==== net_building ====
 test_that("data_expr should be a data.frame or a matrix of values >= 0", {
-  expect_error(net_building(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
+  expect_error(build_net(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
 })
 test_that("data_expr should be either a matrix or data frame of intensities or counts", {
-  expect_error(net_building(data_expr = df_expr$df_microarray), NA)
-  expect_error(net_building(data_expr = df_expr$df_microarray %>% as.matrix), NA)
-  expect_error(net_building(data_expr = "this is not a data.frame nor a matrix"))
-  expect_error(net_building(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
-  expect_warning(net_building(data_expr = df_expr$df_microarray %>% t))
+  expect_error(build_net(data_expr = df_expr$df_microarray), NA)
+  expect_error(build_net(data_expr = df_expr$df_microarray %>% as.matrix), NA)
+  expect_error(build_net(data_expr = "this is not a data.frame nor a matrix"))
+  expect_error(build_net(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
+  expect_warning(build_net(data_expr = df_expr$df_microarray %>% t))
 })
 

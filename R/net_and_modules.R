@@ -39,6 +39,7 @@
   if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
   if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
+  if (is.null(colnames(data_expr)) || is.null(rownames(data_expr))) stop("data_expr should have colnames and rownames")
 }
 
 
@@ -293,19 +294,24 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' @export
 
-modules_detection <- function(data_expr, net, min_module_size = min(20, ncol(data_expr) / 2), merge_cut_height = 0.25,
+detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_expr) / 2), merge_close_modules = TRUE, merge_cut_height = 0.25,
                               detailled_result = FALSE, ...) {
   # Checks
+  .check_data_expr(data_expr)
+  if (!(is.data.frame(net) || is.matrix(net))) stop("net should be a data.frame or a matrix.")
+  if (ncol(net) != nrow(net)) stop("net should be squarred")
+  if (is.null(colnames(net)) || is.null(rownames(net))) stop("net should have genes names as colnames and rownames")
 
+  # Order net matrix in the same order as data_expr
+  net <- net[order]
 
-  # Detection
-  message("Hierarchical clustering")
+  # Hierarchical clustering
   gene_tree = stats::hclust(as.dist(net), method = "average")
-  message("Tree cut")
+  # Tree cut
   dynamicMods = dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = net,
                                               deepSplit = 2, pamRespectsDendro = FALSE,
                                               minClusterSize = min_module_size)
-  message("Merging closest modules")
+  # Merging closest modules
   merge = WGCNA::mergeCloseModules(data_expr, dynamicMods, cutHeight = merge_cut_height, relabel = TRUE, ...)
 
   # Return
