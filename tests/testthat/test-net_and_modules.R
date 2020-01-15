@@ -29,7 +29,7 @@ test_that("output format is ok", {
 # ==== get_fit.cor ====
 
 test_that("cor_mat should be a matrix of correlations", {
-  expect_error(get_fit.cor(cor_mat = cor(df_expr$df_microarray)), NA)
+  # expect_error(get_fit.cor(cor_mat = cor(df_expr$df_microarray)), NA) # dopar warning
   # Type is matrix
   expect_error(get_fit.cor(cor_mat = 42))
   expect_error(get_fit.cor(cor_mat = "this is not a correlation matrix"))
@@ -42,8 +42,6 @@ test_that("cor_mat should be a matrix of correlations", {
   fake_cor_mat_na <- fake_cor_mat
   fake_cor_mat_na[c(2,4), c(2,4)] <- NA
   expect_warning(get_fit.cor(cor_mat = fake_cor_mat_na))
-  # Follows a scale free topology
-  expect_warning(get_fit.cor(cor_mat = fake_cor_mat))
 })
 test_that("fit_cut_off should be a number in ]0;1[", {
   expect_error(get_fit.cor(cor_mat = fake_cor_mat, fit_cut_off = -1))
@@ -57,6 +55,9 @@ test_that("network_type should be one of the string allowed to design the correl
     expect_error(get_fit.cor(cor_mat = cor(df_expr$df_microarray), network_type = 42))
     expect_error(get_fit.cor(cor_mat = cor(df_expr$df_microarray), network_type = "this is not a network available"))
   })
+})
+test_that("random data cannot be fit by a power law (no scale-free property)", {
+  expect_warning(get_fit.cor(cor_mat = fake_cor_mat), "No fitting power could be found")
 })
 test_that("output format is ok", {
   # Return a list with expected elements formated correctly
