@@ -8,9 +8,9 @@ df_expr <- list(df_microarray = kuehne_expr[,1:100],
                 df_rnaseq = gtex_expr[, 1:100])
 
 
-# ==== cor_func_match ====
+# ==== .cor_func_match ====
 
-test_that("badly formatted input throw an error", {
+test_that("badly formatted cor_func throw an error", {
   # cor_func should be one of the string allowed to design the correlation function
   lapply(arg_cor_func, function(arg){
     expect_error(.cor_func_match(cor_func = arg), NA)
@@ -23,6 +23,26 @@ test_that("output format is ok", {
   lapply(arg_cor_func, function(arg) {
     expect_true(is.function(.cor_func_match(cor_func = arg)))
   })
+})
+
+
+# ==== .check_data_expr ====
+
+test_that("Rightly formated data_expr throw no error", {
+  expect_error(.check_data_expr(data_expr = df_expr$df_microarray), NA)
+  expect_error(.check_data_expr(data_expr = df_expr$df_microarray %>% as.matrix), NA)
+})
+test_that("data_expr should be either a matrix or data frame", {
+  expect_error(.check_data_expr(data_expr = 42))
+  expect_error(.check_data_expr(data_expr = 1:42))
+  expect_error(.check_data_expr(data_expr = "this is not a data.frame nor a matrix"))
+  expect_error(.check_data_expr(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
+})
+test_that("data_expr should have values >= 0", {
+  expect_error(.check_data_expr(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
+})
+test_that("data_expr should have genes as columns and samples as rows", {
+  expect_warning(.check_data_expr(data_expr = df_expr$df_microarray %>% t))
 })
 
 
