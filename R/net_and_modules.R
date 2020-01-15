@@ -301,16 +301,20 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
   if (is.null(colnames(net)) || is.null(rownames(net))) stop("net should have genes names as colnames and rownames")
 
   # Order net matrix in the same order as data_expr
-  net <- net[order]
+  net <- net[colnames(data_expr), colnames(data_expr)]
 
   # Hierarchical clustering
   gene_tree = stats::hclust(as.dist(net), method = "average")
   # Tree cut
-  dynamicMods = dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = net,
+  dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = net,
                                               deepSplit = 2, pamRespectsDendro = FALSE,
-                                              minClusterSize = min_module_size)
+                                              minClusterSize = min_module_size))
+  # TODO manage to divide ellipsis (...) to allow users to add args for cutreeDynamic
+
   # Merging closest modules
-  merge = WGCNA::mergeCloseModules(data_expr, dynamicMods, cutHeight = merge_cut_height, relabel = TRUE, ...)
+  if (merge_close_modules) {
+    merge <- quiet(WGCNA::mergeCloseModules(data_expr, colors = dynamicMods, cutHeight = merge_cut_height, relabel = TRUE, ...))
+  } else { merge <- list(colors = , newMEs = dynamicMods) }
 
   # Return
   if (detailled_result) {
@@ -348,7 +352,15 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
 #'
 #' @export
 
-plot_modules_merge <- function(modules) {
+plot_modules_merge <- function(modules_premerge, modules_merged) {
+  # Checks
+  if (!is.vector(modules_premerge, "character") || (!is.vector(modules_premerge, "numeric") && any(modules_premerge %% 1 != 0))) {
+    stop("modules_premerge must be a vector of whole number or string") }
+  if (!is.vector(modules_merged, "character") || (!is.vector(modules_merged, "numeric") && any(modules_merged %% 1 != 0))) {
+    stop("modules_premerge must be a vector of whole number or string") }
+  if (length(modules_premerge) != length(modules_merged)) stop("modules_premerge and modules_merged must be of same length")
+
+  # Graph
   g <- data.frame(before = modules$modules_premerge , after = modules$modules, stringsAsFactors = FALSE) %>%
     distinct %>%
     arrange(before) %>%
@@ -388,8 +400,7 @@ plot_expression_profiles <- function(data_expr, modules) {
   df <- data.frame(gene = names(modules$modules), module = modules$modules, stringsAsFactors = FALSE)
 
   eigengenes <- df %>%
-    left_join(data_expr %>% t %>% as.data.frame %>%
-                tibble::rownames_to_column(var = "gene"), by = "gene") %>%
+    dplyr::left_join(data_expr %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene"), by = "gene") %>%
     split.data.frame(.$module) %>%
     lapply(function(y) y[,c(-1,-2)] %>% t %>% prcomp(center = TRUE, scale.=TRUE) %>% .$x %>% .[, "PC1"] %>% scale) %>%
     as.data.frame(check.names = FALSE) %>%
