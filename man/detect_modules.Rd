@@ -9,19 +9,21 @@ detect_modules(data_expr, net, min_module_size = min(20,
   merge_cut_height = 0.25, detailled_result = FALSE, ...)
 }
 \arguments{
-\item{data_expr}{matrix of expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
 
-\item{tom}{TODO finish}
+\item{net}{matrix or data.frame, strengh of gene co-expression (edge values).}
+
+\item{min_module_size}{integer, lowest number of gene allowed in a module. If none provided, estimated.}
+
+\item{merge_close_modules}{boolean, does closest modules (based on eigengene) should be merged together.}
+
+\item{merge_cut_height}{float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.}
+
+\item{detailled_results}{boolean, does pre-merge modules (if applicable) and dendrogram included in output.}
 }
 \value{
-TODO
+list containing modules detected, modules_eigengenes, and if asked for, modules pre-merge and dendrogram
 }
 \description{
 Detect the modules by hierarchical clustering .
-}
-\details{
-TODO
-}
-\examples{
-#TODO
 }

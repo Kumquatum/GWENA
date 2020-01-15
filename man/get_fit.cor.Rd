@@ -10,7 +10,7 @@ get_fit.cor(cor_mat, fit_cut_off = 0.9, network_type = c("unsigned",
 \arguments{
 \item{cor_mat}{matrix or data.frame of genes correlation.}
 
-\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded.}
+\item{fit_cut_off}{float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.}
 
 \item{network_type}{string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
 

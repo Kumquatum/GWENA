@@ -12,7 +12,7 @@ get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 \arguments{
 \item{data_expr}{matrix of data only normalized for constructor specificities, with genes as column and samples as row.}
 
-\item{fit_cut_off}{integer by which R^2 (coefficient of determination) will be thresholded.}
+\item{fit_cut_off}{float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.}
 
 \item{cor_func}{string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided}
 
