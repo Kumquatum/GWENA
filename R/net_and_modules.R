@@ -48,7 +48,7 @@
 #' Adjust a correlation matrix depending of the type of network, then try to parameter a power law for best fit
 #'
 #' @param cor_mat matrix or data.frame of genes correlation.
-#' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded.
+#' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
 #' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
 #'
@@ -121,7 +121,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' parameter a power law for best fit
 #'
 #' @param data_expr matrix of data only normalized for constructor specificities, with genes as column and samples as row.
-#' @param fit_cut_off integer by which R^2 (coefficient of determination) will be thresholded.
+#' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param cor_func string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
@@ -187,7 +187,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
 #'
 #' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
-#' @param fit_cut_off integer, cut off by which R^2 (coefficient of determination) will be thresholded.
+#' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param cor_func string, name of the correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
 #' @param power_value integer, power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.
@@ -278,17 +278,15 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' Detect the modules by hierarchical clustering .
 #'
-#' @param data_expr matrix of expression data with genes as column and samples as row.
-#' @param tom
-#' TODO finish
+#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#' @param net matrix or data.frame, strengh of gene co-expression (edge values).
+#' @param min_module_size integer, lowest number of gene allowed in a module. If none provided, estimated.
+#' @param merge_close_modules boolean, does closest modules (based on eigengene) should be merged together.
+#' @param merge_cut_height float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.
+#' @param detailled_results boolean, does pre-merge modules (if applicable) and dendrogram included in output.
 #'
-#' @details
-#' TODO
-#' @return
-#' TODO
+#' @return list containing modules detected, modules_eigengenes, and if asked for, modules pre-merge and dendrogram
 #'
-#' @examples
-#' #TODO
 #' @importFrom WGCNA mergeCloseModules
 #' @importFrom dynamicTreeCut cutreeDynamic
 #'
@@ -334,20 +332,17 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
 
 
 
-#' Merging modules' plot
+#' Modules merge plot
 #'
 #' Plot a bipartite graph to see in which modules all modules have been merged
 #'
-#' @param
-#' TODO finish
+#' @param modules_premerge vector, id (whole number or string) of module before merge
+#' @param modules_merged vector, id (whole number or string) of module after merge
 #'
-#' @details
-#' TODO
-#' @return
-#' TODO
+#' @details Both vectors must be in the same gene order before passing them to the function. No check is applied on this.
 #'
-#' @examples
-#' #TODO
+#' @return A bipartite graph
+#'
 #' @importFrom igraph graph_from_data_frame V add_layout_ as_bipartite
 #' @importFrom magrittr %>%
 #'
