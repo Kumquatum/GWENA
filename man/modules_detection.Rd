@@ -4,7 +4,7 @@
 \alias{modules_detection}
 \title{Modules detection in a network}
 \usage{
-modules_detection(data_expr, tom, min_module_size = min(20,
+modules_detection(data_expr, net, min_module_size = min(20,
   ncol(data_expr)/2), merge_cut_height = 0.25,
   detailled_result = FALSE, ...)
 }
