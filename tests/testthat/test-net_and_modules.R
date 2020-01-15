@@ -84,11 +84,9 @@ test_that("output format is ok", {
   res <- get_fit.cor(cor_mat = cor(df_expr$df_microarray))
   expect_true(is.list(res))
   expect_true(all(names(res) == c("power_value", "fit_table", "fit_above_cut_off", "metadata")))
-  expect_true(all(names(res$metadata) == c("net_type")))
+  expect_true(all(names(res$metadata) == c("network_type")))
   expect_true(is.numeric(res$power_value) && length(res$power_value) == 1)
   expect_true(is.data.frame(res$fit_table) && colnames(res$fit_table) == c("Power", "SFT.R.sq", "slope", "truncated.R.sq", "mean.k.", "median.k.", "max.k."))
-  expect_true
-  expect_true(is.list(res$metadata) && all(names(res$metadata) == c("net_type")) && (res$metadata$net_type %in% arg_network_type))
 })
 
 
@@ -114,22 +112,22 @@ test_that("output format is ok", {
   res <- get_fit.expr(data_expr = df_expr$df_microarray)
   expect_true(is.list(res))
   expect_true(all(names(res) == c("power_value", "fit_table", "fit_above_cut_off", "metadata")))
-  expect_true(all(names(res$metadata) == c("net_type", "cor_func")))
+  expect_true(all(names(res$metadata) == c("network_type", "cor_func")))
   expect_true(is.numeric(res$power_value) && length(res$power_value) == 1)
   expect_true(is.data.frame(res$fit_table) && colnames(res$fit_table) == c("Power", "SFT.R.sq", "slope", "truncated.R.sq", "mean.k.", "median.k.", "max.k."))
-  expect_true(is.list(res$metadata) && all(names(res$metadata) == c("net_type", "cor_func")) && (res$metadata$net_type %in% arg_network_type))
 })
 
 
-# ==== net_building ====
-test_that("data_expr should be a data.frame or a matrix of values >= 0", {
-  expect_error(build_net(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
+# ==== build_net ====
+res <- build_net(data_expr = df_expr$df_microarray)
+test_that("genes interactions strength is in [0;1]", {
+  expect_gte(min(res$network %>% c), 0)
+  expect_lte(max(res$network %>% c), 1)
 })
-test_that("data_expr should be either a matrix or data frame of intensities or counts", {
-  expect_error(build_net(data_expr = df_expr$df_microarray), NA)
-  expect_error(build_net(data_expr = df_expr$df_microarray %>% as.matrix), NA)
-  expect_error(build_net(data_expr = "this is not a data.frame nor a matrix"))
-  expect_error(build_net(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
-  expect_warning(build_net(data_expr = df_expr$df_microarray %>% t))
+test_that("output format is ok", {
+  expect_true(is.list(res))
+  expect_true(all(names(res) == c("network", "metadata")))
+  expect_true(all(names(res$metadata) == c("cor_func", "network_type", "tom_type", "power", "fit_power_table")))
 })
 
+# ==== detect_modules ====
