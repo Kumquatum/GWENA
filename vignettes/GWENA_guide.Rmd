@@ -140,7 +140,7 @@ Another adjustement takes into account the [topology of the network](https://en.
 # In order to fasten the example process here, we only take a sample of the genes
 kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 
-res_net <- build_net(kuehne_expr_filtered, cor_func = "spearman", detailled_result = TRUE)
+res_net <- build_net(kuehne_expr_filtered, cor_func = "spearman")
 ```
 
 * Power selected : `r net$power`
@@ -153,7 +153,7 @@ At this point, our network is a [complete graph](https://en.wikipedia.org/wiki/C
 They can be detected using unsupervised learning (here hierarchical clustering) or other adapted clustering method. 
 
 ```{r modules_detection}
-detection <- detect_modules(kuehne_expr_filtered, res_net$net, merge_cut_height = 0.997, detailled_result = TRUE)
+detection <- detect_modules(kuehne_expr_filtered, res_net$network, merge_cut_height = 0.997, detailled_result = TRUE)
 ```
 
 Since this operation tend to create multiple little modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), they are ussually merged into one.
@@ -162,7 +162,7 @@ Since this operation tend to create multiple little modules with highly similar 
 * Number of modules after merging : `r length(unique(detection$modules))-1`
 
 ```{r bipartite_graph_merge}
-plot_modules_merge(detection)
+plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
 ```
 
 ```{r plot_modules_gene_distribution, fig.height=3}
