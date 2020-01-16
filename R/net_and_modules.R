@@ -293,7 +293,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #' @export
 
 detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_expr) / 2), merge_close_modules = TRUE, merge_cut_height = 0.25,
-                              detailled_result = FALSE, ...) {
+                              detailled_result = TRUE, ...) {
   # Checks
   .check_data_expr(data_expr)
   if (!(is.data.frame(net) || is.matrix(net))) stop("net should be a data.frame or a matrix.")
@@ -340,8 +340,8 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
 #'
 #' Plot a bipartite graph to see in which modules all modules have been merged
 #'
-#' @param modules_premerge vector, id (whole number or string) of module before merge
-#' @param modules_merged vector, id (whole number or string) of module after merge
+#' @param modules_premerge vector, id (whole number or string) of module before merge associated to each gene.
+#' @param modules_merged vector, id (whole number or string) of module after merge associated to each gene.
 #'
 #' @details Both vectors must be in the same gene order before passing them to the function. No check is applied on this.
 #'
@@ -354,18 +354,18 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
 
 plot_modules_merge <- function(modules_premerge, modules_merged) {
   # Checks
-  if (!is.vector(modules_premerge, "character") || (!is.vector(modules_premerge, "numeric") && any(modules_premerge %% 1 != 0))) {
+  if (!(is.vector(modules_premerge, "character") || (is.vector(modules_premerge, "numeric") && all(modules_premerge %% 1 == 0)))) {
     stop("modules_premerge must be a vector of whole number or string") }
-  if (!is.vector(modules_merged, "character") || (!is.vector(modules_merged, "numeric") && any(modules_merged %% 1 != 0))) {
+  if (!(is.vector(modules_merged, "character") || (is.vector(modules_merged, "numeric") && all(modules_merged %% 1 == 0)))) {
     stop("modules_premerge must be a vector of whole number or string") }
   if (length(modules_premerge) != length(modules_merged)) stop("modules_premerge and modules_merged must be of same length")
 
   # Graph
-  g <- data.frame(before = modules$modules_premerge , after = modules$modules, stringsAsFactors = FALSE) %>%
+  g <- data.frame(before = modules_premerge , after = modules_merged, stringsAsFactors = FALSE) %>%
     distinct %>%
     arrange(before) %>%
     igraph::graph_from_data_frame()
-  igraph::V(g)$type <- lapply(igraph::V(g) %>% names %>% as.numeric, function(x) ifelse(x %in% unique(modules$modules), TRUE, FALSE)) %>% unlist
+  igraph::V(g)$type <- lapply(igraph::V(g) %>% names %>% as.numeric, function(x) ifelse(x %in% unique(modules_merged), TRUE, FALSE)) %>% unlist
   g %>% igraph::add_layout_(igraph::as_bipartite()) %>%
     plot(vertex.label.color = "gray20",
          vertex.label.family = "Helvetica",
@@ -375,20 +375,15 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 }
 
 
-#' Plot all modules expression profiles
+#' Modules expression profiles
 #'
-#' f
+#' Plot expression profiles for all modules with eigengene highlighted
 #'
-#' @param
-#' TODO finish
+#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#' @param modules vector, id (whole number or string) of modules associated to each gene.
 #'
-#' @details
-#' TODO
-#' @return
-#' TODO
+#' @return A ggplot representing expression profile and eigengene by module
 #'
-#' @examples
-#' #TODO
 #' @importFrom ggplot2 ggplot aes geom_line facet_grid theme element_text
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
@@ -397,7 +392,13 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 #' @export
 
 plot_expression_profiles <- function(data_expr, modules) {
-  df <- data.frame(gene = names(modules$modules), module = modules$modules, stringsAsFactors = FALSE)
+  # Check
+  .check_data_expr(data_expr)
+  if (!(is.vector(modules, "character") || (is.vector(modules, "numeric") && all(modules %% 1 == 0)))) {
+    stop("modules_premerge must be a vector of whole number or string") }
+
+  # Tables preparation for ggplot
+  df <- data.frame(gene = names(modules), module = modules, stringsAsFactors = FALSE)
 
   eigengenes <- df %>%
     dplyr::left_join(data_expr %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene"), by = "gene") %>%

@@ -2,22 +2,21 @@
 % Please edit documentation in R/net_and_modules.R
 \name{plot_modules_merge}
 \alias{plot_modules_merge}
-\title{Merging modules' plot}
+\title{Modules merge plot}
 \usage{
-plot_modules_merge(modules)
+plot_modules_merge(modules_premerge, modules_merged)
 }
 \arguments{
-\item{TODO}{finish}
+\item{modules_premerge}{vector, id (whole number or string) of module before merge}
+
+\item{modules_merged}{vector, id (whole number or string) of module after merge}
 }
 \value{
-TODO
+A bipartite graph
 }
 \description{
 Plot a bipartite graph to see in which modules all modules have been merged
 }
 \details{
-TODO
-}
-\examples{
-#TODO
+Both vectors must be in the same gene order before passing them to the function. No check is applied on this.
 }

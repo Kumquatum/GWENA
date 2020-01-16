@@ -6,7 +6,7 @@
 \usage{
 detect_modules(data_expr, net, min_module_size = min(20,
   ncol(data_expr)/2), merge_close_modules = TRUE,
-  merge_cut_height = 0.25, detailled_result = FALSE, ...)
+  merge_cut_height = 0.25, detailled_result = TRUE, ...)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
