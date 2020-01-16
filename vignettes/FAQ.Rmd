@@ -68,6 +68,11 @@ ________________________________
 
 # Advanced questions
 
-## Why the arg `network_type = "signed"` implies a modification of the similarity score ?
+## Why the arg `network_type = "signed"` implies a modification of the similarity score even though it is already signed?
 
 Since a correlation matrix is already signed, one could as what is this `similarity <- (1 + cor_mat) / 2` operation. It is simply because ulterior steps of estimating a scale-free index in WGCNA implies a log10 transformation. Therefore you can't have negative numbers. Because a correlation matrix have values in [0;1], the operation will keep the distribution and avoid negative values.
+
+
+## Why `plot_expression_profiles()` computes a PCA for eigengenes instead of using eigengenes given by `detect_modules()`?
+
+Eigenenes provided by `detect_modules` are from a SVD, and PCA is equivalent to performing the SVD on the centered data ([see 'Running PCA and SVD in R '](https://genomicsclass.github.io/book/pages/pca_svd.html)). Because expression profiles are using centered values (for clarity of representation), the PCA to represent eigengenes is more accurate.
