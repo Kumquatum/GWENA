@@ -4,8 +4,8 @@ arg_cor_func <- c("pearson", "spearman", "bicor")
 arg_network_type = c("unsigned", "signed", "signed hybrid")
 fake_mat <-  runif(n = 10*45, max = 100) %>%  matrix(ncol = 45)
 fake_cor_mat <- cor(fake_mat)
-df_expr <- list(df_microarray = kuehne_expr[,1:100],
-                df_rnaseq = gtex_expr[, 1:100])
+df_expr <- list(df_microarray = kuehne_expr[, 5000:7000],
+                df_rnaseq = gtex_expr[, 5000:7000])
 
 
 # ==== .cor_func_match ====
@@ -119,15 +119,43 @@ test_that("output format is ok", {
 
 
 # ==== build_net ====
-res <- build_net(data_expr = df_expr$df_microarray)
+
+res_net <- build_net(data_expr = df_expr$df_microarray)
 test_that("genes interactions strength is in [0;1]", {
-  expect_gte(min(res$network %>% c), 0)
-  expect_lte(max(res$network %>% c), 1)
+  expect_gte(min(res_net$network %>% c), 0)
+  expect_lte(max(res_net$network %>% c), 1)
 })
 test_that("output format is ok", {
-  expect_true(is.list(res))
-  expect_true(all(names(res) == c("network", "metadata")))
-  expect_true(all(names(res$metadata) == c("cor_func", "network_type", "tom_type", "power", "fit_power_table")))
+  expect_true(is.list(res_net))
+  expect_true(all(names(res_net) == c("network", "metadata")))
+  expect_true(all(names(res_net$metadata) == c("cor_func", "network_type", "tom_type", "power", "fit_power_table")))
 })
 
 # ==== detect_modules ====
+
+test_that("net is a matrix or data.frame", {
+  expect_error(detect_modules(df_expr$df_microarray, 42))
+  expect_error(detect_modules(df_expr$df_microarray, "this is not a data.frame or matrix"))
+  expect_error(detect_modules(df_expr$df_microarray, 1:42))
+  expect_error(detect_modules(df_expr$df_microarray, list("this is not a data.frame", "this is not a matrix")))
+})
+test_that("net should be squarred", {
+  expect_error(detect_modules(data_expr = df_expr$df_microarray, net = res_net$network[, -1]))
+})
+test_that("all colnames in rownames", {
+  expect_error(detect_modules(data_expr = df_expr$df_microarray, net = res_net$network[-1, -10]))
+})
+test_that("output format is ok (detailled)", {
+  res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network)
+  expect_true(all(names(res_modules) == c("modules", "modules_premerge", "modules_eigengenes", "dendrograms")))
+  expect_true(is.vector(res_modules$modules, "numeric"))
+  expect_true(is.vector(res_modules$modules_premerge, "numeric"))
+  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(table(res_modules$modules)))
+  expect_true(class(res_modules$dendrograms) == "hclust")
+})
+test_that("output format is ok (not detailled)", {
+  res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network, detailled_result = FALSE)
+  expect_true(all(names(res_modules) == c("modules", "modules_eigengenes")))
+  expect_true(is.vector(res_modules$modules, "numeric"))
+  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(table(res_modules$modules)))
+})
