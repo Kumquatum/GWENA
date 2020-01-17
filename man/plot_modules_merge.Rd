@@ -7,9 +7,9 @@
 plot_modules_merge(modules_premerge, modules_merged)
 }
 \arguments{
-\item{modules_premerge}{vector, id (whole number or string) of module before merge}
+\item{modules_premerge}{vector, id (whole number or string) of module before merge associated to each gene.}
 
-\item{modules_merged}{vector, id (whole number or string) of module after merge}
+\item{modules_merged}{vector, id (whole number or string) of module after merge associated to each gene.}
 }
 \value{
 A bipartite graph
