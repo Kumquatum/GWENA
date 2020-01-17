@@ -298,7 +298,7 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
   .check_data_expr(data_expr)
   if (!(is.data.frame(net) || is.matrix(net))) stop("net should be a data.frame or a matrix.")
   if (ncol(net) != nrow(net)) stop("net should be squarred")
-  if (is.null(colnames(net)) || is.null(rownames(net))) stop("net should have genes names as colnames and rownames")
+  if (is.null(rownames(net)) || !all(colnames(net) %in% rownames(net))) stop("net should have the same genes names as colnames and rownames")
 
   # Order net matrix in the same order as data_expr
   net <- net[colnames(data_expr), colnames(data_expr)]
@@ -309,12 +309,24 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
   dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = net,
                                               deepSplit = 2, pamRespectsDendro = FALSE,
                                               minClusterSize = min_module_size))
+
+  # Re-assign gene names
+  dynamicMods <- setNames(dynamicMods, colnames(data_expr))
+
   # TODO manage to divide ellipsis (...) to allow users to add args for cutreeDynamic
+
+  if (length(table(dynamicMods)) == 1) stop("No modules detected")
+  if (length(table(dynamicMods)) == 2) warning("Only one module found, plus 'non-classified genes' module")
 
   # Merging closest modules
   if (merge_close_modules) {
+    if (length(table(dynamicMods)) == 1) stop("All genes were classified in the same module")
     merge <- quiet(WGCNA::mergeCloseModules(data_expr, colors = dynamicMods, cutHeight = merge_cut_height, relabel = TRUE, ...))
-  } else { merge <- list(colors = , newMEs = dynamicMods) }
+  } else {
+    merge <- list(
+      colors = dynamicMods,
+      newMEs = WGCNA::moduleEigengenes(data_expr, dynamicMods)$eigengenes)
+  }
 
   # Return
   if (detailled_result) {
