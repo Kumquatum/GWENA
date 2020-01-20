@@ -328,17 +328,23 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
       newMEs = WGCNA::moduleEigengenes(data_expr, dynamicMods)$eigengenes)
   }
 
+  # Re-formating
+  modules_list <- setNames(merge$colors, colnames(data_expr)) %>%
+    split(names(.), .)
+  modules_list_premerge <- setNames(dynamicMods, colnames(data_expr)) %>%
+    split(names(.), .)
+
   # Return
   if (detailled_result) {
     detection <- list(
-      modules = setNames(merge$colors, colnames(data_expr)),
-      modules_premerge = dynamicMods,
+      modules = modules_list,
+      modules_premerge = modules_list_premerge,
       modules_eigengenes = merge$newMEs,
       dendrograms = stats::hclust(as.dist(1 - cor(merge$newMEs)), method = "average")
     )
   } else {
     detection <- list(
-      modules = setNames(merge$colors, colnames(data_expr)),
+      modules = modules_list,
       modules_eigengenes = merge$newMEs
     )
   }
