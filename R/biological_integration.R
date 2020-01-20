@@ -79,8 +79,8 @@ join_gost <- function(gost_result) {
 #'
 #' Enrich genes list from modules.
 #'
-#' @param data_expr matrix of expression data with genes as column and samples as row.
-#' @param tom
+#' @param module
+#' @param
 #' TODO finish
 #'
 #' @details
@@ -94,17 +94,45 @@ join_gost <- function(gost_result) {
 #'
 #' @export
 
-modules_enrichment <- function(modules, custom_gmt = NULL, ...) {
+bio_enrich <- function(module, custom_gmt = NULL, ...) {
   # Checks
-
-  # Splitting genes by module
-  modules_list <- split(names(modules), modules)
+  module_is_list <- FALSE
+  if (is.list(module)) {
+    module_is_list <- TRUE
+    if (!all(unlist(lapply(module, function(element) { (is.vector(element, "numeric") || is.vector(element, "character")) && !is.null(names(element)) })))) {
+      stop("If module is a list of modules, all elements of the list must be vectors of gene names") }
+  } else if (!((is.vector(module, "numeric") || is.vector(module, "character")) && !is.null(names(module)))) {
+    stop("module must be a vector of gene names, or a list of vectors of gene names") }
+  if (!is.null(custom_gmt)) {
+    if (!is.character(custom_gmt) && !is.list(custom_gmt)) stop("custom_gmt must be a path or a list of path to gmt file(s)")
+    if (is.list(custom_gmt) && !all(lapply(custom_gmt, is.character))) stop("all element of the list must be paths")
+  }
 
   # Enrichment
-  enriched_modules <- lapply(modules_list, function(module){
-    gprofiler2::gost(query = module, ...)
-  })
-  # TODO Check why multiple query return less enrichment results than mono query on each module
+  enriched_modules <- gprofiler2::gost(query = module, ...)
+
+  if (!is.null(custom_gmt)) {
+    if (!is.list(custom_gmt)) custom_gmt <- list(custom_gmt)
+    list_res_custom_gmts <- lapply(custom_gmt, function(gmt) {
+      gmt_id <- quiet(gprofiler2::upload_GMT_file(gmt))
+      enriched_modules_gmt <- quiet(gprofiler2::gost(query = module, organism = gmt_id, ...))
+      if (is.null(enriched_modules_gmt)) warning("No enrichment found on one of custom_gmt provided")
+    })
+    # Joining results
+    enriched_modules <- join_gost(c(list(enriched_modules), list_res_custom_gmts))
+
+    # if (is.list(custom_gmt)) {
+    #   list_res_custom_gmts <- lapply(custom_gmt, function(gmt) {
+    #     gmt_id <- quiet(gprofiler2::upload_GMT_file(gmt))
+    #     enriched_modules_gmt <- quiet(gprofiler2::gost(query = module, organism = gmt_id, ...))
+    #     if (is.null(enriched_modules_gmt)) warning("No enrichment found on one of custom_gmt provided")
+    #   })
+    #   # Joining results
+    #   enrichements_custom_gmt <- join_gost(c(list(enriched_modules), list_res_custom_gmts))
+    # } else {
+    #   enrichements_custom_gmt <- join_gost(list(enriched_modules))
+    # }
+  }
 
   return(enriched_modules)
 }
@@ -130,7 +158,7 @@ modules_enrichment <- function(modules, custom_gmt = NULL, ...) {
 #'
 #' @export
 
-modules_phenotype <- function(eigengenes, phenotypes) {
+associate_phenotype <- function(eigengenes, phenotypes) {
   # Checks
 
   # Design matrix (dummy variable formation for qualitative variables)
