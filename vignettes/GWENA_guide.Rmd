@@ -166,7 +166,7 @@ plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged
 ```
 
 ```{r plot_modules_gene_distribution, fig.height=3}
-ggplot2::ggplot(data.frame(module = detection$modules), ggplot2::aes(x = module)) + ggplot2::stat_count() +
+ggplot2::ggplot(data.frame(module = detection$modules %>% stack), ggplot2::aes(x = module)) + ggplot2::stat_count() +
   ggplot2::ylab("Number of genes")
 ```
 
@@ -174,7 +174,7 @@ ggplot2::ggplot(data.frame(module = detection$modules), ggplot2::aes(x = module)
 Each of the modules now present a specific profile, with an eigengene representing it wich acts like a signature. These informations along to the genes sets inside modules are now usefull to relate external gene information, or more generally, biological information.
 
 ```{r plot_module_profile}
-plot_expression_profiles(kuehne_expr_filtered, detection)
+plot_expression_profiles(kuehne_expr_filtered, detection$modules)
 ```
 
 ### 5. Biological integration
@@ -187,7 +187,7 @@ Using the over-representation analysis (ORA) function GOSt implemented in the g:
 
 ```{r modules_enrichment}
 library(gprofiler2)
-enrichment <- modules_enrichment(detection$modules)
+enrichment <- bio_enrich(detection$modules)
 # Example with module 2
 gprofiler2::gostplot(enrichment$`1`)
 ```

@@ -329,10 +329,8 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
   }
 
   # Re-formating
-  modules_list <- setNames(merge$colors, colnames(data_expr)) %>%
-    split(names(.), .)
-  modules_list_premerge <- setNames(dynamicMods, colnames(data_expr)) %>%
-    split(names(.), .)
+  modules_list <- setNames(merge$colors, colnames(data_expr)) %>% split(names(.), .)
+  modules_list_premerge <- setNames(dynamicMods, colnames(data_expr)) %>% split(names(.), .)
 
   # Return
   if (detailled_result) {
@@ -372,18 +370,37 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
 
 plot_modules_merge <- function(modules_premerge, modules_merged) {
   # Checks
-  if (!(is.vector(modules_premerge, "character") || (is.vector(modules_premerge, "numeric") && all(modules_premerge %% 1 == 0)))) {
-    stop("modules_premerge must be a vector of whole number or string") }
-  if (!(is.vector(modules_merged, "character") || (is.vector(modules_merged, "numeric") && all(modules_merged %% 1 == 0)))) {
-    stop("modules_premerge must be a vector of whole number or string") }
-  if (length(modules_premerge) != length(modules_merged)) stop("modules_premerge and modules_merged must be of same length")
+  if (!is.list(modules_premerge)) stop("modules_premerge must be a named list with modules id as names, and vectors of gene names as content")
+  if (!is.list(modules_merged)) stop("modules_merged must be a named list with modules id as names, and vectors of gene names as content")
+  if (length(modules_premerge) < 2) stop("modules_premerge must contain at least 2 modules")
+  if (length(modules_merged) < 1 || length(modules_merged) > length(modules_premerge))
+    stop("modules_premerge must contain at least 1 module and less or equal number of module")
+  if (is.null(names(modules_premerge))) stop("modules_premerge must be named with modules id as names ")
+  if (is.null(names(modules_merged))) stop("modules_merged must be named with modules id as names ")
+  if (!all(lapply(modules_merged, is.vector, "character") %>% unlist)) stop("module_merged values for each module must be a vector of gene names")
 
-  # Graph
-  g <- data.frame(before = modules_premerge , after = modules_merged, stringsAsFactors = FALSE) %>%
+  # Old checks
+  # if (!(is.vector(modules_premerge, "character") || (is.vector(modules_premerge, "numeric") && all(modules_premerge %% 1 == 0)))) {
+  #   stop("modules_premerge must be a vector of whole number or string") }
+  # if (!(is.vector(modules_merged, "character") || (is.vector(modules_merged, "numeric") && all(modules_merged %% 1 == 0)))) {
+  #   stop("modules_premerge must be a vector of whole number or string") }
+  # if (length(modules_premerge) != length(modules_merged)) stop("modules_premerge and modules_merged must be of same length")
+
+  # data.frame indicating which module got merge into another
+  g <- left_join(stack(modules_premerge), stack(modules_merged), by = "values") %>%
+    tibble::column_to_rownames("values") %>%
+    set_colnames(c("before", "after")) %>%
+    mutate_if(is.factor, as.character) %>%
+    mutate_if(is.character, as.numeric) %>%
     distinct %>%
     arrange(before) %>%
     igraph::graph_from_data_frame()
-  igraph::V(g)$type <- lapply(igraph::V(g) %>% names %>% as.numeric, function(x) ifelse(x %in% unique(modules_merged), TRUE, FALSE)) %>% unlist
+
+  # Adding property used by bipartite plot
+  igraph::V(g)$type <- lapply(igraph::V(g) %>% names %>% as.numeric,
+                              function(x) ifelse(x %in% (modules_merged %>% names %>% unique), TRUE, FALSE)) %>% unlist
+
+  # Bipartite plot
   g %>% igraph::add_layout_(igraph::as_bipartite()) %>%
     plot(vertex.label.color = "gray20",
          vertex.label.family = "Helvetica",
