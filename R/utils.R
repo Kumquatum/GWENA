@@ -1,7 +1,7 @@
 #' Muting a function
 #'
 #' Prevent a function to output multiple message.
-#' Source
+#' Source https://r.789695.n4.nabble.com/Suppressing-output-e-g-from-cat-td859876.html
 #'
 #' @param func Function who need to be muted.
 #'
