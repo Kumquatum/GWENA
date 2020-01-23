@@ -10,5 +10,5 @@
 quiet <- function(func) {
   sink(tempfile())
   on.exit(sink())
-  invisible(force(func))
+  suppressMessages(invisible(force(func)))
 }
