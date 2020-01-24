@@ -139,6 +139,55 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
   return(enriched_modules)
 }
 
+#' Plot module from bio_enrich
+#'
+#' Wrapper of the gprofiler2::gostplot function. Adding support of colorblind palet and selection of subsets if
+#' initial multiple query, and/or sources to plot.
+#'
+#' @param enrich_output list, bio_enrich result which are in fact gprofiler2::gost output.
+#' @param modules string or vector of characters designing the modules to plot. "all" by default to plot every module.
+#' @param sources string or vector of characters designing the sources to plot. "all" by default to plot every source.
+#' @param ... any other parameter you can provide to gprofiler2::gostplot
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom gprofiler2 gostplot
+#'
+#' @export
+
+plot_enrichment <- function(enrich_output, modules = "all", sources = "all", colorblind = TRUE, custom_palette = NULL, ...) {
+  # Checks
+  if (!is.vector(modules, "character")) stop("modules must be a string or vector of characters")
+  if (!is.vector(sources, "character")) stop("sources must be a string or vector of characters")
+  if (!("all" %in% modules) && !all(modules %in% enrich_output$meta$query_metadata$queries %>% names)) {
+    stop("Specified module must be in enrich_output list of modules names") }
+  if (!("all" %in% sources) && !all(sources %in% enrich_output$meta$query_metadata$sources)) {
+    stop("Specified sources must be in enrich_output list of sources") }
+  if (!is.logical(colorblind)) stop("colorblind should be a boolean")
+  if (length(enrich_output$meta$query_metadata$sources) > 12) warning("Cannot use a colorblind palette if more than 12 sources")
+  if (!is.null(custom_palette) && colorblind) warning("colorblind palette will not be used if custom_palette is provided")
+
+  # Selection of modules subsets if needed
+  if (!("all" %in% modules)) {
+    enrich_output$result <- enrich_output$result %>% dplyr::filter(query %in% modules)
+  }
+
+  # Selection of sources subsets if needed
+  if (!("all" %in% sources)) {
+    enrich_output$meta$query_metadata$sources <- sources
+    enrich_output$result <- enrich_output$result %>% dplyr::filter(source %in% sources)
+  }
+
+  # Colorblind pallet
+  if (isTRUE(colorblind) && is.null(custom_palette)) {
+    palette <- RColorBrewer::brewer.pal(length(enrich_output$meta$query_metadata$sources), "Paired")
+  } else palette <- NULL
+
+  # Plotting
+  gprofiler2::gostplot(enrich_output, pal = if (is.null(custom_palette)) palette else custom_palette, ...)
+}
+
 
 #' Modules phenotpic association
 #'

@@ -188,8 +188,7 @@ Using the over-representation analysis (ORA) function GOSt implemented in the g:
 ```{r modules_enrichment}
 library(gprofiler2)
 enrichment <- bio_enrich(detection$modules)
-# Example with module 2
-gprofiler2::gostplot(enrichment$`1`)
+plot_enrichment(enrichment)
 ```
 
 In these module, the functionnal activity seems to be linked to the processes of membrane communication. Moreover, the type of processes suggest an activity about cell cycle of life (differentiation, autophagy and content degradation).
