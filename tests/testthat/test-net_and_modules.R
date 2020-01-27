@@ -145,17 +145,20 @@ test_that("net should be squarred", {
 test_that("all colnames in rownames", {
   expect_error(detect_modules(data_expr = df_expr$df_microarray, net = res_net$network[-1, -10]))
 })
-test_that("output format is ok (detailled)", {
+test_that("output format is ok (detailled_result = TRUE)", {
   res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network)
   expect_true(all(names(res_modules) == c("modules", "modules_premerge", "modules_eigengenes", "dendrograms")))
-  expect_true(is.vector(res_modules$modules, "numeric"))
-  expect_true(is.vector(res_modules$modules_premerge, "numeric"))
-  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(table(res_modules$modules)))
+  expect_true(is.list(res_modules$modules))
+  expect_true(is.list(res_modules$modules_premerge))
+  expect_true(is.vector(res_modules$modules %>% unlist, "character"))
+  expect_true(is.vector(res_modules$modules_premerge %>% unlist, "character"))
+  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(res_modules$modules))
   expect_true(class(res_modules$dendrograms) == "hclust")
 })
-test_that("output format is ok (not detailled)", {
+test_that("output format is ok (detailled_result = FALSE)", {
   res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network, detailled_result = FALSE)
   expect_true(all(names(res_modules) == c("modules", "modules_eigengenes")))
-  expect_true(is.vector(res_modules$modules, "numeric"))
-  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(table(res_modules$modules)))
+  expect_true(is.list(res_modules$modules))
+  expect_true(is.vector(res_modules$modules %>% unlist, "character"))
+  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(res_modules$modules))
 })

@@ -7,17 +7,20 @@
 bio_enrich(module, custom_gmt = NULL, ...)
 }
 \arguments{
-\item{TODO}{finish}
+\item{module}{vector or list, vector of gene names representing a module or a named list of this modules.}
+
+\item{custom_gmt}{string or list, path to a gmt file or a list of these path.}
+
+\item{...}{any other parameter you can provide to gprofiler2::gost function.}
 }
 \value{
-TODO
+a gprofiler2::gost output, meaning a named list containing a 'result' data.frame with enrichement information on the
+differents databases and custom gmt files, and a 'meta' list containing informations on the input args, the version of gost,
+timestamp, etc. For more detail, see ?gprofiler2::gost.
 }
 \description{
 Enrich genes list from modules.
 }
-\details{
-TODO
-}
 \examples{
-#TODO
+# TODO
 }

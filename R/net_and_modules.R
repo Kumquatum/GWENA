@@ -379,13 +379,6 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
   if (is.null(names(modules_merged))) stop("modules_merged must be named with modules id as names ")
   if (!all(lapply(modules_merged, is.vector, "character") %>% unlist)) stop("module_merged values for each module must be a vector of gene names")
 
-  # Old checks
-  # if (!(is.vector(modules_premerge, "character") || (is.vector(modules_premerge, "numeric") && all(modules_premerge %% 1 == 0)))) {
-  #   stop("modules_premerge must be a vector of whole number or string") }
-  # if (!(is.vector(modules_merged, "character") || (is.vector(modules_merged, "numeric") && all(modules_merged %% 1 == 0)))) {
-  #   stop("modules_premerge must be a vector of whole number or string") }
-  # if (length(modules_premerge) != length(modules_merged)) stop("modules_premerge and modules_merged must be of same length")
-
   # data.frame indicating which module got merge into another
   g <- left_join(stack(modules_premerge), stack(modules_merged), by = "values") %>%
     tibble::column_to_rownames("values") %>%
