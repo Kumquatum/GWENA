@@ -4,8 +4,6 @@ arg_cor_func <- c("pearson", "spearman", "bicor")
 arg_network_type = c("unsigned", "signed", "signed hybrid")
 fake_mat <-  runif(n = 10*45, max = 100) %>%  matrix(ncol = 45)
 fake_cor_mat <- cor(fake_mat)
-df_expr <- list(df_microarray = kuehne_expr[, 5000:7000],
-                df_rnaseq = gtex_expr[, 5000:7000])
 
 
 # ==== .cor_func_match ====
@@ -120,7 +118,7 @@ test_that("output format is ok", {
 
 # ==== build_net ====
 
-res_net <- build_net(data_expr = df_expr$df_microarray)
+# res_net <- build_net(data_expr = df_expr$df_microarray)
 test_that("genes interactions strength is in [0;1]", {
   expect_gte(min(res_net$network %>% c), 0)
   expect_lte(max(res_net$network %>% c), 1)
@@ -146,19 +144,20 @@ test_that("all colnames in rownames", {
   expect_error(detect_modules(data_expr = df_expr$df_microarray, net = res_net$network[-1, -10]))
 })
 test_that("output format is ok (detailled_result = TRUE)", {
-  res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network)
-  expect_true(all(names(res_modules) == c("modules", "modules_premerge", "modules_eigengenes", "dendrograms")))
-  expect_true(is.list(res_modules$modules))
-  expect_true(is.list(res_modules$modules_premerge))
-  expect_true(is.vector(res_modules$modules %>% unlist, "character"))
-  expect_true(is.vector(res_modules$modules_premerge %>% unlist, "character"))
-  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(res_modules$modules))
-  expect_true(class(res_modules$dendrograms) == "hclust")
+  # res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network)
+  expect_true(all(names(res_detection) == c("modules", "modules_premerge", "modules_eigengenes", "dendrograms")))
+  expect_true(is.list(res_detection$modules))
+  expect_true(is.list(res_detection$modules_premerge))
+  expect_true(is.vector(res_detection$modules %>% unlist, "character"))
+  expect_true(is.vector(res_detection$modules_premerge %>% unlist, "character"))
+  expect_true(is.data.frame(res_detection$modules_eigengenes) && ncol(res_detection$modules_eigengenes) == length(res_detection$modules))
+  expect_true(class(res_detection$dendrograms) == "hclust")
 })
 test_that("output format is ok (detailled_result = FALSE)", {
-  res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network, detailled_result = FALSE)
-  expect_true(all(names(res_modules) == c("modules", "modules_eigengenes")))
-  expect_true(is.list(res_modules$modules))
-  expect_true(is.vector(res_modules$modules %>% unlist, "character"))
-  expect_true(is.data.frame(res_modules$modules_eigengenes) && ncol(res_modules$modules_eigengenes) == length(res_modules$modules))
+  res_detection_not_detailled <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network, detailled_result = FALSE)
+  expect_true(all(names(res_detection_not_detailled) == c("modules", "modules_eigengenes")))
+  expect_true(is.list(res_detection_not_detailled$modules))
+  expect_true(is.vector(res_detection_not_detailled$modules %>% unlist, "character"))
+  expect_true(is.data.frame(res_detection_not_detailled$modules_eigengenes) &&
+                ncol(res_detection_not_detailled$modules_eigengenes) == length(res_detection_not_detailled$modules))
 })
