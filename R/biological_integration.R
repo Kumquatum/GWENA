@@ -18,9 +18,9 @@
 join_gost <- function(gost_result) {
   # Check format
   if (!is.list(gost_result)) stop("gost_result must be a list.")
-  if (length(gost_result) < 2) stop("List must contain at list 2 gprofiler2::gost element")
+  if (length(gost_result) < 2) stop("gost_result must contain at least 2 gprofiler2::gost element")
   lapply(gost_result, function(gost){
-    if (is.null(gost)) stop("Elements of the list cannot be NULL")
+    if (is.null(gost)) stop("Elements of gost_result cannot be NULL")
     if (!all(names(gost) %in% c("result", "meta"))) stop("Bad format: gprofiler2::gost first levels should be 'result' and 'meta'")
     if (!is.data.frame(gost$result)) stop("Bad format: 'result' should be a data.frame")
     if (any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
@@ -39,15 +39,16 @@ join_gost <- function(gost_result) {
       if (!(name %in% c("organism", "sources"))) { # They won't be equivalent anyway
         if (name == "queries") {
           if (length(ref$meta$query_metadata$queries) != length(addon$meta$query_metadata$queries)) stop("Number of queries different.")
-          if (!all.equal(lapply(ref$meta$query_metadata$queries, length) %>% unlist %>% sort,
-                         lapply(addon$meta$query_metadata$queries, length) %>% unlist %>% sort)) stop("Length of queries different.")
+          if (!isTRUE(all.equal(lapply(ref$meta$query_metadata$queries, length) %>% unlist %>% sort,
+                         lapply(addon$meta$query_metadata$queries, length) %>% unlist %>% sort))) stop("Length of queries different.")
           if (length(setdiff(ref$meta$query_metadata$queries, addon$meta$query_metadata$queries)) > 0) warning(
             "Queries different between reference and gost_result element n°", x, ". It may be due to different type of ID (Ensembl, Entrez, etc.).
             IDs from reference (first element of gost_result) will be kept.")
         } else if (name == "numeric_ns") {
-          if (ref$meta$query_metadata$numeric_ns != addon$meta$query_metadata$numeric_ns)
-            warning("Different type of IDs. ", ref$meta$query_metadata$numeric_ns, " (reference) and ", addon$meta$query_metadata$numeric_ns,
-                    " (list element n°", x, ")")
+          if (is.vector(ref$meta$query_metadata$numeric_ns, "numeric") || is.vector(addon$meta$query_metadata$numeric_ns, "numeric")) {
+            if (ref$meta$query_metadata$numeric_ns != addon$meta$query_metadata$numeric_ns) {
+              warning("Different type of IDs. ", ref$meta$query_metadata$numeric_ns, " (reference) and ", addon$meta$query_metadata$numeric_ns,
+                      " (list element n°", x, ")")}}
         } else {
           # if (ref$meta$query_metadata[[name]] != addon$meta$query_metadata[[name]]) stop(paste0("Item ", name, " of query_metadata isn't identical"))
           if (!identical(ref$meta$query_metadata[[name]], addon$meta$query_metadata[[name]])) warning(
