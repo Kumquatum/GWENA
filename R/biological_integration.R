@@ -42,8 +42,8 @@ join_gost <- function(gost_result) {
           if (!isTRUE(all.equal(lapply(ref$meta$query_metadata$queries, length) %>% unlist %>% sort,
                          lapply(addon$meta$query_metadata$queries, length) %>% unlist %>% sort))) stop("Length of queries different.")
           if (length(setdiff(ref$meta$query_metadata$queries, addon$meta$query_metadata$queries)) > 0) warning(
-            "Queries different between reference and gost_result element n°", x, ". It may be due to different type of ID (Ensembl, Entrez, etc.).
-            IDs from reference (first element of gost_result) will be kept.")
+            "Queries different between reference (first element of gost_result) and gost_result element n°", x, ". It may be due to different type of ID (Ensembl, Entrez, etc.).
+            IDs from reference will be kept.")
         } else if (name == "numeric_ns") {
           if (is.vector(ref$meta$query_metadata$numeric_ns, "numeric") || is.vector(addon$meta$query_metadata$numeric_ns, "numeric")) {
             if (ref$meta$query_metadata$numeric_ns != addon$meta$query_metadata$numeric_ns) {
