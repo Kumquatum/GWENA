@@ -117,10 +117,16 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
     if (is.null(names(module))) warning("No name provided for the list of modules.")
   } else if (!is.vector(module, "character")) {
     stop("module must be either a list of modules or a single module represented by a vector of gene names")
+  } else if (!is.list(module) && length(module) < 2) {
+    warning("module represent a single module and only contains one gene name")
   }
   if (!is.null(custom_gmt)) {
-    if (!is.character(custom_gmt) && !is.list(custom_gmt)) stop("custom_gmt must be a path or a list of path to gmt file(s)")
-    if (is.list(custom_gmt) && !all(lapply(custom_gmt, is.character) %>% unlist)) stop("all element of the list must be paths")
+    if (!is.character(custom_gmt) || !is.list(custom_gmt)) stop("custom_gmt must be a path or a list of path to gmt file(s)")
+    if (is.list(custom_gmt)) {
+      if (!all(lapply(custom_gmt, is.character) %>% unlist)) stop("all element of the list must be paths")
+      # Checking path to avoid useless call to gost
+      if (!all(lapply(custom_gmt, file.exists))) stop("all custom_gmt path provided must exist")
+    } else if (!file.exists(custom_gmt)) stop("custom_gmt path provided does not exists")
   }
 
   # Enrichment with gprofiler internal datasets
