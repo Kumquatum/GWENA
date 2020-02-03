@@ -64,3 +64,35 @@ test_that("return a gost object", {
   expect_false(!is.list(joined_gost$meta))
   expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(joined_gost$meta)))))
 })
+
+
+# ==== bio_enrich ====
+
+test_that("module input is correctly checked", {
+  expect_error(bio_enrich())
+  expect_error(bio_enrich(NULL))
+  expect_error(bio_enrich(42))
+  expect_error(bio_enrich(1:42))
+  expect_error(bio_enrich(matrix(1:9, 3)))
+  expect_error(bio_enrich(data.frame(a = c(letters[1:5], b = letters[6:10]))))
+  expect_error(bio_enrich(list(c(res_detection$modules[4:5], c = 1:5))))
+  expect_warning(bio_enrich("this is not modules"))
+})
+
+test_that("custom_gmt input is correctly checked", {
+  expect_error(bio_enrich(res_detection$modules[[5]], 42))
+  expect_error(bio_enrich(res_detection$modules[[5]], "this is not a path"))
+  expect_error(bio_enrich(res_detection$modules[[5]], 1:42))
+  expect_error(bio_enrich(res_detection$modules[[5]], c("~/.bashrc", "~/.bash_history")))
+})
+
+test_that("returns enriched modules", {
+  expect_false(is.null(res_enrich))
+  expect_false(!all(names(res_enrich) %in% c("result", "meta")))
+  expect_false(!is.data.frame(res_enrich$result))
+  expect_false(any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
+                                 "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"), colnames(res_enrich$result)))))
+  expect_false(!is.list(res_enrich$meta))
+  expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(res_enrich$meta)))))
+})
+
