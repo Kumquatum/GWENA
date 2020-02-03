@@ -42,11 +42,26 @@ test_that("input is a gost result", {
                                                              genes_metadata = "not",
                                                              timestamp = "a",
                                                              version = "true meta")))))
-  expect_warning(join_gost(list(classic_gost, custom_gost_entrez)))
 })
 
-# test_that("correct input return gost_result", {
-#   expect_true(all(names(joined) %in% c("result", "meta")))
-# })
+test_that("gost objects in list are compatible", {
+  expect_error(join_gost(list(classic_gost, custom_gost_entrez))) # not same length
+  expect_warning(join_gost(list(classic_gost, gprofiler2::gost(query_entrez[28:140], organism = gmt_entrez_id)))) # not same id type (27:140 arbitrairy to get gost result)
+  mock_custom_gost <- custom_gost_symbols
+  mock_custom_gost$meta$query_metadata$ordered <- TRUE
+  expect_warning(join_gost(list(classic_gost, mock_custom_gost))) # element different
+})
+
+test_that("return a gost object", {
+  expect_false(is.null(gost))
+  expect_false(!all(names(gost) %in% c("result", "meta")))
+  expect_false(!is.data.frame(gost$result))
+  expect_false(any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
+                        "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"), colnames(gost$result)))))
+  expect_false(!is.list(gost$meta))
+  expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(gost$meta)))))
+
+
+})
 
 # test_that("warnings about ")
