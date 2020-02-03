@@ -96,3 +96,21 @@ test_that("returns enriched modules", {
   expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(res_enrich$meta)))))
 })
 
+
+# ==== plot_enrichment ====
+
+test_that("input enrich_output is correctly checked", {
+  expect_error(plot_enrichment())
+  expect_error(plot_enrichment("this is not a enrich_output result"))
+  expect_error(plot_enrichment(42))
+  expect_error(plot_enrichment(1:42))
+  expect_error(plot_enrichment(list(a = 1:5, b = "this is not a list of enrich_output result")))
+  expect_error(plot_enrichment(list(res_enrich[[5]], NULL)))
+  expect_error(plot_enrichment(fake_enrich_output = list(result = "this is not a true result",
+                                                         meta = list(query_metadata = "this",
+                                                         result_metadata = "is",
+                                                         genes_metadata = "not",
+                                                         timestamp = "a",
+                                                         version = "true meta"))))
+})
+
