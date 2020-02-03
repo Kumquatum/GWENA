@@ -1,3 +1,24 @@
+#' Check if it's a gost result
+#'
+#' Take a list that should be a gost result and check if format is good.
+#'
+#' @param gost_result list of gprofiler2::gost result
+
+check_gost <- function(gost_result) {
+  if (!is.list(gost_result)) stop("gost_result must be a list.")
+
+    if (is.null(gost_result)) stop("Elements of gost_result cannot be NULL")
+    if (!all(names(gost_result) %in% c("result", "meta"))) stop("gprofiler2::gost first levels should be 'result' and 'meta'")
+    if (!is.data.frame(gost_result$result)) stop("'result' should be a data.frame")
+    if (any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
+                          "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"),
+                        colnames(gost_result$result))))) stop("'result' is not a gprofiler2::gost result output")
+    if (!is.list(gost_result$meta)) stop("meta should be a list")
+    if (any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"),
+                        names(gost_result$meta))))) stop("Bad format: 'meta' is not a gprofiler2::gost result output")
+
+}
+
 #' Join gprofiler2::gost results
 #'
 #' Takes list of gprofiler2::gost results and join them. Usefull to join results of gprofiler2::gost with custom gmt to
@@ -17,19 +38,10 @@
 
 join_gost <- function(gost_result) {
   # Check format
-  if (!is.list(gost_result)) stop("gost_result must be a list.")
+  if (isTRUE(all.equal(names(gost_result), c("result", "meta")))) {
+    stop("You provided a single gprofiler2::gost result, it must be a list of at least 2 gprofiler2::gost")}
+  lapply(gost_result, check_gost) # All elements of gost_result list must be gprofiler2::gost results
   if (length(gost_result) < 2) stop("gost_result must contain at least 2 gprofiler2::gost element")
-  lapply(gost_result, function(gost){
-    if (is.null(gost)) stop("Elements of gost_result cannot be NULL")
-    if (!all(names(gost) %in% c("result", "meta"))) stop("Bad format: gprofiler2::gost first levels should be 'result' and 'meta'")
-    if (!is.data.frame(gost$result)) stop("Bad format: 'result' should be a data.frame")
-    if (any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
-                          "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"),
-                        colnames(gost$result))))) stop("Bad format: 'result' is not a gprofiler2::gost result output")
-    if (!is.list(gost$meta)) stop("Bad format: meta should be a list")
-    if (any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"),
-                        names(gost$meta))))) stop("Bad format: 'meta' is not a gprofiler2::gost result output")
-  })
 
   # Checking content is compatible (from the same queries) using 'meta' and the first element of the list as reference
   ref <- gost_result[[1]]
@@ -159,6 +171,7 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
 
 plot_enrichment <- function(enrich_output, modules = "all", sources = "all", colorblind = TRUE, custom_palette = NULL, ...) {
   # Checks
+  check_gost(enrich_output)
   if (!is.vector(modules, "character")) stop("modules must be a string or vector of characters")
   if (!is.vector(sources, "character")) stop("sources must be a string or vector of characters")
   if (!("all" %in% modules) && !all(modules %in% enrich_output$meta$query_metadata$queries %>% names)) {
