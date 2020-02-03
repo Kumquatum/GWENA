@@ -144,7 +144,7 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
 
     # If no enrichment with custom_gmt, returning only classic gost enrichment
     if (all(lapply(list_res_custom_gmts, is.null) %>% unlist)) {
-      stop("None of the custom_gmt file provided returned an enrichement")
+      warning("None of the custom_gmt file provided returned an enrichement")
       return(enriched_modules)
     }
 
