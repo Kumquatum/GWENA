@@ -14,10 +14,13 @@ gmt_symbols_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "
 gmt_symbols_id <- gprofiler2::upload_GMT_file(gmt_symbols_path)
 custom_gost_symbols <- gprofiler2::gost(query, organism = gmt_symbols_id)
 
+
 # ==== join_gost ====
-joined <- join_gost(list(classic_gost, custom_gost_symbols))
+
+joined_gost <- join_gost(list(classic_gost, custom_gost_symbols))
 
 test_that("input is a gost result", {
+  expect_error(join_gost())
   expect_error(join_gost("this is not a gost result"))
   expect_error(join_gost(42))
   expect_error(join_gost(1:42))
@@ -53,15 +56,11 @@ test_that("gost objects in list are compatible", {
 })
 
 test_that("return a gost object", {
-  expect_false(is.null(gost))
-  expect_false(!all(names(gost) %in% c("result", "meta")))
-  expect_false(!is.data.frame(gost$result))
+  expect_false(is.null(joined_gost))
+  expect_false(!all(names(joined_gost) %in% c("result", "meta")))
+  expect_false(!is.data.frame(joined_gost$result))
   expect_false(any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
-                        "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"), colnames(gost$result)))))
-  expect_false(!is.list(gost$meta))
-  expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(gost$meta)))))
-
-
+                        "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"), colnames(joined_gost$result)))))
+  expect_false(!is.list(joined_gost$meta))
+  expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(joined_gost$meta)))))
 })
-
-# test_that("warnings about ")
