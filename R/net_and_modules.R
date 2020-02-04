@@ -211,7 +211,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
                          power_value = NULL, block_size = NULL, stop_if_no_fit = FALSE, network_type = c("unsigned", "signed", "signed hybrid"),
                          tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"), save_adjacency = NULL,
-                         n_threads = 0, ...)  # TODO program the mclapply version
+                         n_threads = NULL, ...)  # TODO program the mclapply version
 {
   # Checking
   .check_data_expr(data_expr)
@@ -225,7 +225,11 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
   tom_type <- match.arg(tom_type)
   if (!is.null(save_adjacency) && grepl(".+\\.\\w+$", save_adjacency)) warning("Provided path in save_adjacency looks like a filename. Remember save_adjacency must be a folder name.")
   if (!is.null(save_adjacency) && !file.exists(save_adjacency)) stop("Provided path in save_adjacency doesn't exists.")
-  if (!is.numeric(n_threads) || n_threads < 0 || n_threads %% 1 != 0) stop("n_threads must be a whole number >= 0")
+  if (!is.null(n_threads)) {
+    if (!is.numeric(n_threads) || n_threads < 2 || n_threads %% 1 != 0) stop("n_threads must be a whole number > 2")}
+
+  # WGCNA's multi-threading
+  quiet(WGCNA::enableWGCNAThreads(n_threads))
 
   # Correlation selection and correlation matrix computation
   if (cor_func == "other") {
