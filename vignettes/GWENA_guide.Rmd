@@ -198,7 +198,8 @@ In these module, the functionnal activity seems to be linked to the processes of
 If phenotypic informations are available about the samples provided, an association test can help to determine if a module is specifically linked to a trait. In this cas, the module 1 seems to be strongly linked to the `Age` trait.
 
 ```{r modules_phenotype}
-phenotype_association <- associate_phenotype(detection$modules_eigengenes, kuehne_traits %>% select(Condition, Age, Slide))
+phenotype_association <- associate_phenotype(detection$modules_eigengenes, 
+                                             kuehne_traits %>% select(Condition, Age, Slide))
 plot_modules_phenotype(phenotype_association)
 ```
 
