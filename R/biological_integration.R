@@ -268,16 +268,8 @@ associate_phenotype <- function(eigengenes, phenotypes) {
 #'
 #' Plot a heatmap of the correlation between all modules and the phenotypic variables and the p value associated
 #'
-#' @param modules_phenotype List form modules_phenotype function output
-#' TODO finish
+#' @param modules_phenotype list, data.frames of correlation and pvalue associated
 #'
-#' @details
-#' TODO
-#' @return
-#' TODO
-#'
-#' @examples
-#' #TODO
 #' @importFrom ggplot2 ggplot geom_tile geom_point scale_color_gradient2 theme_bw xlab ylab
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
