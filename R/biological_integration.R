@@ -280,7 +280,20 @@ associate_phenotype <- function(eigengenes, phenotypes) {
 
 plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
   # Checks
-
+  if (!is.list(modules_phenotype)) stop("modules_phenotype must be a list")
+  if (!isTRUE(all.equal(names(modules_phenotype), c("association", "pval")))) {
+    stop("modules_penotype must have two elements: association and pvalue associated")}
+  if (!all(lapply(modules_phenotype, is.data.frame) %>% unlist)) {
+    stop("All elements of modules_phenotype must be data.frame") }
+  if (!isTRUE(all.equal(dim(modules_phenotype$association), dim(modules_phenotype$pval)))) {
+    stop("modules_phenotype data.frames must have the same number of rows") }
+  if (!modules_phenotype %>% unlist %>% is.numeric) {
+    stop("modules_phenotype data.frames must only contains numeric values")}
+  if (!(isTRUE(all.equal(rownames(modules_phenotype$association), rownames(modules_phenotype$pval))))) {
+    stop("rownames of assocaition and pval must be the same") }
+  if (!is.numeric(signif_th)) stop("signif_th must be a numeric value")
+  if (length(signif_th) != 1) stop("signif_th must be a single value")
+  if (signif_th <= 0 || signif_th >= 1) stop("signif_th must be in ]0;1[")
 
   # Data preparation
   df_cor <- modules_phenotype$association %>%
@@ -295,11 +308,18 @@ plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
     dplyr::mutate(signif = ifelse(pval > signif_th, FALSE, TRUE))
 
   # Plotting
-  ggplot2::ggplot(df_total, ggplot2::aes(x = factor(eigengene), y = factor(phenotype))) +
-    ggplot2::geom_tile(fill = "white") +
-    ggplot2::geom_point(ggplot2::aes(colour = cor, size = signif)) +
-    ggplot2::scale_color_gradient2() +
-    ggplot2::theme_bw() +
-    ggplot2::xlab("Module") +
-    ggplot2::ylab("Phenotype")
+  quiet(
+    g <- ggplot2::ggplot(df_total, ggplot2::aes(x = factor(eigengene), y = factor(phenotype))) +
+      ggplot2::geom_tile(fill = "white") +
+      ggplot2::geom_point(ggplot2::aes(colour = cor, size = signif)) +
+      ggplot2::scale_color_gradient2() +
+      ggplot2::theme_bw() +
+      ggplot2::xlab("Module") +
+      ggplot2::ylab("Phenotype")
+  ) # Warning message: Using size for a discrete variable is not advised. (vecause of using TRUE/FALSE as size)
+  ## Dirty solution proposed by G. Devailly
+    # geom_point(size = 5) +
+    # scale_shape_manual(values = c("\u25CF", "\u2B24")) +
+
+  g
 }
