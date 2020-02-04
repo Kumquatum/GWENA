@@ -3,17 +3,15 @@ library(magrittr)
 
 query <- res_detection$modules[[5]]
 query_entrez <- gprofiler2::gconvert(query, target = "ENTREZGENE_ACC")$target
-
 classic_gost <- gprofiler2::gost(query)
-
 gmt_entrez_path <- system.file("extdata", "h.all.v6.2.entrez.gmt", package = "GWENA", mustWork = TRUE)
 gmt_entrez_id <- gprofiler2::upload_GMT_file(gmt_entrez_path)
 custom_gost_entrez <- gprofiler2::gost(query_entrez, organism = gmt_entrez_id)
-
 gmt_symbols_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "GWENA", mustWork = TRUE)
 gmt_symbols_id <- gprofiler2::upload_GMT_file(gmt_symbols_path)
 custom_gost_symbols <- gprofiler2::gost(query, organism = gmt_symbols_id)
 
+asso_phen <- associate_phenotype(res_detection$modules_eigengenes, kuehne_traits)
 
 # ==== join_gost ====
 
@@ -113,4 +111,91 @@ test_that("input enrich_output is correctly checked", {
                                                          timestamp = "a",
                                                          version = "true meta"))))
 })
+
+test_that("input modules is correctly checked", {
+  expect_error(plot_enrichment(res_enrich, modules = 42))
+  expect_error(plot_enrichment(res_enrich, modules = 1:42))
+  expect_error(plot_enrichment(res_enrich, modules = list(a = 1:5, b = letters[1:42])))
+  expect_error(plot_enrichment(res_enrich, modules = c("this", "are", "not", "modules", "names")))
+  expect_error(plot_enrichment(res_enrich, modules = matrix(1:9, ncol = 3)))
+  expect_error(plot_enrichment(res_enrich, modules = data.frame(a = letters[1:5], b = c("this", "are", "not", "modules", "names"))))
+})
+
+test_that("input sources is correctly checked", {
+  expect_error(plot_enrichment(res_enrich, sources = 42))
+  expect_error(plot_enrichment(res_enrich, sources = 1:42))
+  expect_error(plot_enrichment(res_enrich, sources = list(a = 1:5, b = letters[1:42])))
+  expect_error(plot_enrichment(res_enrich, sources = c("this", "are", "not", "modules", "names")))
+  expect_error(plot_enrichment(res_enrich, sources = matrix(1:9, ncol = 3)))
+  expect_error(plot_enrichment(res_enrich, sources = data.frame(a = letters[1:5], b = c("this", "are", "not", "modules", "names"))))
+})
+
+test_that("output is a ggplot or plotly object", {
+  expect_true(any(class(plot_enrichment(res_enrich)) %in% c("ggplot", "plotly")))
+})
+
+
+# ==== associate_phenotype ====
+
+eigen_no_names <- setNames(res_detection$modules_eigengenes, NULL)
+
+test_that("input eigengenes is correctly checked", {
+  expect_error(associate_phenotype(NULL, kuehne_traits))
+  expect_error(associate_phenotype(42, kuehne_traits))
+  expect_error(associate_phenotype("This is not an eigengenes data.frame", kuehne_traits))
+  expect_error(associate_phenotype(1:42, kuehne_traits))
+  expect_error(associate_phenotype(list(a = 1:5, b = letters[1:5]), kuehne_traits))
+  expect_error(associate_phenotype(eigen_no_names, kuehne_traits))
+})
+
+test_that("input phenotypes is correctly checked", {
+  expect_error(associate_phenotype(res_detection$modules_eigengenes, NULL))
+  expect_error(associate_phenotype(res_detection$modules_eigengenes, 42))
+  expect_error(associate_phenotype(res_detection$modules_eigengenes, "This is not an eigengenes data.frame"))
+  expect_error(associate_phenotype(res_detection$modules_eigengenes, 1:42))
+  expect_error(associate_phenotype(res_detection$modules_eigengenes, list(a = 1:5, b = letters[1:5])))
+})
+
+test_that("adequation between eigengenes and phenotypes", {
+  expect_error(associate_phenotype())
+  expect_error(associate_phenotype(res_detection$modules_eigengenes, kuehne_traits[1:(nrow(kuehne_traits) - 1),]))
+})
+
+test_that("output is conform", {
+  expect_true(is.list(asso_phen))
+  expect_true(isTRUE(all.equal(names(asso_phen), c("association", "pval"))))
+  expect_true(all(lapply(asso_phen, is.data.frame) %>% unlist))
+  expect_true(isTRUE(all.equal(dim(asso_phen$association), dim(asso_phen$pval))))
+  expect_true(asso_phen %>% unlist %>% is.numeric)
+  expect_true(isTRUE(all.equal(colnames(res_detection$modules_eigengenes), rownames(asso_phen$association))))
+  expect_true(isTRUE(all.equal(colnames(res_detection$modules_eigengenes), rownames(asso_phen$pval))))
+})
+
+
+# ==== plot_modules_phenotype ===
+
+test_that("input modules_phenotype is correctly checked", {
+  expect_error(plot_modules_phenotype())
+  expect_error(plot_modules_phenotype(NULL))
+  expect_error(plot_modules_phenotype(42))
+  expect_error(plot_modules_phenotype("This is not an eigengenes data.frame"))
+  expect_error(plot_modules_phenotype(1:42))
+  expect_error(plot_modules_phenotype(list(a = 1:5, b = letters[1:5])))
+  expect_error(plot_modules_phenotype(data.frame(a = 1:5, b = letters[1:5])))
+})
+
+test_that("input signif_th is correctly checked", {
+ expect_error(plot_modules_phenotype(asso_phen, NULL))
+ expect_error(plot_modules_phenotype(asso_phen, -1))
+ expect_error(plot_modules_phenotype(asso_phen, 42))
+ expect_error(plot_modules_phenotype(asso_phen, "a"))
+ expect_error(plot_modules_phenotype(asso_phen, 1:42))
+ expect_error(plot_modules_phenotype(asso_phen, data.frame(a = 1:5, b = letters[1:5])))
+ expect_error(plot_modules_phenotype(asso_phen, list(a = 1:5, b = letters[1:5])))
+})
+
+test_that("output is a ggplot", {
+  expect_true("ggplot" %in% class(plot_modules_phenotype(asso_phen)))
+})
+
 
