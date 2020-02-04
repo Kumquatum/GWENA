@@ -7,20 +7,10 @@
 associate_phenotype(eigengenes, phenotypes)
 }
 \arguments{
-\item{eigengenes}{Matrix of igengenes provided by the output of modules_detection.}
+\item{eigengenes}{matrix or data.frame, eigengenes of the modules. Provided by the output of modules_detection.}
 
-\item{phenotypes}{Matrix of phenotypes for each sample to associate.
-TODO finish}
-}
-\value{
-TODO
+\item{phenotypes}{matrix or data.frame, phenotypes for each sample to associate.}
 }
 \description{
 Compute the correlation between all modules and the phenotypic variables
-}
-\details{
-TODO
-}
-\examples{
-#TODO
 }

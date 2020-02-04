@@ -7,18 +7,8 @@
 plot_modules_phenotype(modules_phenotype, signif_th = 0.05)
 }
 \arguments{
-\item{modules_phenotype}{List form modules_phenotype function output
-TODO finish}
-}
-\value{
-TODO
+\item{modules_phenotype}{list, data.frames of correlation and pvalue associated}
 }
 \description{
 Plot a heatmap of the correlation between all modules and the phenotypic variables and the p value associated
-}
-\details{
-TODO
-}
-\examples{
-#TODO
 }

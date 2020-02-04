@@ -9,7 +9,7 @@ build_net(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
   block_size = NULL, stop_if_no_fit = FALSE,
   network_type = c("unsigned", "signed", "signed hybrid"),
   tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2",
-  "signed 2", "none"), save_adjacency = NULL, n_threads = 0, ...)
+  "signed 2", "none"), save_adjacency = NULL, n_threads = NULL, ...)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
