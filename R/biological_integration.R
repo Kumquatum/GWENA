@@ -213,17 +213,9 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all", col
 #'
 #' Compute the correlation between all modules and the phenotypic variables
 #'
-#' @param eigengenes Matrix of igengenes provided by the output of modules_detection.
-#' @param phenotypes Matrix of phenotypes for each sample to associate.
-#' TODO finish
-#'
-#' @details
-#' TODO
-#' @return
-#' TODO
-#'
-#' @examples
-#' #TODO
+#' @param eigengenes matrix or data.frame, eigengenes of the modules. Provided by the output of modules_detection.
+#' @param phenotypes matrix or data.frame, phenotypes for each sample to associate.
+
 #' @importFrom WGCNA corPvalueStudent
 #' @importFrom dplyr select
 #'
