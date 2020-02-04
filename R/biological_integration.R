@@ -223,6 +223,14 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all", col
 
 associate_phenotype <- function(eigengenes, phenotypes) {
   # Checks
+  if (!(is.data.frame(eigengenes) || is.matrix(eigengenes))) stop("eigengenes should be a data.frame or matrix")
+  if (is.null(colnames(eigengenes))) stop("eigengenes should have modules reference as colnames")
+  if (!all(lapply(eigengenes, function(x) is.character(x) || is.numeric(x) || is.logical(x)) %>% unlist)) {
+    stop("eigengenes content should be only characters, numeric, or booleans") }
+  if (!(is.data.frame(phenotypes) || is.matrix(phenotypes))) stop("phenotypes should be a data.frame or matrix")
+  if (!all(lapply(phenotypes, function(x) is.character(x) || is.numeric(x) || is.logical(x)) %>% unlist)) {
+    stop("eigengenes content should be only characters, numeric, or booleans") }
+  if (nrow(eigengenes) != nrow(phenotypes)) stop("Number of row should be the same between eigengene and phenotypes (samples)")
 
   # Design matrix (dummy variable formation for qualitative variables)
   dummies_var <- lapply(colnames(phenotypes), function(dummy_name) {
