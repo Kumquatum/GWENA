@@ -303,6 +303,7 @@ detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_e
   if (!(is.data.frame(net) || is.matrix(net))) stop("net should be a data.frame or a matrix.")
   if (ncol(net) != nrow(net)) stop("net should be squarred")
   if (is.null(rownames(net)) || !all(colnames(net) %in% rownames(net))) stop("net should have the same genes names as colnames and rownames")
+  # TODO : finish checks
 
   # Order net matrix in the same order as data_expr
   net <- net[colnames(data_expr), colnames(data_expr)]
