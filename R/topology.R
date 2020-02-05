@@ -40,3 +40,31 @@ get_hub_gene_high_co <- function(network, modules = NULL, top_n = 5) {
   }
   return(hubs)
 }
+
+
+#' Determine hub genes inside each module
+#'
+#' Return genes considered as hub genes inside each module of a network
+#'
+#' @param network
+#' @param modules
+#' @param method
+#'
+#' @detail
+#' \describe{
+#'   \item{highest connectivity}{Select the top n (n depending on parameter given) highest connected genes. Similar to WGCNA::chooseTopHubInEachModule.}
+#'   \item{superior degree}{Select genes which degree is greater than average connection degree of the network. Definition from network theory.}
+#'   \item{Kleinberg's score}{Select genes which Kleinberg's score superior to provided threshold.}
+#'   \item{local and connector}{}
+#' }
+#'
+#' @return list of vectors representing hub genes, by module
+#'
+#' @export
+
+get_hub_genes <- function(network, modules, method) {
+
+}
+# Idee pour fournir method avec nom method + param : des listes à passer avec un element nommé "name" puis les autres elements avec le
+# nom des parametres et leur valeur
+# Ex : method = list(name = "highest connectivity", n = 10)
