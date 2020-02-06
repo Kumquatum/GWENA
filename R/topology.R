@@ -103,23 +103,21 @@ get_hub_degree <- function(network, modules, weight_th = 0.2) {
 
   # TODO : check if can avoid transforming to igraph object. It takes a lot of time...
 
-  # Graph whole network
-  g_net <- get_graph_from_sq_mat(network) %>%
-    igraph::delete.edges(which(igraph::E(.)$weight < weight_th))
-
-  # Average degree
-  g_net_degree <- igraph::degree(g_net)
-  avg_degree <- g_net_degree %>% mean
 
   # Above average degree genes
   if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
-    hubs <- g_net_degree[which(g_net_degree > avg_degree)] %>% names
+    # Graph whole network
+    net_degree <- get_graph_from_sq_mat(network) %>%
+      igraph::delete.edges(which(igraph::E(.)$weight < weight_th)) %>%
+      igraph::degree()
+    hubs <- net_degree[which(net_degree > (net_degree %>% mean))] %>% names
   } else {
     hubs <- lapply(modules, function(x){
       net_degree <- network[x,x] %>%
         get_graph_from_sq_mat() %>%
+        igraph::delete.edges(which(igraph::E(.)$weight < weight_th)) %>%
         igraph::degree()
-      x_hubs <- net_degree[which(net_degree > avg_degree)]
+      x_hubs <- net_degree[which(net_degree > (net_degree %>% mean))] %>% names
     })
   }
   return(hubs)
