@@ -36,8 +36,12 @@ get_graph_from_sq_mat <- function(sq_mat) {
 #' @param top_n integer, number of highest connected genes to be considered as hub genes
 #'
 #' @return list of vectors, or single vector of gene names
+#'
+#' @importFrom magrittr %>%
+#'
+#' @export
 
-get_hub_gene_high_co <- function(network, modules = NULL, top_n = 5) {
+get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
   # Checks
   if (!(is.data.frame(network) || is.matrix(network))) stop("network must be a data.frame or a matrix")
   if (is.null(colnames(network)) || is.null(rownames(network))) stop("network must have colnames and rownames")
