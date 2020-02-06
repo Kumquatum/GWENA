@@ -72,6 +72,59 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
   return(hubs)
 }
 
+#' Determine hub genes based on degree
+#'
+#' Remove edges from the graph which value is under weight_th then compute degree of each node (gene).
+#' Hub gene are genes whose degree value is above average degree value of the thresholded network.
+#'
+#' @param network
+#' @param modules
+#' @param weight_th decimal, weight threshold under which edges will be removed
+#'
+#' @detail GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
+#' are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same ()
+#'
+#' @importFrom igraph
+#'
+#' @return list of vectors, or single vector of gene names
+#'
+#' @export
+
+get_hub_degree <- function(network, modules, weight_th = 0.2) {
+  # Checks
+  if (!(is.data.frame(network) || is.matrix(network))) stop("network must be a data.frame or a matrix")
+  if (is.null(colnames(network)) || is.null(rownames(network))) stop("network must have colnames and rownames")
+  if (!is.null(modules)) {
+    if (!is.list(modules)) stop("modules must be a list")
+    if (is.null(names(modules))) stop("modules list must have names")
+    if (any(names(modules) == "" %>% unlist)) stop("modules list must have names for all elements")
+    if (any(lapply(modules, is.vector, "character") %>% unlist)) stop("modules list element must be vector of gene names")
+  }
+
+  # TODO : check if can avoid transforming to igraph object. It takes a lot of time...
+
+  # Graph whole network
+  g_net <- get_graph_from_sq_mat(network) %>%
+    igraph::delete.edges(which(igraph::E(.)$weight < weight_th))
+
+  # Average degree
+  g_net_degree <- igraph::degree(g_net)
+  avg_degree <- g_net_degree %>% mean
+
+  # Above average degree genes
+  if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
+    hubs <- g_net_degree[which(g_net_degree > avg_degree)] %>% names
+  } else {
+    hubs <- lapply(modules, function(x){
+      net_degree <- network[x,x] %>%
+        get_graph_from_sq_mat() %>%
+        igraph::degree()
+      x_hubs <- net_degree[which(net_degree > avg_degree)] # GNGNGNGNGNG verif hub gene reseau total fait sens (gateway gene ?) ou si juste dans module car local hub gene... PUTIAN
+    })
+  }
+  return(hubs)
+}
+
 
 #' Determine hub genes inside each module
 #'
