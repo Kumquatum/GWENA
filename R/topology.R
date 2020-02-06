@@ -1,3 +1,30 @@
+#' Return graph from squared matrix network
+#'
+#' Takes a squared matrix containing the pairwise similarity scores for each gene and return a igraph object.
+#'
+#' @param sq_mat matrix or data.frame, squared matrix representing
+#'
+#' @export
+
+get_graph_from_sq_mat <- function(sq_mat) {
+  # Checks
+  if (!(is.matrix(sq_mat) || is.data.frame((sq_mat)))) stop("sq_mat should be a matrix or a data.frame")
+  if (any(is.na(sq_mat))) warning("sq_mat should not contain any missing value")
+  if ((any(sq_mat > 1) || any(sq_mat < -1)) && !any(is.na(sq_mat))) stop("sq_mat should be filled with value in the [-1,1] range")
+  if (nrow(sq_mat) != ncol(sq_mat)) stop("sq_mat must be a squared matrix")
+
+  # From matrix to graph
+  sq_mat %>%
+    as.data.frame %>%
+    tibble::rownames_to_column("gene_from") %>%
+    tidyr::pivot_longer(-gene_from, names_to = "gene_to", values_to = "weight") %>%
+    .[!duplicated(t(apply(.[, c("gene_from", "gene_to")], 1, sort))), ] %>% # removing pairwise duplicates
+    as.data.frame %>%
+    dplyr::filter(gene_from != gene_to) %>% #removing self edge
+    igraph::graph_from_data_frame(directed = FALSE)
+}
+
+
 #' Determine hub genes based on connectivity
 #'
 #' Compute connectivity of each gene by module if provided or for whole network if not and return the top_n highest connected ones.
