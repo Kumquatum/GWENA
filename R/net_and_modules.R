@@ -296,22 +296,22 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' @export
 
-detect_modules <- function(data_expr, net, min_module_size = min(20, ncol(data_expr) / 2), merge_close_modules = TRUE, merge_cut_height = 0.25,
+detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(data_expr) / 2), merge_close_modules = TRUE, merge_cut_height = 0.25,
                               detailled_result = TRUE, ...) {
   # Checks
   .check_data_expr(data_expr)
-  if (!(is.data.frame(net) || is.matrix(net))) stop("net should be a data.frame or a matrix.")
-  if (ncol(net) != nrow(net)) stop("net should be squarred")
-  if (is.null(rownames(net)) || !all(colnames(net) %in% rownames(net))) stop("net should have the same genes names as colnames and rownames")
+  if (!(is.data.frame(network) || is.matrix(network))) stop("network should be a data.frame or a matrix.")
+  if (ncol(network) != nrow(network)) stop("network should be squarred")
+  if (is.null(rownames(network)) || !all(colnames(network) %in% rownames(network))) stop("network should have the same genes names as colnames and rownames")
   # TODO : finish checks
 
-  # Order net matrix in the same order as data_expr
-  net <- net[colnames(data_expr), colnames(data_expr)]
+  # Order network matrix in the same order as data_expr
+  network <- network[colnames(data_expr), colnames(data_expr)]
 
   # Hierarchical clustering
-  gene_tree = stats::hclust(as.dist(net), method = "average")
+  gene_tree = stats::hclust(as.dist(network), method = "average")
   # Tree cut
-  dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = net,
+  dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = network,
                                               deepSplit = 2, pamRespectsDendro = FALSE,
                                               minClusterSize = min_module_size))
 
