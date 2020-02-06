@@ -6,7 +6,7 @@
 #'
 #' @export
 
-get_graph_from_sq_mat <- function(sq_mat) {
+transform_sq_mat_to_graph <- function(sq_mat) {
   # Checks
   if (!(is.matrix(sq_mat) || is.data.frame((sq_mat)))) stop("sq_mat should be a matrix or a data.frame")
   if (any(is.na(sq_mat))) warning("sq_mat should not contain any missing value")
@@ -119,7 +119,7 @@ get_hub_degree <- function(network, modules, weight_th = 0.2) {
       net_degree <- network[x,x] %>%
         get_graph_from_sq_mat() %>%
         igraph::degree()
-      x_hubs <- net_degree[which(net_degree > avg_degree)] # GNGNGNGNGNG verif hub gene reseau total fait sens (gateway gene ?) ou si juste dans module car local hub gene... PUTIAN
+      x_hubs <- net_degree[which(net_degree > avg_degree)]
     })
   }
   return(hubs)
