@@ -90,44 +90,99 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 
 get_hub_degree <- function(network, modules, weight_th = 0.2) {
   # Checks
-  if (!(is.data.frame(network) || is.matrix(network))) stop("network must be a data.frame or a matrix")
-  if (is.null(colnames(network)) || is.null(rownames(network))) stop("network must have colnames and rownames")
+  .check_is_network(network)
   if (!is.null(modules)) {
-    if (!is.list(modules)) stop("modules must be a list")
-    if (is.null(names(modules))) stop("modules list must have names")
-    if (any(names(modules) == "" %>% unlist)) stop("modules list must have names for all elements")
-    if (any(lapply(modules, is.vector, "character") %>% unlist)) stop("modules list element must be vector of gene names")
+    .check_is_module(modules, is.list(modules))}
+  # TODO : check if can avoid transforming to igraph object. It takes a lot of time...
+
+  # Above average degree genes
+  if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
+    modules <- list(colnames(network))
+  }
+  hubs <- lapply(modules, function(x){
+    net_degree <- network[x,x] %>%
+      build_graph_from_sq_mat() %>%
+      igraph::delete.edges(which(igraph::E(.)$weight <= weight_th)) %>%
+      igraph::degree()
+    x_hubs <- net_degree[which(net_degree > (net_degree %>% mean))] %>% names
+  })
+
+  return(hubs)
+}
+
+
+#' Determine hub genes based on Kleinberg's score
+#'
+#' Compute Kleinberg's score (defined as the principal eigenvector of A*t(A), where A is the similarity matrix of the graph)
+#' of each gene by module if provided or for whole network if not, and return the top_n highest ones.
+#'
+#' @param network matrix or data.frame, square table representing connectivity between each genes as returned by
+#' build_net. Can be whole network or a single module.
+#' @param modules list, modules defined as list of gene vectors. If null, network is supposed to be the whole network
+#' or an already split module
+#' @param top_n integer, number genes to be considered as hub genes
+#' @param k_th decimal, Kleinberg's score threshold above or equal to which genes are considered as hubs
+#'
+#' @details If you provide a top_n value, you can't provide a k_th value and vice versa. If none of them is provided
+#' top_n = 5.
+#' For more information on Kleinberg's score, look at \code{\link[igraph{hub_score}]} from igraph.
+#'
+#' @importFrom igraph
+#'
+#' @return list of vectors, or single vector of gene names
+#'
+#' @export
+
+get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL) {
+  # Checks
+  .check_is_network(network)
+  if (!is.null(modules)) {
+    .check_is_module(modules, is.list(modules))}
+  if (is.null(top_n) && is.null(k_th)) {
+    top_n <- 5
+    warning("No top_n or k_th value provided. Default: top_n = ", top_n) }
+  if (!is.null(top_n) && !is.null(k_th)) {
+    k_th <- NULL
+    warning("Conflict: top_n and k_th value provided. Keeping only top_n value") }
+  if (!is.null(k_th)) {
+    if (length(k_th) > 1) stop("k_th must be a single numeric value")
+    if (!is.numeric(k_th)) stop("k_th must be a numeric value")
+    if (k_th >= 1 || k_th <= 0) stop("k_th must be a in ]0;1[")
+  }
+  if (!is.null(top_n)) {
+    if (length(top_n) > 1) stop("top_n must be a single numeric value")
+    if (!is.numeric(top_n)) stop("top_n must be a numeric value")
+    if (top_n < 1 || top_n %% 1 != 0) stop("If not NULL, block_size must be a whole number >= 1")
   }
 
   # TODO : check if can avoid transforming to igraph object. It takes a lot of time...
 
-
-  # Above average degree genes
   if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
-    # Graph whole network
-    net_degree <- get_graph_from_sq_mat(network) %>%
-      igraph::delete.edges(which(igraph::E(.)$weight < weight_th)) %>%
-      igraph::degree()
-    hubs <- net_degree[which(net_degree > (net_degree %>% mean))] %>% names
-  } else {
-    hubs <- lapply(modules, function(x){
-      net_degree <- network[x,x] %>%
-        get_graph_from_sq_mat() %>%
-        igraph::delete.edges(which(igraph::E(.)$weight < weight_th)) %>%
-        igraph::degree()
-      x_hubs <- net_degree[which(net_degree > (net_degree %>% mean))] %>% names
-    })
+    modules <- list(colnames(network))
   }
-  return(hubs)
-}
+  hubs <- lapply(modules, function(x){
+    net_hub_score <- network[x,x] %>%
+      build_graph_from_sq_mat() %>%
+      igraph::hub_score(scale = TRUE)$vector
 
+    # With top_n
+    if (!is.null(top_n)) {
+      x_hubs <- net_hub_score %>% sort(decreasing = TRUE) %>% .[1:top_n]
+    } else { # With k_th
+      x_hubs <- net_hub_score[which(net_hub_score >= k_th)]
+    }
+    return(x_hubs)
+  })
+}
 
 #' Determine hub genes inside each module
 #'
 #' Return genes considered as hub genes inside each module of a network
 #'
-#' @param network
-#' @param modules
+#' @param network matrix or data.frame, square table representing connectivity between each genes as returned by
+#' build_net. Can be whole network or a single module.
+#' @param modules list, modules defined as list of gene vectors. If null, network is supposed to be the whole network
+#' or an already split module
 #' @param method
 #'
 #' @detail
