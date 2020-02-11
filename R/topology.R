@@ -4,6 +4,12 @@
 #'
 #' @param sq_mat matrix or data.frame, squared matrix representing
 #'
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom dplyr filter
+#' @importFrom magrittr %>%
+#' @importFrom tibble rownames_to_column
+#' @importFrom tidyr pivot_longer
+#'
 #' @export
 
 build_graph_from_sq_mat <- function(sq_mat) {
@@ -82,7 +88,7 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 #' @detail GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
 #' are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same ()
 #'
-#' @importFrom igraph
+#' @importFrom igraph delete.edges degree E
 #'
 #' @return list of vectors, or single vector of gene names
 #'
@@ -127,7 +133,7 @@ get_hub_degree <- function(network, modules, weight_th = 0.2) {
 #' top_n = 5.
 #' For more information on Kleinberg's score, look at \code{\link[igraph{hub_score}]} from igraph.
 #'
-#' @importFrom igraph
+#' @importFrom igraph hub_score
 #'
 #' @return list of vectors, or single vector of gene names
 #'
@@ -173,17 +179,21 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL
     }
     return(x_hubs)
   })
+
+  return(hubs)
 }
+
 
 #' Determine hub genes inside each module
 #'
-#' Return genes considered as hub genes inside each module of a network
+#' Return genes considered as hub genes inside each module of a network following the selected method. Method will be lauched with default
+#' parameters. If specific parameters desired, please use directly the function \code{get_hub_...} itself.
 #'
 #' @param network matrix or data.frame, square table representing connectivity between each genes as returned by
 #' build_net. Can be whole network or a single module.
 #' @param modules list, modules defined as list of gene vectors. If null, network is supposed to be the whole network
 #' or an already split module
-#' @param method
+#' @param methodstring, name of the method to be used for hub gene detection. See details.
 #'
 #' @detail
 #' \describe{
