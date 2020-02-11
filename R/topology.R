@@ -162,7 +162,7 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL
   if (!is.null(k_th)) {
     if (length(k_th) > 1) stop("k_th must be a single numeric value")
     if (!is.numeric(k_th)) stop("k_th must be a numeric value")
-    if (k_th >= 1 || k_th <= 0) stop("k_th must be a in ]0;1[")
+    if (k_th > 0 || k_th <= 1) stop("k_th must be a in [0;1[")
   }
   if (!is.null(top_n)) {
     if (length(top_n) > 1) stop("top_n must be a single numeric value")
