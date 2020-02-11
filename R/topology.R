@@ -59,18 +59,18 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
   # Highly connected genes selection
   if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
     if (top_n > ncol(network)) stop("top_n > to number of genes into network")
-    hubs <- rowSums(network) %>% sort(decreasing = TRUE) %>% .[1:top_n] %>% names
-  } else {
-    hubs <- lapply(modules, function(x){
-      net <- network[x,x]
-      if (top_n > ncol(net)) {
-        warning("top_n > to number of genes into one of the modules. Taking all genes in this case.")
-        top_n <- ncol(net)
-      } else {
-        hubs_name <- rowSums(net) %>% sort(decreasing = TRUE) %>% .[1:top_n] %>% names
-      }
-    })
+    modules <- list(colnames(network))
   }
+
+  hubs <- lapply(modules, function(x){
+    net <- network[x,x]
+    if (top_n > ncol(net)) {
+      warning("top_n > to number of genes into one of the modules. Taking all genes in this case.")
+      top_n <- ncol(net)
+    } else {
+      hubs_name <- rowSums(net) %>% sort(decreasing = TRUE) %>% .[1:top_n]
+    }
+  })
   return(hubs)
 }
 
