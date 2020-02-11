@@ -94,11 +94,16 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 #'
 #' @export
 
-get_hub_degree <- function(network, modules, weight_th = 0.2) {
+get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
   # Checks
   .check_is_network(network)
   if (!is.null(modules)) {
     .check_is_module(modules, is.list(modules))}
+  if (!is.null(weight_th)) {
+    if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
+    if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
+    if (weight_th >= 0 || weight_th < 1) stop("weight_th must be a in [0;1[")
+  }
   # TODO : check if can avoid transforming to igraph object. It takes a lot of time...
 
   # Above average degree genes
