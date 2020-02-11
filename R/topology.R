@@ -115,7 +115,11 @@ get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
       build_graph_from_sq_mat() %>%
       igraph::delete.edges(which(igraph::E(.)$weight <= weight_th)) %>%
       igraph::degree()
-    x_hubs <- net_degree[which(net_degree > (net_degree %>% mean))] %>% names
+    if (table(net_degree) %>% length == 1) {
+      x_hubs <- c()
+    } else {
+      x_hubs <- net_degree[which(net_degree > (net_degree %>% mean))] }
+
   })
 
   return(hubs)
