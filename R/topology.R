@@ -170,15 +170,14 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL
     if (top_n < 1 || top_n %% 1 != 0) stop("If not NULL, block_size must be a whole number >= 1")
   }
 
-  # TODO : check if can avoid transforming to igraph object. It takes a lot of time...
-
   if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
-    modules <- list(colnames(network))
+    modules <- list(module = colnames(network))
   }
   hubs <- lapply(modules, function(x){
     net_hub_score <- network[x,x] %>%
       build_graph_from_sq_mat() %>%
-      igraph::hub_score(scale = TRUE)$vector
+      igraph::hub_score(scale = TRUE) %>%
+      .$vector
 
     # With top_n
     if (!is.null(top_n)) {
