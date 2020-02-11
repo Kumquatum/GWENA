@@ -214,10 +214,22 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL
 #'
 #' @export
 
-get_hub_genes <- function(network, modules, method) {
+get_hub_genes <- function(network, modules, method = c("highest connectivity", "superior degree", "Kleinberg's score")) {
+  # Checks
+  method = match.arg(method)
+
+  # Call
+  if (method == "highest connectivity") { hubs <- get_hub_high_co(network, modules)
+  } else if (method == "superior degree") { hubs <- get_hub_degree(network, modules)
+  } else if (method == "Kleinberg's score") { hubs <- get_hub_kleinberg(network, modules) }
+
+  return(hubs)
 
 }
 
-# Idee pour fournir method avec nom method + param : des listes à passer avec un element nommé "name" puis les autres elements avec le
-# nom des parametres et leur valeur
-# Ex : method = list(name = "highest connectivity", n = 10)
+
+
+
+
+
+
