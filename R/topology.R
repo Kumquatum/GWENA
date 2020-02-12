@@ -86,7 +86,7 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 #' @param weight_th decimal, weight threshold under or equal to which edges will be removed
 #'
 #' @detail GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
-#' are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same ()
+#' are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same.
 #'
 #' @importFrom igraph delete.edges degree E
 #'
@@ -234,8 +234,8 @@ get_hub_genes <- function(network, modules, method = c("highest connectivity", "
 #' @param graph_module igraph object, module to plot.
 #' @param hubs character vector or numeric vector with names, optionnal, vector of gene names or vector of numeric
 #' values named with gene names
-#' @param weight_th
-#' @param enrichment
+#' @param weight_th  decimal, weight threshold under or equal to which edges will be removed
+#' @param enrichment list, representing a gost object
 #' @param title string, main title that will be displayed on the plot
 #' @param degree_node_scaling boolean, indicate if node size should represent the degree of this node
 #' @param node_scaling numeric, scaling factor by whihch the node size will be scalled
@@ -253,6 +253,7 @@ get_hub_genes <- function(network, modules, method = c("highest connectivity", "
 plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment = NULL,
                         title = "Module", degree_node_scaling = TRUE, node_scaling = 1,
                         edge_scaling = 5, layout = "auto", ...) {
+  # TODO: add a layer arg that could take a list where each named element could be list of genes of interest (like one displaying gene known in aging and another for inflammation)
   # Checks
   if (!igraph::is.igraph(graph_module)) stop("graph_module must be an igraph object")
   named_num_vec <- char_vec <- FALSE
