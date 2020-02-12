@@ -6,10 +6,27 @@
 \usage{
 plot_module(graph_module, hubs = NULL, weight_th = 0.2,
   enrichment = NULL, title = "Module", degree_node_scaling = TRUE,
-  edge_scaling = 5, node_scaling = 1, ...)
+  node_scaling = 1, edge_scaling = 5, layout = "auto", ...)
 }
 \arguments{
-\item{hubs}{vector, optionnal,}
+\item{graph_module}{igraph object, module to plot.}
+
+\item{hubs}{character vector or numeric vector with names, optionnal, vector of gene names or vector of numeric
+values named with gene names}
+
+\item{title}{string, main title that will be displayed on the plot}
+
+\item{degree_node_scaling}{boolean, indicate if node size should represent the degree of this node}
+
+\item{node_scaling}{numeric, scaling factor by whihch the node size will be scalled}
+
+\item{edge_scaling}{numeric, scaling factor by whihch the edge width will be scalled}
+
+\item{layout}{numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
+or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
+the graph. For more information, see \code{\link{[igraph]{igraph.plotting}}}}
+
+\item{...}{any other parameter compatible with the \code{\link{[igraph]{plot.igraph}}} function}
 }
 \description{
 Display a graph representing the co-expression network and different informations like hubs, enrichments

@@ -27,5 +27,5 @@ of each gene by module if provided or for whole network if not, and return the t
 \details{
 If you provide a top_n value, you can't provide a k_th value and vice versa. If none of them is provided
 top_n = 5.
-For more information on Kleinberg's score, look at \code{\link[igraph{hub_score}]} from igraph.
+For more information on Kleinberg's score, look at \code{\link[igraph]{hub_score}} from igraph.
 }
