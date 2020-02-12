@@ -224,12 +224,96 @@ get_hub_genes <- function(network, modules, method = c("highest connectivity", "
   } else if (method == "Kleinberg's score") { hubs <- get_hub_kleinberg(network, modules) }
 
   return(hubs)
+}
 
+
+#' Plot co-expression network
+#'
+#' Display a graph representing the co-expression network and different informations like hubs, enrichments
+#'
+#' @param graph_module igraph object, module to plot.
+#' @param hubs character vector or numeric vector with names, optionnal, vector of gene names or vector of numeric
+#' values named with gene names
+#' @param weight_th
+#' @param enrichment
+#' @param title string, main title that will be displayed on the plot
+#' @param degree_node_scaling boolean, indicate if node size should represent the degree of this node
+#' @param node_scaling numeric, scaling factor by whihch the node size will be scalled
+#' @param edge_scaling numeric, scaling factor by whihch the edge width will be scalled
+#' @param layout numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
+#' or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
+#' the graph. For more information, see \code{\link{[igraph]{igraph.plotting}}}
+#' @param ... any other parameter compatible with the \code{\link{[igraph]{plot.igraph}}} function
+#'
+#' @import igraph
+#' @importFrom magrittr %>%
+#'
+#' @export
+
+plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment = NULL,
+                        title = "Module", degree_node_scaling = TRUE, node_scaling = 1,
+                        edge_scaling = 5, layout = "auto", ...) {
+  # Checks
+  if (!igraph::is.igraph(graph_module)) stop("graph_module must be an igraph object")
+  named_num_vec <- char_vec <- FALSE
+  if (!is.null(hubs)) {
+    if (is.vector(hubs, "numeric") && !is.null(names(hubs))) named_num_vec <- TRUE # Named vector with numeric values
+    if (is.vector(hubs, "character")) char_vec <- TRUE # Vector of characters
+    if (!(named_num_vec && char_vec)) stop("hubs must be a named vector of numeric values, or a vector of characters")
+  }
+  if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
+  if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
+  if (weight_th < 0 || weight_th >= 1) stop("weight_th must be a in [0;1[")
+  if (!is.null(enrichment)) check_gost(enrichment)
+  if (!is.character(layout) && !is.matrix(layout) && !is.function(layout)) {
+    stop("layout must be a layout function, its name as a string, or a matrix giving position of each node ") }
+
+  # Keeping only gene names if hubs is a named numeric vector
+  if (named_num_vec) hubs <- names(hubs)
+  if (!(all(hubs %in% igraph::V(graph_module)$names))) stop("Not all hubs are in graph_module")
+
+  # Removing edges whose weight < weight_th
+  graph_to_plot <- graph_module %>% delete.edges(which(E(.)$weight < weight_th))
+
+  if (layout != "auto") {
+    if (is.character(layout)) {
+      # Checking if layout function name exists
+      igraph_layouts <- grep("layout_[\\w|_]+", lsf.str("package:igraph"), value = TRUE)
+      if (!any(layout %in% igraph_layouts)) stop("layout name provided not found in igraph layout functions")
+      l = igraph::layout_(graph_to_plot, get(layout))
+    } else if (is.function(layout)) {
+      l = igraph::layout_(graph_to_plot, layout)
+    } else { # Meaning it's a matrix
+      l = layout
+    }
+  } else {
+    l = igraph::layout_nicely(graph_to_plot)}
+
+  # Should node be scaled with the degree information
+  if (node_scaling) {vertex_size = 2 + degree(graph_to_plot)^(1/node_scaling*0.1)
+  } else { vertex_size <- 15*node_scaling }
+
+  igraph::plot.igraph(graph_to_plot,
+                      vertex.label.color = "gray20",
+                      vertex.label.family = "Helvetica",
+                      vertex.label.cex = 0.7,
+                      vertex.label.dist = 1,
+                      vertex.size = vertex_size,
+                      edge.width = E(graph_to_plot)$weight*edge_scaling,
+                      edge.color = "gray70",
+                      vertex.frame.color = "white",
+                      vertex.color = "gray60",
+                      layout = l,
+                      main = title,
+                      ...)
 }
 
 
 
 
 
-
-
+#
+#
+# plot_modules_both_cond <- function(graph_module_1, graph_module_2, hubs, ...) {
+#
+# }
