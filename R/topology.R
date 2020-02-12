@@ -140,7 +140,7 @@ get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
 #'
 #' @details If you provide a top_n value, you can't provide a k_th value and vice versa. If none of them is provided
 #' top_n = 5.
-#' For more information on Kleinberg's score, look at \code{\link[igraph{hub_score}]} from igraph.
+#' For more information on Kleinberg's score, look at \code{\link[igraph]{hub_score}} from igraph.
 #'
 #' @importFrom igraph hub_score
 #'
