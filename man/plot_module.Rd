@@ -14,6 +14,10 @@ plot_module(graph_module, hubs = NULL, weight_th = 0.2,
 \item{hubs}{character vector or numeric vector with names, optionnal, vector of gene names or vector of numeric
 values named with gene names}
 
+\item{weight_th}{decimal, weight threshold under or equal to which edges will be removed}
+
+\item{enrichment}{list, representing a gost object}
+
 \item{title}{string, main title that will be displayed on the plot}
 
 \item{degree_node_scaling}{boolean, indicate if node size should represent the degree of this node}
