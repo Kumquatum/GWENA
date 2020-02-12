@@ -140,11 +140,11 @@ Another adjustement takes into account the [topology of the network](https://en.
 # In order to fasten the example process here, we only take a sample of the genes
 kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 
-res_net <- build_net(kuehne_expr_filtered, cor_func = "spearman")
+net <- build_net(kuehne_expr_filtered, cor_func = "spearman")
 ```
 
-* Power selected : `r net$power`
-* Fit of the power law to data ($R^2$) : `r net$fit_power`
+* Power selected : `r net$metadata$power`
+* Fit of the power law to data ($R^2$) : `r net$metadata$fit_power_table[net$metadata$fit_power_table$Power == net$metadata$power, "SFT.R.sq"]`
 
 ### 4. Modules detection
 
@@ -153,7 +153,7 @@ At this point, our network is a [complete graph](https://en.wikipedia.org/wiki/C
 They can be detected using unsupervised learning (here hierarchical clustering) or other adapted clustering method. 
 
 ```{r modules_detection}
-detection <- detect_modules(kuehne_expr_filtered, res_net$network, merge_cut_height = 0.997, detailled_result = TRUE)
+detection <- detect_modules(kuehne_expr_filtered, net$network, merge_cut_height = 0.997, detailled_result = TRUE)
 ```
 
 Since this operation tend to create multiple little modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), they are ussually merged into one.
@@ -166,8 +166,9 @@ plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged
 ```
 
 ```{r plot_modules_gene_distribution, fig.height=3}
-ggplot2::ggplot(data.frame(module = detection$modules %>% stack), ggplot2::aes(x = module)) + ggplot2::stat_count() +
-  ggplot2::ylab("Number of genes")
+ggplot2::ggplot(data.frame(detection$modules %>% stack), ggplot2::aes(x = ind)) + ggplot2::stat_count() +
+  ggplot2::ylab("Number of genes") +
+  ggplot2::xlab("Module")
 ```
 
 <!-- As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below. -->
@@ -186,7 +187,6 @@ A popular way to explore the modules consist to link know biological gene sets t
 Using the over-representation analysis (ORA) function GOSt implemented in the g:Profiler tool, we can retieve the biological association for each module and plot it as follow.
 
 ```{r modules_enrichment}
-library(gprofiler2)
 enrichment <- bio_enrich(detection$modules)
 plot_enrichment(enrichment)
 ```
@@ -209,49 +209,35 @@ The combination of information with the previous functionnal enrichment can orie
 
 ### 6. Graph analysis
 
-missing informations
-looking to neighboor genes
-adding data driven information with less bias
-hubgenes
+<!-- missing informations -->
+<!-- looking to neighboor genes -->
+<!-- adding data driven information with less bias -->
+<!-- hubgenes -->
 
-
-To recover this missing information, a common method in co-expression analysis is to use topology information. Neighborhood genes, patterns of interactions and other graph infromations can retrieve information yet to be biologicaly confirmed. Neighborhood genes have already be founded to be regulators or indirect factors of a condition (like gene-coded protein which would be catalyzed and from whom the product would impact the condition). 
+<!-- Alternative text -->
+<!-- To recover this missing information, a common method in co-expression analysis is to use topology information. Neighborhood genes, patterns of interactions and other graph infromations can retrieve information yet to be biologicaly confirmed. Neighborhood genes have already be founded to be regulators or indirect factors of a condition (like gene-coded protein which would be catalyzed and from whom the product would impact the condition).  -->
 
 To recover this missing information, a common method is to look to the genes linked to the known one inside co-expression networks. These neighborhood genes may act as regulators or indirect factors of the condition (like gene-coded protein which would be catalyzed and from whom the product would impact the condition). Multiple metrics, in the sens of graph theory, exist to assess the closely lineked genes.
-
 Moreover, information can itself come from the network, meaning data-driven information, by opposition to the functionnal enrichment which is knowledge driven (information from biological databases is "matched" onto studied data). For example, hub genes are genes which are central in the network in terms of centrality and 
 
+Manipulation of graph objects can be quite demanding in memory and CPU usage. Caution is advised when choosing to plot the whole network if it is larger than 100 genes (therefore nodes). 
+
+For this reason it is a good practice to plot only interesting modules. The module 1 from our example present a significant link to aging based on phenotype association and also many terms of biological enrichment. We will continue our topological analysis with it.
+Since co-expression network are complete graph, all nodes are connected with each other even if the strengh of the link is weak (at the module scale, not the network). In order to remove this noise and bring some clarity in visualisation, this links below a threshold are removed.
 
 ```{r graph}
-# TODO
-
+module_1 <- detection$modules$`1`
+graph <- build_graph_from_sq_mat(net$network[module_1, module_1])
+plot_module(graph, weight_th = 0.99, edge_scaling = 0.1, node_scaling = 0.5)
 ```
 
+As you can see, adjustments on node size and edges width can be applied to improve clarity
 
-### 7. Modules comparison
+Inside the module are genes which are key genes in the biological functions covered. This are called "hub genes". In order to detect them, multiple algorithms are available:
 
-```{r redo_by_condition, message=FALSE, results='hide'}
-kuehne_traits$sample = apply(kuehne_traits, 1, function(line) paste(line["Slide"], line["Exp"], sep = "_"))
-data_list <- list(
-  kuehne_young = kuehne_expr_filtered[rownames(kuehne_expr_filtered) %in% kuehne_traits[which(kuehne_traits$Condition == "young"), "sample"],],
-  kuehne_old = kuehne_expr_filtered[rownames(kuehne_expr_filtered) %in% kuehne_traits[which(kuehne_traits$Condition == "old"), "sample"],]  
-)
-
-net_list <- lapply(data_list, net_building, kuehne_expr_filtered, cor_func = "spearman", save_adjacency = TRUE, detailled_result = TRUE)
-detection_list <- mapply(modules_detection, data_list, lapply(net_list, function(condition) condition$tom), SIMPLIFY = FALSE)
-```
-
-```{r modules_preservation}
-preservation <- modules_preservation(data_list, net_list, detection_list, "kuehne_young", "kuehne_old")
-preserved_modules <- which(apply(preservation$p.value, 1, max) < 0.999) # Fake value here, just to show the result
-```
-
-* Preservation statistics
-
-`r knitr::kable(preservation$p.values)`
-
-* Modules preserved : `r paste(preserved_modules, collapse = ", ")`
-
+* Highest connectivity: Select the top n (n depending on parameter given) highest connected genes. Similar to WGCNA's selection of hub genes
+* Superior degree: Select genes which degree is greater than average connection degree of the network. Definition from network theory.
+* Kleinberg's score: Select genes which Kleinberg's score superior to provided threshold.
 
 
 <div style="text-align:center; font-size:70%; margin-top:50px"> 
