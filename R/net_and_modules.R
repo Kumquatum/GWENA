@@ -427,11 +427,25 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 plot_expression_profiles <- function(data_expr, modules) {
   # Check
   .check_data_expr(data_expr)
-  if (!(is.vector(modules, "character") || (is.vector(modules, "numeric") && all(modules %% 1 == 0)))) {
-    stop("modules_premerge must be a vector of whole number or string") }
+  if (is.list(modules)) {
+    if (any(!unlist(lapply(modules, is.vector, "character")))) {
+      stop("If modules is a list of modules, all elements of the list must be vectors of gene names") }
+    if (is.null(names(modules))) warning("No name provided for the list of modules.")
+  } else if (!is.vector(modules, "character")) {
+    stop("modules must be either a list of modules or a single module represented by a vector of gene names")
+  } else if (!is.list(modules) && length(modules) < 2) {
+    warning("modules represent a single modules and only contains one gene name")
+  }
+  # if (!(is.vector(modules, "character") || (is.vector(modules, "numeric") && all(modules %% 1 == 0)))) {
+  #   stop("modules_premerge must be a vector of whole number or string") }
 
   # Tables preparation for ggplot
-  df <- data.frame(gene = names(modules), module = modules, stringsAsFactors = FALSE)
+  if (is.list(modules)) {
+    df <- modules %>% stack %>% setNames(c("gene", "module")) %>% mutate(module = as.character(module))
+  } else {
+    df <- data.frame(gene = modules, module = "module", stringsAsFactors = FALSE) %>% mutate(module = as.character(module))
+  }
+  # df <- data.frame(gene = names(modules), module = modules, stringsAsFactors = FALSE)
 
   eigengenes <- df %>%
     dplyr::left_join(data_expr %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene"), by = "gene") %>%
@@ -440,7 +454,8 @@ plot_expression_profiles <- function(data_expr, modules) {
     as.data.frame(check.names = FALSE) %>%
     tibble::rownames_to_column(var="sample") %>%
     mutate(gene = "eigengene") %>%
-    tidyr::pivot_longer(c(-gene, -sample), names_to = "module", values_to = "expression", names_ptypes = list(module = numeric()))
+    tidyr::pivot_longer(c(-gene, -sample), names_to = "module", values_to = "expression", names_ptypes = list(module = numeric())) %>%
+    mutate(module = as.character(module))
 
   plot_table <- df %>%
     left_join(data_expr %>% scale %>% as.data.frame %>% t %>% as.data.frame %>%
