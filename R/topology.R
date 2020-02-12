@@ -242,8 +242,8 @@ get_hub_genes <- function(network, modules, method = c("highest connectivity", "
 #' @param edge_scaling numeric, scaling factor by whihch the edge width will be scalled
 #' @param layout numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
 #' or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
-#' the graph. For more information, see \code{\link{[igraph]{igraph.plotting}}}
-#' @param ... any other parameter compatible with the \code{\link{[igraph]{plot.igraph}}} function
+#' the graph. For more information, see \code{\link[igraph]{igraph.plotting}}
+#' @param ... any other parameter compatible with the \code{\link[igraph]{plot.igraph}} function
 #'
 #' @import igraph
 #' @importFrom magrittr %>%

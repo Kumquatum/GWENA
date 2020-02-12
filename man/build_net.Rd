@@ -34,14 +34,12 @@ and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
 \item{save_adjacency}{string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.}
 
 \item{n_threads}{integer, number of threads that can be used to paralellise the computing}
+
+\item{...}{any parameter compatible with \code{get_fit.cor}}
 }
 \value{
 list containing network matrix, metadata of input parameters and power fitting information.
 }
 \description{
 Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
-}
-\examples{
-net_building(kuehne_expr[, 1:1000])
-
 }

@@ -137,9 +137,6 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #'
 #' @return A list containing power of the law for best fit, fit table, and metadata about the arguments used.
 #'
-#' @examples
-#' get_fit.expr(data_expr = kuehne_expr[, 1:100])
-#'
 #' @importFrom magrittr %>%
 #'
 #' @export
@@ -198,10 +195,9 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
 #' @param save_adjacency string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.
 #' @param n_threads integer, number of threads that can be used to paralellise the computing
+#' @param ... any parameter compatible with \code{get_fit.cor}
 #'
 #' @return list containing network matrix, metadata of input parameters and power fitting information.
-#' @examples
-#' net_building(kuehne_expr[, 1:1000])
 #'
 #' @importFrom WGCNA adjacency.fromSimilarity TOMsimilarity
 #' @importFrom magrittr %>% set_colnames set_rownames
