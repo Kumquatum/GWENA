@@ -4,20 +4,20 @@
 \alias{detect_modules}
 \title{Modules detection in a network}
 \usage{
-detect_modules(data_expr, net, min_module_size = min(20,
+detect_modules(data_expr, network, min_module_size = min(20,
   ncol(data_expr)/2), merge_close_modules = TRUE,
   merge_cut_height = 0.25, detailled_result = TRUE, ...)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
 
-\item{net}{matrix or data.frame, strengh of gene co-expression (edge values).}
-
 \item{min_module_size}{integer, lowest number of gene allowed in a module. If none provided, estimated.}
 
 \item{merge_close_modules}{boolean, does closest modules (based on eigengene) should be merged together.}
 
 \item{merge_cut_height}{float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.}
+
+\item{net}{matrix or data.frame, strengh of gene co-expression (edge values).}
 
 \item{detailled_results}{boolean, does pre-merge modules (if applicable) and dendrogram included in output.}
 }
