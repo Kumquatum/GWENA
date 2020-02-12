@@ -313,7 +313,8 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
 
 
 
-
+#
+#
 # plot_modules_both_cond <- function(graph_module_1, graph_module_2, hubs, ...) {
 #
 # }
