@@ -287,7 +287,7 @@ plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
     dplyr::mutate(signif = ifelse(pval > signif_th, FALSE, TRUE))
 
   # Plotting
-  quiet(
+  suppressWarnings(quiet(
     g <- ggplot2::ggplot(df_total, ggplot2::aes(x = factor(eigengene), y = factor(phenotype))) +
       ggplot2::geom_tile(fill = "white") +
       ggplot2::geom_point(ggplot2::aes(colour = cor, size = signif)) +
@@ -295,7 +295,8 @@ plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
       ggplot2::theme_bw() +
       ggplot2::xlab("Module") +
       ggplot2::ylab("Phenotype")
-  ) # Warning message: Using size for a discrete variable is not advised. (vecause of using TRUE/FALSE as size)
+  )) # Warning message: Using size for a discrete variable is not advised. (vecause of using TRUE/FALSE as size)
+  # TODO : find why suppressWarnings + quiet doesn't make the function shut up
   ## Dirty solution proposed by G. Devailly
     # geom_point(size = 5) +
     # scale_shape_manual(values = c("\u25CF", "\u2B24")) +
