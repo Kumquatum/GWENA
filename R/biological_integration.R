@@ -1,24 +1,3 @@
-#' Check if it's a gost result
-#'
-#' Take a list that should be a gost result and check if format is good.
-#'
-#' @param gost_result list of gprofiler2::gost result
-
-check_gost <- function(gost_result) {
-  if (!is.list(gost_result)) stop("gost_result must be a list.")
-
-    if (is.null(gost_result)) stop("Elements of gost_result cannot be NULL")
-    if (!all(names(gost_result) %in% c("result", "meta"))) stop("gprofiler2::gost first levels should be 'result' and 'meta'")
-    if (!is.data.frame(gost_result$result)) stop("'result' should be a data.frame")
-    if (any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
-                          "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"),
-                        colnames(gost_result$result))))) stop("'result' is not a gprofiler2::gost result output")
-    if (!is.list(gost_result$meta)) stop("meta should be a list")
-    if (any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"),
-                        names(gost_result$meta))))) stop("Bad format: 'meta' is not a gprofiler2::gost result output")
-
-}
-
 #' Join gprofiler2::gost results
 #'
 #' Takes list of gprofiler2::gost results and join them. Usefull to join results of gprofiler2::gost with custom gmt to
