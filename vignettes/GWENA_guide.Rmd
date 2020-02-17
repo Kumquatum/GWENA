@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 
 *Citation: TODO quand la ref + DOI de la publi sera dispo*
 
-## Presentation
+## Overview
 
 Comprehension of complex biological systems now require an approach based on interactions between each actor, meaning a network. Their interpretation often involve both a knowledge-driven and a data driven analysis. Current methods respectively focus on functional enrichment and hub genes detection. Combining them with the comparison of conditions and an extended topology analysis within a single pipeline can lead to better results exploitation. 
 
@@ -53,11 +53,11 @@ library(GWENA)
 <!-- # TODO: ajouter wrapper -->
 <!-- ``` -->
 
-## Steps detail
+## Main steps detail with default pipeline
 
 ### 1. Input data
 
-Input data supported by this package can be either from RNA-seq or microarray. They must have been resumed to the gene level (if you have no idea how to do so, see [How can I resume my transcriptomic data to the gene level ?](FAQ.html/#how-can-i-resume-my-transcriptomic-data-to-the-gene-level) from the [FAQ](FAQ.html)) . 
+Input data supported by this package can be either from RNA-seq or microarray. You can use the import function of your choice (read.csv, read.table, ect.) as long as the final format is a data.frame with genes as columns and samples as rows. Transcriptomic data must have been resumed to the gene level (if you have no idea how to do so, see [How can I resume my transcriptomic data to the gene level ?](FAQ.html/#how-can-i-resume-my-transcriptomic-data-to-the-gene-level) from the [FAQ](FAQ.html)) . 
 
 <!-- TODO Si le package n'implémente pas de méthode, laisser cette phrase et la compléter en indiquant dans la section en question les moyens de résumé à l'échelle gene comme collapseRows de WGCNA, ou ... ? RSEM ? RNA-SeQC ? etc. -->
 
@@ -76,10 +76,11 @@ kuehne_traits[1:5,]
 
 > Note : GWENA doesn't provide normalization methods. Explaination can be found in FAQ at [Why GWENA doesn't provide normalization methods ?](FAQ.html/#)
 
-### 2. Filtration
+### 2. Gene filtering
 
-This step need to be carefully studied as it will impact the modules building. 
-The authors of WGCNA advise against using differentialy expressed (DE) genes as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
+Even if co-expression method will filter out low co-expressed genes, it is interesting in terms of computer power to reduce the dataset to work with. This will require less memory to store the data, and less CPU power and memory when working on it. Howerver, this step need to be carefully studied as it will impact the modules building. 
+
+The [authors of WGCNA advise against using differentialy expressed (DE) genes](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html) as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
 
 Multiple types of filtration have been natively implemented :
 
@@ -123,7 +124,7 @@ Remaining number of genes : `r ncol(kuehne_expr_filtered)`
 
 
 
-### 3. Network building and modules detection
+### 3. Network building 
 
 Gene co-expression networks consist in an ensemble of genes (nodes) linked to each other (edges) according to the strengh of their relation. This strengh estimation begins by the computation of a **similarity score**. It can be a distance (euclidian, minkowski, ...) but is usually a correlation. Among these, Pearson's one is the more popular. However in GWENA we chosed Spearman correlation by default since it is less sensible to outliers which are frequent in transcriptomics.
 
@@ -165,6 +166,8 @@ Since this operation tend to create multiple little modules with highly similar 
 plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
 ```
 
+Resulting modules contain more genes whose repartition can be seen by a simple barplot. Noticebly, WGCNA tend to create bigger modules for the first ones and smaller for the latest. 
+
 ```{r plot_modules_gene_distribution, fig.height=3}
 ggplot2::ggplot(data.frame(detection$modules %>% stack), ggplot2::aes(x = ind)) + ggplot2::stat_count() +
   ggplot2::ylab("Number of genes") +
@@ -172,11 +175,14 @@ ggplot2::ggplot(data.frame(detection$modules %>% stack), ggplot2::aes(x = ind)) 
 ```
 
 <!-- As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below. -->
-Each of the modules now present a specific profile, with an eigengene representing it wich acts like a signature. These informations along to the genes sets inside modules are now usefull to relate external gene information, or more generally, biological information.
+Each of the modules present a specific profile, which can be plotted in two figures to separate the positive (+ facet) and negative (- facet) correlations profile. As a summary of this profiles, an eigengene (red line) acting like a signature can be stacked on this representation. 
 
 ```{r plot_module_profile}
 plot_expression_profiles(kuehne_expr_filtered, detection$modules)
 ```
+
+These informations along to the genes sets inside modules are now usefull to relate external gene information, or more generally, biological information.
+
 
 ### 5. Biological integration
 
@@ -238,6 +244,25 @@ Inside the module are genes which are key genes in the biological functions cove
 * Highest connectivity: Select the top n (n depending on parameter given) highest connected genes. Similar to WGCNA's selection of hub genes
 * Superior degree: Select genes which degree is greater than average connection degree of the network. Definition from network theory.
 * Kleinberg's score: Select genes which Kleinberg's score superior to provided threshold.
+
+
+
+
+
+
+
+
+
+
+
+## Main steps detail with change in pipeline's modules
+
+
+
+
+
+
+
 
 
 <div style="text-align:center; font-size:70%; margin-top:50px"> 
