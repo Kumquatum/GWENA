@@ -307,6 +307,30 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
                       layout = l,
                       main = title,
                       ...)
+
+
+  # From https://rdrr.io/bioc/NetPathMiner/src/R/plotPath.R#sym-graph.sizes
+  graph.sizes <- function(v, devsize = min(par("pin"))){
+    vsize <- (devsize*200)/v
+    if(vsize < 1) vsize <- 1
+    if(vsize > 15) vsize <- 15
+
+    earrow <- vsize*0.08
+    if(earrow < 0.2) earrow <- 0.2
+    if(earrow > 1) earrow <- 1
+
+    label <- earrow*1.5
+    if(label>1) label <- 1
+    return(list(vsize=vsize, earrow=earrow, label=label))
+  }
+
+  # Legend nodes
+  scale_vertex_size <- seq(round(min(vertex_size)), round(max(vertex_size)), length.out = 6)
+  a <- legend("bottomright", as.character(scale_vertex_size), pt.cex = scale_vertex_size/200,
+              col = 'white', pch = 21, title = "Degree", bty = "n")
+  x <- (a$text$x + a$rect$left) / 2
+  y <- a$text$y
+  symbols(x, y, circles = scale_vertex_size/200, inches=FALSE, add=TRUE, bg='gray', fg='white')
 }
 
 
