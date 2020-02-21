@@ -5,8 +5,6 @@
 #' @param cor_func string of the name of the correlation to be use
 #'
 #' @return A function corresponding to the correlation required
-#' @examples
-#' .cor_func_match("pearson")
 #'
 #' @importFrom WGCNA bicor cor
 
@@ -30,7 +28,9 @@
 
 #' Run all checks on expression data
 #'
-#' Check that it is a matrix or data frame,
+#' Check that a data_expr is a matrix or data frame conform for process by GWENA
+#'
+#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
 #'
 #' @return A boolean, indicate if all checks were good
 
@@ -51,6 +51,7 @@
 #' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
 #' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
+#' @param ... any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}
 #'
 #' @details
 #' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
@@ -126,6 +127,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
 #' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
+#' @param ... any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}
 #'
 #' @details
 #' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
@@ -195,7 +197,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
 #' @param save_adjacency string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.
 #' @param n_threads integer, number of threads that can be used to paralellise the computing
-#' @param ... any parameter compatible with \code{get_fit.cor}
+#' @param ... any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}
 #'
 #' @return list containing network matrix, metadata of input parameters and power fitting information.
 #'
@@ -279,11 +281,12 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #' Detect the modules by hierarchical clustering .
 #'
 #' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
-#' @param net matrix or data.frame, strengh of gene co-expression (edge values).
+#' @param network matrix or data.frame, strengh of gene co-expression (edge values).
 #' @param min_module_size integer, lowest number of gene allowed in a module. If none provided, estimated.
 #' @param merge_close_modules boolean, does closest modules (based on eigengene) should be merged together.
 #' @param merge_cut_height float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.
-#' @param detailled_results boolean, does pre-merge modules (if applicable) and dendrogram included in output.
+#' @param detailled_result boolean, does pre-merge modules (if applicable) and dendrogram included in output.
+#' @param ... any other parameter compatible with \code{\link[WGCNA]{mergeCloseModules}}
 #'
 #' @return list containing modules detected, modules_eigengenes, and if asked for, modules pre-merge and dendrogram
 #'
