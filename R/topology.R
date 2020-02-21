@@ -296,8 +296,17 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
     l = igraph::layout_nicely(graph_to_plot)}
 
   # Should node be scaled with the degree information
-  if (node_scaling) {vertex_size = 2 + degree(graph_to_plot)^(1/node_scaling*0.1)
-  } else { vertex_size <- 15*node_scaling }
+  if (degree_node_scaling) {
+    deg <- degree(graph_to_plot)
+    node_scaling_min <- 1
+    vertex_size <- sapply(deg, function(x) {
+      (x - min(deg)) / (max(deg) - min(deg)) * (node_scaling_max - node_scaling_min) + node_scaling_min})
+  } else { vertex_size <- node_scaling_max }
+
+  edge_scaling_min <- 0.2
+  edge <- E(graph_to_plot)$weight
+  edge_width <- sapply(edge, function(x) {
+    (x - min(edge)) / (max(edge) - min(edge)) * (edge_scaling_max - edge_scaling_min) + edge_scaling_min})
 
   igraph::plot.igraph(graph_to_plot,
                       vertex.label.color = "gray20",
@@ -305,7 +314,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
                       vertex.label.cex = 0.7,
                       vertex.label.dist = 1,
                       vertex.size = vertex_size,
-                      edge.width = E(graph_to_plot)$weight*edge_scaling,
+                      edge.width = edge_width,
                       edge.color = "gray70",
                       vertex.frame.color = "white",
                       vertex.color = "gray60",
@@ -313,33 +322,24 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
                       main = title,
                       ...)
 
-
-  # From https://rdrr.io/bioc/NetPathMiner/src/R/plotPath.R#sym-graph.sizes
-  graph.sizes <- function(v, devsize = min(par("pin"))){
-    vsize <- (devsize*200)/v
-    if(vsize < 1) vsize <- 1
-    if(vsize > 15) vsize <- 15
-
-    earrow <- vsize*0.08
-    if(earrow < 0.2) earrow <- 0.2
-    if(earrow > 1) earrow <- 1
-
-    label <- earrow*1.5
-    if(label>1) label <- 1
-    return(list(vsize=vsize, earrow=earrow, label=label))
-  }
-
   # Legend nodes
-  scale_vertex_size <- seq(round(min(vertex_size)), round(max(vertex_size)), length.out = 6)
-  a <- legend("bottomright", as.character(scale_vertex_size), pt.cex = scale_vertex_size/200,
-              col = 'white', pch = 21, title = "Degree", bty = "n")
+  scale_vertex_size <- seq(node_scaling_min, node_scaling_max, length.out = nb_row_legend)
+  if (degree_node_scaling){
+    label_legend_node <- seq(min(deg), max(deg), length.out = nb_row_legend) %>% round %>% as.character
+  } else { label_legend_node <- as.character(scale_vertex_size) }
+
+  a <- legend("bottomright", label_legend_node, pt.cex = scale_vertex_size/200,
+              col = 'white', pch = 21, title = "Degree", bty = "n", y.intersp = 0.7)
   x <- (a$text$x + a$rect$left) / 2
   y <- a$text$y
-  symbols(x, y, circles = scale_vertex_size/200, inches=FALSE, add=TRUE, bg='gray', fg='white')
+  symbols(x, y, circles = scale_vertex_size/200, inches = FALSE, add = TRUE, bg = 'gray', fg = 'white')
+
+  # Legend vertex
+  scale_edge_width <- seq(edge_scaling_min, edge_scaling_max, length.out = nb_row_legend) %>% signif
+  label_legend_edge <- seq(min(edge), max(edge), length.out = nb_row_legend) %>% signif %>% as.character
+  legend("topright", label_legend_edge, col='gray', title = "Weight", lwd = scale_edge_width, bty = "n")
+
 }
-
-
-
 
 
 #
