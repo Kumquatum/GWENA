@@ -33,17 +33,17 @@ join_gost <- function(gost_result) {
           if (!isTRUE(all.equal(lapply(ref$meta$query_metadata$queries, length) %>% unlist %>% sort,
                          lapply(addon$meta$query_metadata$queries, length) %>% unlist %>% sort))) stop("Length of queries different.")
           if (length(setdiff(ref$meta$query_metadata$queries, addon$meta$query_metadata$queries)) > 0) warning(
-            "Queries different between reference (first element of gost_result) and gost_result element n°", x, ". It may be due to different type of ID (Ensembl, Entrez, etc.).
+            "Queries different between reference (first element of gost_result) and gost_result element n\u00B0", x, ". It may be due to different type of ID (Ensembl, Entrez, etc.).
             IDs from reference will be kept.")
         } else if (name == "numeric_ns") {
           if (is.vector(ref$meta$query_metadata$numeric_ns, "numeric") || is.vector(addon$meta$query_metadata$numeric_ns, "numeric")) {
             if (ref$meta$query_metadata$numeric_ns != addon$meta$query_metadata$numeric_ns) {
               warning("Different type of IDs. ", ref$meta$query_metadata$numeric_ns, " (reference) and ", addon$meta$query_metadata$numeric_ns,
-                      " (list element n°", x, ")")}}
+                      " (list element \u00B0", x, ")")}}
         } else {
           # if (ref$meta$query_metadata[[name]] != addon$meta$query_metadata[[name]]) stop(paste0("Item ", name, " of query_metadata isn't identical"))
           if (!identical(ref$meta$query_metadata[[name]], addon$meta$query_metadata[[name]])) warning(
-            name, " from query_metadata isn't identical between reference and gost_result element n°", x, ".")
+            name, " from query_metadata isn't identical between reference and gost_result element n\u00B0", x, ".")
         }
       }
     })
@@ -80,8 +80,6 @@ join_gost <- function(gost_result) {
 #' differents databases and custom gmt files, and a 'meta' list containing informations on the input args, the version of gost,
 #' timestamp, etc. For more detail, see ?gprofiler2::gost.
 #'
-#' @examples
-#' # TODO
 #' @importFrom gprofiler2 gost
 #' @importFrom plyr compact
 #' @importFrom magrittr %>%
@@ -145,7 +143,11 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
 #' @param enrich_output list, bio_enrich result which are in fact gprofiler2::gost output.
 #' @param modules string or vector of characters designing the modules to plot. "all" by default to plot every module.
 #' @param sources string or vector of characters designing the sources to plot. "all" by default to plot every source.
-#' @param ... any other parameter you can provide to gprofiler2::gostplot
+#' @param colorblind boolean, indicates if a colorblind friendly palette should be used.
+#' @param custom_palette vector of character, colors to be used for plotting.
+#' @param ... any other parameter you can provide to gprofiler2::gostplot.
+#'
+#' @details Note: The colorblind friendly palette is limited to maximum 8 colors, therefore 8 sources of enrichment.
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
@@ -248,6 +250,7 @@ associate_phenotype <- function(eigengenes, phenotypes) {
 #' Plot a heatmap of the correlation between all modules and the phenotypic variables and the p value associated
 #'
 #' @param modules_phenotype list, data.frames of correlation and pvalue associated
+#' @param pvalue_th float, threshold in ]0;1[ under which module will be considered as significantly associated
 #'
 #' @importFrom ggplot2 ggplot geom_tile geom_point scale_color_gradient2 theme_bw xlab ylab
 #' @importFrom magrittr %>%
@@ -257,7 +260,7 @@ associate_phenotype <- function(eigengenes, phenotypes) {
 #'
 #' @export
 
-plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
+plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05){
   # Checks
   if (!is.list(modules_phenotype)) stop("modules_phenotype must be a list")
   if (!isTRUE(all.equal(names(modules_phenotype), c("association", "pval")))) {
@@ -270,9 +273,9 @@ plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
     stop("modules_phenotype data.frames must only contains numeric values")}
   if (!(isTRUE(all.equal(rownames(modules_phenotype$association), rownames(modules_phenotype$pval))))) {
     stop("rownames of assocaition and pval must be the same") }
-  if (!is.numeric(signif_th)) stop("signif_th must be a numeric value")
-  if (length(signif_th) != 1) stop("signif_th must be a single value")
-  if (signif_th <= 0 || signif_th >= 1) stop("signif_th must be in ]0;1[")
+  if (!is.numeric(pvalue_th)) stop("pvalue_th must be a numeric value")
+  if (length(pvalue_th) != 1) stop("pvalue_th must be a single value")
+  if (pvalue_th <= 0 || pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
 
   # Data preparation
   df_cor <- modules_phenotype$association %>%
@@ -284,7 +287,7 @@ plot_modules_phenotype <- function(modules_phenotype, signif_th = 0.05){
     tidyr::pivot_longer(-eigengene, names_to = "phenotype", values_to = "pval")
 
   df_total <- dplyr::bind_cols(df_cor, df_pval %>% dplyr::select(pval)) %>%
-    dplyr::mutate(signif = ifelse(pval > signif_th, FALSE, TRUE))
+    dplyr::mutate(signif = ifelse(pval > pvalue_th, FALSE, TRUE))
 
   # Plotting
   suppressWarnings(quiet(
