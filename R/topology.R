@@ -85,7 +85,7 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 #' or an already split module
 #' @param weight_th decimal, weight threshold under or equal to which edges will be removed
 #'
-#' @detail GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
+#' @details GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
 #' are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same.
 #'
 #' @importFrom igraph delete.edges degree E
@@ -201,9 +201,9 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL
 #' build_net. Can be whole network or a single module.
 #' @param modules list, modules defined as list of gene vectors. If null, network is supposed to be the whole network
 #' or an already split module
-#' @param methodstring, name of the method to be used for hub gene detection. See details.
+#' @param method string, name of the method to be used for hub gene detection. See details.
 #'
-#' @detail
+#' @details
 #' \describe{
 #'   \item{highest connectivity}{Select the top n (n depending on parameter given) highest connected genes. Similar to WGCNA::chooseTopHubInEachModule.}
 #'   \item{superior degree}{Select genes which degree is greater than average connection degree of the network. Definition from network theory.}
@@ -238,12 +238,17 @@ get_hub_genes <- function(network, modules, method = c("highest connectivity", "
 #' @param enrichment list, representing a gost object
 #' @param title string, main title that will be displayed on the plot
 #' @param degree_node_scaling boolean, indicate if node size should represent the degree of this node
-#' @param node_scaling numeric, scaling factor by whihch the node size will be scalled
-#' @param edge_scaling numeric, scaling factor by whihch the edge width will be scalled
+#' @param node_scaling_max integer, if degree_node_scaling is TRUE, it is the max size of the node, else it is the exact
+#' size of all node
+#' @param edge_scaling_max integer, scaling factor by whihch the edge width will be scalled
+#' @param nb_row_legend integer, number of levels in the legend.
 #' @param layout numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
 #' or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
 #' the graph. For more information, see \code{\link[igraph]{igraph.plotting}}
 #' @param ... any other parameter compatible with the \code{\link[igraph]{plot.igraph}} function
+#'
+#' @details Take care of you intend to compare modules' graphs, the same size of node will not correspond to the
+#' same values because of the scaling.
 #'
 #' @import igraph
 #' @importFrom magrittr %>%
@@ -251,8 +256,8 @@ get_hub_genes <- function(network, modules, method = c("highest connectivity", "
 #' @export
 
 plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment = NULL,
-                        title = "Module", degree_node_scaling = TRUE, node_scaling = 1,
-                        edge_scaling = 5, layout = "auto", ...) {
+                        title = "Module", degree_node_scaling = TRUE, node_scaling_max = 6,
+                        edge_scaling_max = 1, nb_row_legend = 6, layout = "auto", ...) {
   # TODO: add a layer arg that could take a list where each named element could be list of genes of interest (like one displaying gene known in aging and another for inflammation)
   # Checks
   if (!igraph::is.igraph(graph_module)) stop("graph_module must be an igraph object")
