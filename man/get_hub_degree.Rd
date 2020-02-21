@@ -22,3 +22,7 @@ list of vectors, or single vector of gene names
 Remove edges from the graph which value is under weight_th then compute degree of each node (gene).
 Hub gene are genes whose degree value is above average degree value of the thresholded network.
 }
+\details{
+GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
+are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same.
+}

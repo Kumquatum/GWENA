@@ -14,7 +14,7 @@ build_net. Can be whole network or a single module.}
 \item{modules}{list, modules defined as list of gene vectors. If null, network is supposed to be the whole network
 or an already split module}
 
-\item{methodstring, }{name of the method to be used for hub gene detection. See details.}
+\item{method}{string, name of the method to be used for hub gene detection. See details.}
 }
 \value{
 list of vectors representing hub genes, by module
@@ -22,4 +22,11 @@ list of vectors representing hub genes, by module
 \description{
 Return genes considered as hub genes inside each module of a network following the selected method. Method will be lauched with default
 parameters. If specific parameters desired, please use directly the function \code{get_hub_...} itself.
+}
+\details{
+\describe{
+  \item{highest connectivity}{Select the top n (n depending on parameter given) highest connected genes. Similar to WGCNA::chooseTopHubInEachModule.}
+  \item{superior degree}{Select genes which degree is greater than average connection degree of the network. Definition from network theory.}
+  \item{Kleinberg's score}{Select genes which Kleinberg's score superior to provided threshold.}
+}
 }

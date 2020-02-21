@@ -6,7 +6,8 @@
 \usage{
 plot_module(graph_module, hubs = NULL, weight_th = 0.2,
   enrichment = NULL, title = "Module", degree_node_scaling = TRUE,
-  node_scaling = 1, edge_scaling = 5, layout = "auto", ...)
+  node_scaling_max = 6, edge_scaling_max = 1, nb_row_legend = 6,
+  layout = "auto", ...)
 }
 \arguments{
 \item{graph_module}{igraph object, module to plot.}
@@ -22,9 +23,12 @@ values named with gene names}
 
 \item{degree_node_scaling}{boolean, indicate if node size should represent the degree of this node}
 
-\item{node_scaling}{numeric, scaling factor by whihch the node size will be scalled}
+\item{node_scaling_max}{integer, if degree_node_scaling is TRUE, it is the max size of the node, else it is the exact
+size of all node}
 
-\item{edge_scaling}{numeric, scaling factor by whihch the edge width will be scalled}
+\item{edge_scaling_max}{integer, scaling factor by whihch the edge width will be scalled}
+
+\item{nb_row_legend}{integer, number of levels in the legend.}
 
 \item{layout}{numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
 or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
@@ -34,4 +38,8 @@ the graph. For more information, see \code{\link[igraph]{igraph.plotting}}}
 }
 \description{
 Display a graph representing the co-expression network and different informations like hubs, enrichments
+}
+\details{
+Take care of you intend to compare modules' graphs, the same size of node will not correspond to the
+same values because of the scaling.
 }

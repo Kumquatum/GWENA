@@ -21,6 +21,8 @@ get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 \item{network_type}{string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
 
 \item{block_size}{integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.}
+
+\item{...}{any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}}
 }
 \value{
 A list containing power of the law for best fit, fit table, and metadata about the arguments used.

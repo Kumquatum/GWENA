@@ -15,14 +15,14 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-Depends: R (>= 3.6.0),
-         dplyr (>= 0.8.3)
+Depends: R (>= 3.6.0)
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
     rmarkdown
 Imports: 
     WGCNA (>= 1.67),
+    dplyr (>= 0.8.3),
     dynamicTreeCut (>= 1.63-1),
     ggplot2 (>= 3.1.1),
     gprofiler2 (>= 0.1.6),

@@ -11,15 +11,17 @@ detect_modules(data_expr, network, min_module_size = min(20,
 \arguments{
 \item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
 
+\item{network}{matrix or data.frame, strengh of gene co-expression (edge values).}
+
 \item{min_module_size}{integer, lowest number of gene allowed in a module. If none provided, estimated.}
 
 \item{merge_close_modules}{boolean, does closest modules (based on eigengene) should be merged together.}
 
 \item{merge_cut_height}{float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.}
 
-\item{net}{matrix or data.frame, strengh of gene co-expression (edge values).}
+\item{detailled_result}{boolean, does pre-merge modules (if applicable) and dendrogram included in output.}
 
-\item{detailled_results}{boolean, does pre-merge modules (if applicable) and dendrogram included in output.}
+\item{...}{any other parameter compatible with \code{\link[WGCNA]{mergeCloseModules}}}
 }
 \value{
 list containing modules detected, modules_eigengenes, and if asked for, modules pre-merge and dendrogram

@@ -6,9 +6,12 @@
 \usage{
 .check_data_expr(data_expr)
 }
+\arguments{
+\item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
+}
 \value{
 A boolean, indicate if all checks were good
 }
 \description{
-Check that it is a matrix or data frame,
+Check that a data_expr is a matrix or data frame conform for process by GWENA
 }

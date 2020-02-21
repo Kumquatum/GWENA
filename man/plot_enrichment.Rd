@@ -14,9 +14,16 @@ plot_enrichment(enrich_output, modules = "all", sources = "all",
 
 \item{sources}{string or vector of characters designing the sources to plot. "all" by default to plot every source.}
 
-\item{...}{any other parameter you can provide to gprofiler2::gostplot}
+\item{colorblind}{boolean, indicates if a colorblind friendly palette should be used.}
+
+\item{custom_palette}{vector of character, colors to be used for plotting.}
+
+\item{...}{any other parameter you can provide to gprofiler2::gostplot.}
 }
 \description{
 Wrapper of the gprofiler2::gostplot function. Adding support of colorblind palet and selection of subsets if
 initial multiple query, and/or sources to plot.
+}
+\details{
+Note: The colorblind friendly palette is limited to maximum 8 colors, therefore 8 sources of enrichment.
 }

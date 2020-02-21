@@ -21,6 +21,3 @@ timestamp, etc. For more detail, see ?gprofiler2::gost.
 \description{
 Enrich genes list from modules.
 }
-\examples{
-# TODO
-}

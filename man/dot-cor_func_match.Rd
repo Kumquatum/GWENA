@@ -15,7 +15,3 @@ A function corresponding to the correlation required
 \description{
 Translate a function name into an R function.
 }
-\examples{
-.cor_func_match("pearson")
-
-}
