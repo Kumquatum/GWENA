@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{.check_is_network}
 \alias{.check_is_network}
-\title{Check if an object is a network}
+\title{Run checks on an object to test if it's a network}
 \usage{
 .check_is_network(network)
 }

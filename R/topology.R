@@ -270,7 +270,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
   if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
   if (weight_th < 0 || weight_th >= 1) stop("weight_th must be a in [0;1[")
-  if (!is.null(enrichment)) check_gost(enrichment)
+  if (!is.null(enrichment)) .check_gost(enrichment)
   if (!is.character(layout) && !is.matrix(layout) && !is.function(layout)) {
     stop("layout must be a layout function, its name as a string, or a matrix giving position of each node ") }
 

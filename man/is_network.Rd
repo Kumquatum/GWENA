@@ -15,5 +15,5 @@ set to FALSE
 }
 \description{
 Check content of a given object to determine if it's a network, meaning a squared matrix of similarity
-score between genes
+score between genes.
 }

@@ -25,24 +25,6 @@
   }
 }
 
-
-#' Run all checks on expression data
-#'
-#' Check that a data_expr is a matrix or data frame conform for process by GWENA
-#'
-#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
-#'
-#' @return A boolean, indicate if all checks were good
-
-.check_data_expr <- function(data_expr){
-  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
-  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
-  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
-  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
-  if (is.null(colnames(data_expr)) || is.null(rownames(data_expr))) stop("data_expr should have colnames and rownames")
-}
-
-
 #' Calculating best fit of a power low on correlation matrix computed on expression data
 #'
 #' Adjust a correlation matrix depending of the type of network, then try to parameter a power law for best fit

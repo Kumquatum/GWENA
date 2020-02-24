@@ -21,7 +21,7 @@ quiet <- function(func) {
 #' Determine if an object is a network
 #'
 #' Check content of a given object to determine if it's a network, meaning a squared matrix of similarity
-#' score between genes
+#' score between genes.
 #'
 #' @param network matrix or data.frame, object to test to be a network
 #'
@@ -40,7 +40,7 @@ is_network <- function(network) {
   return(list(bool = TRUE, reason = NULL))
 }
 
-#' Check if an object is a network
+#' Run checks on an object to test if it's a network
 #'
 #' Check content of a given object to determine if it's a network, meaning a squared matrix of similarity
 #' score between genes.
@@ -83,7 +83,7 @@ is_module <- function(module, is_list = FALSE) {
 }
 
 
-#' Check if an object is a module or a list of modules
+#' Run checks on an object to test if it's a module or a list of modules
 #'
 #' Check content of a given object to determine if it's a module or a list of modules, meaning a single
 #' vector of characters which are gene names, or a named list of these vectors
@@ -100,13 +100,19 @@ is_module <- function(module, is_list = FALSE) {
   }
 }
 
-#' Check if it's a gost result
-#'
-#' Take a list that should be a gost result and check if format is good.
-#'
-#' @param gost_result list of gprofiler2::gost result
 
-check_gost <- function(gost_result) {
+#' Determine if an object is a gost object
+#'
+#' Check content of a given object to determine if it's a gost object
+#'
+#' @param gost_result list, gprofiler2::gost result
+#'
+#' @return list, a boolean as first element and in second element NULL or the reason why boolean is
+#' set to FALSE
+#'
+#' @export
+
+is_gost <- function(gost_result) {
   if (!is.list(gost_result)) stop("gost_result must be a list.")
 
   if (is.null(gost_result)) stop("Elements of gost_result cannot be NULL")
@@ -118,5 +124,56 @@ check_gost <- function(gost_result) {
   if (!is.list(gost_result$meta)) stop("meta should be a list")
   if (any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"),
                       names(gost_result$meta))))) stop("Bad format: 'meta' is not a gprofiler2::gost result output")
+}
 
+
+#' Run checks on an object to test if it's a gost result
+#'
+#' Take a list that should be a gost result and check if format is good.
+#'
+#' @param gost_result list, gprofiler2::gost result
+#'
+#' @return Throw an error if doesn't correspond
+
+.check_gost <- function(gost_result) {
+  check <- is_gost(gost_result)
+  if (!check$bool) {
+    stop(check$reason)
+  }
+}
+
+
+#' Determine if an object is a data_expr in sens of GWENA
+#'
+#' Check an object to be a data.frame or a matrix compatible of genes and samples.
+#'
+#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#'
+#' @return list, a boolean as first element and in second element NULL or the reason why boolean is
+#' set to FALSE
+#'
+#' @export
+
+is_data_expr <- function(data_expr) {
+  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
+  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
+  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
+  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
+  if (is.null(colnames(data_expr)) || is.null(rownames(data_expr))) stop("data_expr should have colnames and rownames")
+}
+
+
+#' Run checks on an object to test if it's a data_expr
+#'
+#' Check an object to be a data.frame or a matrix compatible of genes and samples.
+#'
+#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#'
+#' @return Throw an error if doesn't correspond
+
+.check_data_expr <- function(data_expr){
+  check <- is_data_expr(data_expr)
+  if (!check$bool) {
+    stop(check$reason)
+  }
 }

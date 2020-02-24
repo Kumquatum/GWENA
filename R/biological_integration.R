@@ -19,7 +19,7 @@ join_gost <- function(gost_result) {
   # Check format
   if (isTRUE(all.equal(names(gost_result), c("result", "meta")))) {
     stop("You provided a single gprofiler2::gost result, it must be a list of at least 2 gprofiler2::gost")}
-  lapply(gost_result, check_gost) # All elements of gost_result list must be gprofiler2::gost results
+  lapply(gost_result, .check_gost) # All elements of gost_result list must be gprofiler2::gost results
   if (length(gost_result) < 2) stop("gost_result must contain at least 2 gprofiler2::gost element")
 
   # Checking content is compatible (from the same queries) using 'meta' and the first element of the list as reference
@@ -158,7 +158,7 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
 
 plot_enrichment <- function(enrich_output, modules = "all", sources = "all", colorblind = TRUE, custom_palette = NULL, ...) {
   # Checks
-  check_gost(enrich_output)
+  .check_gost(enrich_output)
   if (!is.vector(modules, "character")) stop("modules must be a string or vector of characters")
   if (!is.vector(sources, "character")) stop("sources must be a string or vector of characters")
   if (!("all" %in% modules) && !all(modules %in% enrich_output$meta$query_metadata$queries %>% names)) {

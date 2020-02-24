@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{.check_is_module}
 \alias{.check_is_module}
-\title{Check if an object is a module or a list of modules}
+\title{Run checks on an object to test if it's a module or a list of modules}
 \usage{
 .check_is_module(module, is_list = FALSE)
 }
