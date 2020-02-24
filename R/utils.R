@@ -49,7 +49,7 @@ is_network <- function(network) {
 #'
 #' @return Throw an error if doesn't correspond
 
-.check_is_network <- function(network) {
+.check_network <- function(network) {
   check <- is_network(network)
   if (!check$bool) {
     stop(check$reason)
@@ -93,7 +93,7 @@ is_module <- function(module, is_list = FALSE) {
 #'
 #' @return Throw an error if doesn't correspond
 
-.check_is_module <- function(module, is_list = FALSE) {
+.check_module <- function(module, is_list = FALSE) {
   check <- is_module(module, is_list)
   if (!check$bool) {
     stop(check$reason)

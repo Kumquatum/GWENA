@@ -49,9 +49,9 @@ build_graph_from_sq_mat <- function(sq_mat) {
 
 get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
   # Checks
-  .check_is_network(network)
+  .check_network(network)
   if (!is.null(modules)) {
-    .check_is_module(modules, is.list(modules))}
+    .check_module(modules, is.list(modules))}
   if (length(top_n) > 1) stop("top_n must be a single numeric value")
   if (!is.numeric(top_n)) stop("top_n must be a numeric value")
   if (top_n < 1 || top_n %% 1 != 0) stop("If not NULL, block_size must be a whole number >= 1")
@@ -96,9 +96,9 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 
 get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
   # Checks
-  .check_is_network(network)
+  .check_network(network)
   if (!is.null(modules)) {
-    .check_is_module(modules, is.list(modules))}
+    .check_module(modules, is.list(modules))}
   if (!is.null(weight_th)) {
     if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
     if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
@@ -150,9 +150,9 @@ get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
 
 get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL) {
   # Checks
-  .check_is_network(network)
+  .check_network(network)
   if (!is.null(modules)) {
-    .check_is_module(modules, is.list(modules))}
+    .check_module(modules, is.list(modules))}
   if (is.null(top_n) && is.null(k_th)) {
     top_n <- 5
     warning("No top_n or k_th value provided. Default: top_n = ", top_n) }
