@@ -191,7 +191,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 
 build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL, keep_cor_mat = FALSE,
                          power_value = NULL, block_size = NULL, stop_if_no_fit = FALSE, network_type = c("unsigned", "signed", "signed hybrid"),
-                         tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"), save_adjacency = NULL,
+                         tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"),
                          n_threads = NULL, ...)  # TODO program the mclapply version
 {
   # Checking
@@ -204,8 +204,6 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
   if (!is.null(power_value) && (power_value < 1 || power_value %% 1 != 0)) stop("If not NULL, power_value must be a whole number >= 1.")
   network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
-  if (!is.null(save_adjacency) && grepl(".+\\.\\w+$", save_adjacency)) warning("Provided path in save_adjacency looks like a filename. Remember save_adjacency must be a folder name.")
-  if (!is.null(save_adjacency) && !file.exists(save_adjacency)) stop("Provided path in save_adjacency doesn't exists.")
   if (!is.null(n_threads)) {
     if (!is.numeric(n_threads) || n_threads < 2 || n_threads %% 1 != 0) stop("n_threads must be a whole number > 2")}
 
@@ -219,6 +217,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
     cor_to_use <- .cor_func_match(cor_func)
   }
   cor_mat <- cor_to_use(data_expr %>% as.matrix)
+  if (min(cor_mat < -1) || max(cor_mat) > 1) stop("Provided correlation function returned values outside [-1,1].")
 
   # Getting power
   if (is.null(power_value)) {
@@ -232,9 +231,6 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 
   # Adjacency
   adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat, type = network_type, power = fit$power_value)
-  if (!is.null(save_adjacency)) {
-    write.csv(adj, file = file.path(save_adjacency, "adjacency_matrix.csv"))
-  }
 
   # Topological overlap matrix
   if (tom_type != "none") {

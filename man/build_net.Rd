@@ -5,11 +5,11 @@
 \title{Network building by co-expression score computation}
 \usage{
 build_net(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
-  "spearman", "bicor", "other"), your_func = NULL, power_value = NULL,
-  block_size = NULL, stop_if_no_fit = FALSE,
-  network_type = c("unsigned", "signed", "signed hybrid"),
-  tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2",
-  "signed 2", "none"), save_adjacency = NULL, n_threads = NULL, ...)
+  "spearman", "bicor", "other"), your_func = NULL,
+  keep_cor_mat = FALSE, power_value = NULL, block_size = NULL,
+  stop_if_no_fit = FALSE, network_type = c("unsigned", "signed",
+  "signed hybrid"), tom_type = c("unsigned", "signed", "signed Nowick",
+  "unsigned 2", "signed 2", "none"), n_threads = NULL, ...)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
@@ -19,6 +19,8 @@ build_net(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 \item{cor_func}{string, name of the correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided}
 
 \item{your_func}{function returning correlation values. Final values must be in [-1;1]}
+
+\item{keep_cor_mat}{boolean, does the correlation matrix needs to be saved. Will be usefull to keep it if later comparing multiple conditions.}
 
 \item{power_value}{integer, power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.}
 
@@ -31,11 +33,11 @@ build_net(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 \item{tom_type}{string, type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
 and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.}
 
-\item{save_adjacency}{string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.}
-
 \item{n_threads}{integer, number of threads that can be used to paralellise the computing}
 
 \item{...}{any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}}
+
+\item{save_adjacency}{string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.}
 }
 \value{
 list containing network matrix, metadata of input parameters and power fitting information.
