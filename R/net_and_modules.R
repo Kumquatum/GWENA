@@ -171,6 +171,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param cor_func string, name of the correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
+#' @param keep_cor_mat boolean, does the correlation matrix needs to be saved. Will be usefull to keep it if later comparing multiple conditions.
 #' @param power_value integer, power to be applied to the adjacency matrix. If NULL, will be estimated by trying different power law fitting.
 #' @param block_size integer, size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
 #' @param stop_if_no_fit boolean, does not finding a fit above fit_cut_off should stop process, or just print a warning and return the highest fitting power.
@@ -188,7 +189,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' @export
 
-build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
+build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL, keep_cor_mat = FALSE,
                          power_value = NULL, block_size = NULL, stop_if_no_fit = FALSE, network_type = c("unsigned", "signed", "signed hybrid"),
                          tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"), save_adjacency = NULL,
                          n_threads = NULL, ...)  # TODO program the mclapply version
@@ -250,7 +251,8 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
       tom_type = tom_type,
       power = fit$power_value,
       fit_power_table = fit$fit_table
-    )
+    ),
+    cor_mat = if (keep_cor_mat) {cor_mat} else {NULL}
   )
 
   return(net)
