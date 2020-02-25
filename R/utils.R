@@ -113,17 +113,18 @@ is_module <- function(module, is_list = FALSE) {
 #' @export
 
 is_gost <- function(gost_result) {
-  if (!is.list(gost_result)) stop("gost_result must be a list.")
+  if (!is.list(gost_result)) return(list(bool = FALSE, reason = "gost_result must be a list."))
 
-  if (is.null(gost_result)) stop("Elements of gost_result cannot be NULL")
-  if (!all(names(gost_result) %in% c("result", "meta"))) stop("gprofiler2::gost first levels should be 'result' and 'meta'")
-  if (!is.data.frame(gost_result$result)) stop("'result' should be a data.frame")
+  if (is.null(gost_result)) return(list(bool = FALSE, reason = "Elements of gost_result cannot be NULL"))
+  if (!all(names(gost_result) %in% c("result", "meta"))) return(list(bool = FALSE, reason = "gprofiler2::gost first levels should be 'result' and 'meta'"))
+  if (!is.data.frame(gost_result$result)) return(list(bool = FALSE, reason = "'result' should be a data.frame"))
   if (any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
                         "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"),
-                      colnames(gost_result$result))))) stop("'result' is not a gprofiler2::gost result output")
+                      colnames(gost_result$result))))) return(list(bool = FALSE, reason = "'result' is not a gprofiler2::gost result output"))
   if (!is.list(gost_result$meta)) stop("meta should be a list")
   if (any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"),
-                      names(gost_result$meta))))) stop("Bad format: 'meta' is not a gprofiler2::gost result output")
+                      names(gost_result$meta))))) return(list(bool = FALSE, reason = "Bad format: 'meta' is not a gprofiler2::gost result output"))
+  return(list(bool = TRUE, reason = NULL))
 }
 
 
@@ -155,11 +156,12 @@ is_gost <- function(gost_result) {
 #' @export
 
 is_data_expr <- function(data_expr) {
-  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix.")
-  if (any(is.na(data_expr))) stop("data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject.")
-  if (min(data_expr) < 0) stop("data_expr cannot contain any negative value.")
+  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) return(list(bool = FALSE, reason = "data_expr should be a data.frame or a matrix."))
+  if (any(is.na(data_expr))) return(list(bool = FALSE, reason = "data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject."))
+  if (min(data_expr) < 0) return(list(bool = FALSE, reason = "data_expr cannot contain any negative value."))
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
-  if (is.null(colnames(data_expr)) || is.null(rownames(data_expr))) stop("data_expr should have colnames and rownames")
+  if (is.null(colnames(data_expr)) || is.null(rownames(data_expr))) return(list(bool = FALSE, reason = "data_expr should have colnames and rownames"))
+  return(list(bool = TRUE, reason = NULL))
 }
 
 
