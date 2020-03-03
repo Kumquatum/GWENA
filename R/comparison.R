@@ -29,10 +29,10 @@
 #'
 #' @export
 
-compare_modules = function(data_expr_list, net_list, cor_list = NULL, ref = names(data_expr_list)[1], modules_list,
+compare_modules = function(data_expr_list, net_list, cor_list = NULL, modules_list, ref = names(data_expr_list)[1],
                            cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL,
-                           n_perm = 10000, comparison_modules = c("unpreserved", "preserved", "one or the other"), pvalue_th,
-                           n_threads, ...){
+                           n_perm = 10000, comparison_modules = c("unpreserved", "preserved", "one or the other"), pvalue_th = 0.05,
+                           n_threads = NULL, ...){
   # Checks
   if (!is.list(data_expr_list)) stop("data_expr_list must be a list.")
   if (length(data_expr_list) < 2) stop("data_expr_list must have at least 2 elements (2 conditions) to run a comparison")
@@ -53,9 +53,10 @@ compare_modules = function(data_expr_list, net_list, cor_list = NULL, ref = name
     is_modules_by_cond = FALSE
   }
   if (ref != "cross comparison") { # Checking adequation of content between conditions described in modules and reference choosen
-    if (!all(ref %in% names(modules_list))) stop("All conditions cited in ref must have their modules described in modules_list")
-    if (!all(names(modules_list) %in% ref)){
-      warning("More conditions were defined in modules_list than those cited in ref. Keeping only the matching ones")
+    if (!all(ref %in% names(modules_list)) && is_modules_by_cond == TRUE) stop("All conditions cited in ref must have their modules described in modules_list")
+    if (!all(names(modules_list) %in% ref) && is_modules_by_cond == TRUE) {
+      # warning("More conditions were defined in modules_list than those cited in ref. Keeping only the matching ones")
+      additionnal_modules_list <- modules_list[which(names(modules_list) != ref)]
       modules_list <- modules_list[ref]
     }
   } else {
@@ -66,9 +67,11 @@ compare_modules = function(data_expr_list, net_list, cor_list = NULL, ref = name
   if (!is.numeric(n_perm)) stop("n_perm must be a numeric value")
   if (n_perm %% 1 != 0) stop("n_perm must be a whole number")
   comparison_modules <- match.arg(comparison_modules)
-  if (!is.numeric(n_threads)) stop("n_threads must be a numeric value")
-  if (n_threads %% 1 != 0) stop("n_threads must be a whole number")
-  if (!is.numeric(n_threads)) stop("n_threads must be a numeric value")
+  if (!is.null(n_threads)) {
+    if (!is.numeric(n_threads)) stop("n_threads must be a numeric value")
+    if (n_threads %% 1 != 0) stop("n_threads must be a whole number")
+    if (!is.numeric(n_threads)) stop("n_threads must be a numeric value")
+  }
   if (!is.numeric(pvalue_th)) stop("pvalue_th must be a numeric value")
   if (length(pvalue_th) != 1) stop("pvalue_th must be a single value")
   if (pvalue_th <= 0 || pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
@@ -108,7 +111,7 @@ compare_modules = function(data_expr_list, net_list, cor_list = NULL, ref = name
     test_set <- conditions
     ref_set <- conditions
   } else {
-    test_set <- conditions[which(conditions != ref)]
+    test_set <- conditions[which(!(conditions %in% ref))]
     ref_set <- ref
   }
 
@@ -120,8 +123,11 @@ compare_modules = function(data_expr_list, net_list, cor_list = NULL, ref = name
     simplify = FALSE, ...))
 
 
-  # modulePreservation doesn't compute contingency matrix when single ref, so adding it
-  if (ref != "cross comparison" && length(ref) == 1) {
+  #' modulePreservation doesn't compute contingency matrix when single ref because it force to also have a single moduleAssignement
+  #' which prevent to compute contingency matrix (and more generaly, it force to have exactly the same conditions in discovery and
+  #' moduleAssignment. But I want to allow people to pass moduleAssignement for all cond tested even if they're not in discovery,
+  #' so adding the functionnality
+  if (ref != "cross comparison" && exists("additionnal_modules_list")) {
     lapply(test_set, function(cond){
       preservation[[ref]][[cond]][["contingency"]] <- NetRep:::contingencyTable(modules_reformated,
                                                                                 modules_reformated[[ref]] %>% table %>% names,
@@ -150,3 +156,5 @@ compare_modules = function(data_expr_list, net_list, cor_list = NULL, ref = name
   }
   preservation_augmented <- prune_list(preservation_augmented)
 }
+
+
