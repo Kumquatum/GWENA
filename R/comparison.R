@@ -3,23 +3,24 @@
 #' Take modules built from multiples conditions and search for preservation or non-preservation of them against one or mutliple
 #' conditions of reference. Use 7 topological features to perform the differents test, and use permutation to validate results.
 #'
-#' @param data_expr_list list of data_expr, list of expression data with genes as column and samples as row.
-#' @param net_list list of networks, list of square tables representing connectivity between
+#' @param data_expr_list list of data_expr, list of expression data by condition, with genes as column and samples as row.
+#' @param net_list list of networks, list of square tables by condition, representing connectivity between
 #' each genes as returned by build_net.
-#' @param cor_list list of matrices and/or data.frames, list of square tables representing correlation between
+#' @param cor_list list of matrices and/or data.frames, list of square tables by condition, representing correlation between
 #' each gene. Must be the same used to create networks in \code{\link{net_list}}. If NULL, will be re-calculated
 #' according to \code{cor_func}.
-#' @param ref string, condition name to be used as reference for permutation tests or "cross comparison" if you want to compare
-#' each condition with the other as reference. Default will be the name of the first element
-#' in data_expr_list.
-#' @param modules_list list of modules or nested list of modules, list of modules in one condition (will be considered as the one from reference) or a condition
-#' named list with list of modules built in each one.
+#' @param ref string or vector o strings, condition(s) name to be used as reference for permutation tests, or "cross comparison"
+#' if you want to compare each condition with the other as reference. Default will be the name of the first element in data_expr_list.
+#' @param modules_list list of modules or nested list of modules, list of modules in one condition (will be considered as the one
+#' from reference) or a condition named list with list of modules built in each one.
 #' @param cor_func string, name of the correlation function to be used. Must be one of "pearson", "spearman",
 #' "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
 #'
 #' @details
 #' \describe{
+#'   \item{Conditions available will be based on names of data_expr_list. Please do not use numbers for conditions names as modules are
+#'   often named this way}
 #'   \item{To avoid recalculation, correlations matrices can be obtain by setting \code{keep_cor_mat} in \code{\link{net_list}} to TRUE.}
 #'   \item{Description of the 7 topological features used for preservation testing is available in \code{\link[NetRep]{modulePreservation}}.}
 #' }
@@ -45,21 +46,53 @@ compare_modules = function(data_expr_list, net_list, cor_list = NULL, modules_li
   if (!is.character(ref)) stop("ref must be a string or a vector of strings")
   if (ref != "cross comparison" && !(all(ref %in% names(data_expr_list)))) stop("ref must be a condition name, or a vector of it, matching names of data_expr_list.")
   if (!is.list(modules_list)) stop("modules_list must be a single list of modules or a list by condition of the modules")
-  if (all(names(modules_list) %in% names(data_expr_list))) { # Meaning it's a list of modules by condition
-    lapply(modules_list, function(cond){ .check_module(cond, is_list = TRUE) })
+  match_cond_modules_data <- names(modules_list) %in% names(data_expr_list)
+  if (any(match_cond_modules_data)) { # Meaning it could be a list of modules by condition
+    if (!all(match_cond_modules_data)) { # Case of condition defined in modules_list but not present in data_list
+      warning("Conditions defined in modules_list not present in data_expr_list. Removing them.")
+      modules_list <- modules_list[which(match_cond_modules_data)]
+    }
+    lapply(modules_list, function(cond){ .check_module(cond, is_list = TRUE) }) # Checking each cond is a list of modules
     is_modules_by_cond = TRUE
   } else { # Meaning it must be a single list of modules
     .check_module(modules_list, is_list = TRUE)
     is_modules_by_cond = FALSE
   }
   if (ref != "cross comparison") { # Checking adequation of content between conditions described in modules and reference choosen
-    if (!all(ref %in% names(modules_list)) && is_modules_by_cond == TRUE) stop("All conditions cited in ref must have their modules described in modules_list")
-    if (!all(names(modules_list) %in% ref) && is_modules_by_cond == TRUE) {
-      # warning("More conditions were defined in modules_list than those cited in ref. Keeping only the matching ones")
-      additionnal_modules_list <- modules_list[which(names(modules_list) != ref)]
-      modules_list <- modules_list[ref]
+    if (length(ref > 1)) { # Many ref defined
+      if (is_modules_by_cond == TRUE) {
+        if (!all(ref %in% names(modules_list))) stop("All conditions cited in ref must have their modules described in modules_list")
+        if (!all(names(modules_list) %in% ref) && is_modules_by_cond == TRUE) {
+          additionnal_modules_list <- modules_list[which(names(modules_list) != ref)]
+          modules_list <- modules_list[ref]
+        }
+      } else { stop("modules_list must have at least a list of modules for all condition cited in ref") }
+    } else { # One ref defined
+      if (is_modules_by_cond == TRUE) {
+        additionnal_modules_list <- modules_list[which(names(modules_list) != ref)]
+        modules_list <- modules_list[ref]
+      } # else modules_list is just the modules for the only ref
     }
-  } else {
+
+    # Test re-ecriture
+    if (is_modules_by_cond == TRUE) {
+      if (!all(ref %in% names(modules_list))) stop("All conditions cited in ref must have their modules described in modules_list")
+      if (!all(names(modules_list) %in% ref)) {
+        additionnal_modules_list <- modules_list[which(names(modules_list) != ref)]
+        modules_list <- modules_list[ref]
+      }
+    } else {
+      if (length(ref > 1)) stop("modules_list must have at least a list of modules for all condition cited in ref")
+    }
+
+
+    # if (!all(ref %in% names(modules_list)) && is_modules_by_cond == TRUE) stop("All conditions cited in ref must have their modules described in modules_list")
+    # if (!all(names(modules_list) %in% ref) && is_modules_by_cond == TRUE) {
+    #   # warning("More conditions were defined in modules_list than those cited in ref. Keeping only the matching ones")
+    #   additionnal_modules_list <- modules_list[which(names(modules_list) != ref)]
+    #   modules_list <- modules_list[ref]
+    # }
+  } else { # ref == cross comparison
       if (!all(names(data_expr_list) %in% names(modules_list))) stop("All conditions in data_expr_list must have their modules described in modules_list")
   }
   cor_func <- match.arg(cor_func)
