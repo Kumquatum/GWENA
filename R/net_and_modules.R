@@ -178,7 +178,6 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @param network_type string, type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
 #' @param tom_type string, type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
 #' and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
-#' @param save_adjacency string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.
 #' @param n_threads integer, number of threads that can be used to paralellise the computing
 #' @param ... any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}
 #'
@@ -348,7 +347,8 @@ detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(da
 #' @return A bipartite graph
 #'
 #' @importFrom igraph graph_from_data_frame V add_layout_ as_bipartite
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% set_colnames
+#' @importFrom dplyr left_join mutate_if distinct arrange
 #'
 #' @export
 
@@ -364,13 +364,13 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
   if (!all(lapply(modules_merged, is.vector, "character") %>% unlist)) stop("module_merged values for each module must be a vector of gene names")
 
   # data.frame indicating which module got merge into another
-  g <- left_join(stack(modules_premerge), stack(modules_merged), by = "values") %>%
+  g <- dplyr::left_join(stack(modules_premerge), stack(modules_merged), by = "values") %>%
     tibble::column_to_rownames("values") %>%
-    set_colnames(c("before", "after")) %>%
-    mutate_if(is.factor, as.character) %>%
-    mutate_if(is.character, as.numeric) %>%
-    distinct %>%
-    arrange(before) %>%
+    magrittr::set_colnames(c("before", "after")) %>%
+    dplyr::mutate_if(is.factor, as.character) %>%
+    dplyr::mutate_if(is.character, as.numeric) %>%
+    dplyr::distinct() %>%
+    dplyr::arrange(before) %>%
     igraph::graph_from_data_frame()
 
   # Adding property used by bipartite plot
@@ -400,6 +400,7 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
 #' @importFrom magrittr %>%
+#' @importFrom dplyr mutate left_join group_by rename select
 #'
 #' @export
 
@@ -432,21 +433,21 @@ plot_expression_profiles <- function(data_expr, modules) {
     lapply(function(y) y[,c(-1,-2)] %>% t %>% prcomp(center = TRUE, scale.=TRUE) %>% .$x %>% .[, "PC1"] %>% scale) %>%
     as.data.frame(check.names = FALSE) %>%
     tibble::rownames_to_column(var="sample") %>%
-    mutate(gene = "eigengene") %>%
+    dplyr::mutate(gene = "eigengene") %>%
     tidyr::pivot_longer(c(-gene, -sample), names_to = "module", values_to = "expression", names_ptypes = list(module = numeric())) %>%
-    mutate(module = as.character(module))
+    dplyr::mutate(module = as.character(module))
 
   plot_table <- df %>%
-    left_join(data_expr %>% scale %>% as.data.frame %>% t %>% as.data.frame %>%
+    dplyr::left_join(data_expr %>% scale %>% as.data.frame %>% t %>% as.data.frame %>%
                 tibble::rownames_to_column(var = "gene"), by = "gene") %>%
     tidyr::pivot_longer(c(-gene, -module), names_to = "sample", values_to = "expression") %>%
-    left_join(eigengenes, c("module", "sample"), suffix = c("_gene", "_eigengene")) %>%
-    group_by(gene_gene) %>%
-    mutate(cor_sign = ifelse(cor(expression_gene, expression_eigengene) >= 0, "+", "-")) %>%
-    mutate(expression_eigengene = ifelse(cor_sign == "-", -(expression_eigengene), expression_eigengene)) %>%
-    rename(gene = gene_gene) %>%
-    rename(expression = expression_gene) %>%
-    select(gene, module, sample, expression, cor_sign, expression_eigengene)
+    dplyr::left_join(eigengenes, c("module", "sample"), suffix = c("_gene", "_eigengene")) %>%
+    dplyr::group_by(gene_gene) %>%
+    dplyr::mutate(cor_sign = ifelse(cor(expression_gene, expression_eigengene) >= 0, "+", "-")) %>%
+    dplyr::mutate(expression_eigengene = ifelse(cor_sign == "-", -(expression_eigengene), expression_eigengene)) %>%
+    dplyr::rename(gene = gene_gene) %>%
+    dplyr::rename(expression = expression_gene) %>%
+    dplyr::select(gene, module, sample, expression, cor_sign, expression_eigengene)
 
   ggplot2::ggplot(plot_table, ggplot2::aes(x=sample, y=expression, group=gene)) +
     ggplot2::geom_line(alpha = 0.3) +
