@@ -206,7 +206,7 @@ If phenotypic informations are available about the samples provided, an associat
 
 ```{r modules_phenotype}
 phenotype_association <- associate_phenotype(detection$modules_eigengenes, 
-                                             kuehne_traits %>% select(Condition, Age, Slide))
+                                             kuehne_traits %>% dplyr::select(Condition, Age, Slide))
 plot_modules_phenotype(phenotype_association)
 ```
 
