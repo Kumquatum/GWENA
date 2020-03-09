@@ -142,7 +142,7 @@ Another adjustement takes into account the [topology of the network](https://en.
 # In order to fasten the example process here, we only take a sample of the genes
 kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 
-net <- build_net(kuehne_expr_filtered, cor_func = "spearman")
+net <- build_net(kuehne_expr_filtered, cor_func = "spearman", n_threads = 2)
 ```
 
 * Power selected : `r net$metadata$power`
