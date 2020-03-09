@@ -36,8 +36,6 @@ and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
 \item{n_threads}{integer, number of threads that can be used to paralellise the computing}
 
 \item{...}{any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}}
-
-\item{save_adjacency}{string, folder's path where adjacency matrix will be saved. If NULL, it is not saved.}
 }
 \value{
 list containing network matrix, metadata of input parameters and power fitting information.
