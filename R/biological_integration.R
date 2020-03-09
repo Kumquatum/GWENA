@@ -12,6 +12,7 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 #' @importFrom rlist list.merge
+#' @importFrom purrr compact
 #'
 #' @export
 
@@ -81,7 +82,7 @@ join_gost <- function(gost_result) {
 #' timestamp, etc. For more detail, see ?gprofiler2::gost.
 #'
 #' @importFrom gprofiler2 gost
-#' @importFrom plyr compact
+#' @importFrom purrr compact
 #' @importFrom magrittr %>%
 #'
 #' @export
@@ -127,7 +128,8 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
     }
 
     # Removing NULL output from the list to merge
-    list_res_custom_gmts <- plyr::compact(list_res_custom_gmts)
+    # (exist when at least one of the gmt provided return no enrichment for any module)
+    list_res_custom_gmts <- purrr::compact(list_res_custom_gmts)
 
     # Joining results
     enriched_modules <- join_gost(c(list(enriched_modules), list_res_custom_gmts))
