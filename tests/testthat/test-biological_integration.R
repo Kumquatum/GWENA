@@ -66,6 +66,11 @@ test_that("return a gost object", {
 
 # ==== bio_enrich ====
 
+test_that("bio_enrich works with good input", {
+  expect_error(bio_enrich(res_detection$modules[5:6]), NA)
+  expect_error(bio_enrich(res_detection$modules[5:6], custom_gmt = gmt_symbols_path), NA)
+})
+
 test_that("module input is correctly checked", {
   expect_error(bio_enrich())
   expect_error(bio_enrich(NULL))
