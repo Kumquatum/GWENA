@@ -32,6 +32,6 @@ Imports:
     NetRep (>= 1.2.1),
     igraph (>= 1.2.4.1),
     RColorBrewer (>= 1.1-2),
-    plyr (>= 1.8.4),
+    purrr (>= 0.3.3),
     rlist (>= 0.4.6.1)
 VignetteBuilder: knitr
