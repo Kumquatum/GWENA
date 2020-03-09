@@ -89,15 +89,17 @@ test_that("custom_gmt input is correctly checked", {
   expect_error(bio_enrich(res_detection$modules[[5]], c("~/.bashrc", "~/.bash_history")))
 })
 
-test_that("returns enriched modules", {
-  expect_false(is.null(res_enrich))
-  expect_false(!all(names(res_enrich) %in% c("result", "meta")))
-  expect_false(!is.data.frame(res_enrich$result))
-  expect_false(any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
-                                 "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"), colnames(res_enrich$result)))))
-  expect_false(!is.list(res_enrich$meta))
-  expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(res_enrich$meta)))))
-})
+if (!is_gprofiler_down) {
+  test_that("returns enriched modules", {
+    expect_false(is.null(res_enrich))
+    expect_false(!all(names(res_enrich) %in% c("result", "meta")))
+    expect_false(!is.data.frame(res_enrich$result))
+    expect_false(any(is.na(match(c("query", "significant", "p_value", "term_size", "query_size", "intersection_size", "precision", "recall",
+                                   "term_id", "source", "term_name", "effective_domain_size", "source_order", "parents"), colnames(res_enrich$result)))))
+    expect_false(!is.list(res_enrich$meta))
+    expect_false(any(is.na(match(c("query_metadata", "result_metadata", "genes_metadata", "timestamp", "version"), names(res_enrich$meta)))))
+  })
+}
 
 
 # ==== plot_enrichment ====
@@ -108,37 +110,40 @@ test_that("input enrich_output is correctly checked", {
   expect_error(plot_enrichment(42))
   expect_error(plot_enrichment(1:42))
   expect_error(plot_enrichment(list(a = 1:5, b = "this is not a list of enrich_output result")))
-  expect_error(plot_enrichment(list(res_enrich[[5]], NULL)))
-  expect_error(plot_enrichment(fake_enrich_output = list(result = "this is not a true result",
-                                                         meta = list(query_metadata = "this",
-                                                         result_metadata = "is",
-                                                         genes_metadata = "not",
-                                                         timestamp = "a",
-                                                         version = "true meta"))))
+  if (!is_gprofiler_down) {
+    expect_error(plot_enrichment(list(res_enrich[[5]], NULL)))
+    expect_error(plot_enrichment(fake_enrich_output = list(result = "this is not a true result",
+                                                           meta = list(query_metadata = "this",
+                                                           result_metadata = "is",
+                                                           genes_metadata = "not",
+                                                           timestamp = "a",
+                                                           version = "true meta"))))
+  }
 })
 
-test_that("input modules is correctly checked", {
-  expect_error(plot_enrichment(res_enrich, modules = 42))
-  expect_error(plot_enrichment(res_enrich, modules = 1:42))
-  expect_error(plot_enrichment(res_enrich, modules = list(a = 1:5, b = letters[1:42])))
-  expect_error(plot_enrichment(res_enrich, modules = c("this", "are", "not", "modules", "names")))
-  expect_error(plot_enrichment(res_enrich, modules = matrix(1:9, ncol = 3)))
-  expect_error(plot_enrichment(res_enrich, modules = data.frame(a = letters[1:5], b = c("this", "are", "not", "modules", "names"))))
-})
+if (!is_gprofiler_down) {
+  test_that("input modules is correctly checked", {
+    expect_error(plot_enrichment(res_enrich, modules = 42))
+    expect_error(plot_enrichment(res_enrich, modules = 1:42))
+    expect_error(plot_enrichment(res_enrich, modules = list(a = 1:5, b = letters[1:42])))
+    expect_error(plot_enrichment(res_enrich, modules = c("this", "are", "not", "modules", "names")))
+    expect_error(plot_enrichment(res_enrich, modules = matrix(1:9, ncol = 3)))
+    expect_error(plot_enrichment(res_enrich, modules = data.frame(a = letters[1:5], b = c("this", "are", "not", "modules", "names"))))
+  })
 
-test_that("input sources is correctly checked", {
-  expect_error(plot_enrichment(res_enrich, sources = 42))
-  expect_error(plot_enrichment(res_enrich, sources = 1:42))
-  expect_error(plot_enrichment(res_enrich, sources = list(a = 1:5, b = letters[1:42])))
-  expect_error(plot_enrichment(res_enrich, sources = c("this", "are", "not", "modules", "names")))
-  expect_error(plot_enrichment(res_enrich, sources = matrix(1:9, ncol = 3)))
-  expect_error(plot_enrichment(res_enrich, sources = data.frame(a = letters[1:5], b = c("this", "are", "not", "modules", "names"))))
-})
+  test_that("input sources is correctly checked", {
+    expect_error(plot_enrichment(res_enrich, sources = 42))
+    expect_error(plot_enrichment(res_enrich, sources = 1:42))
+    expect_error(plot_enrichment(res_enrich, sources = list(a = 1:5, b = letters[1:42])))
+    expect_error(plot_enrichment(res_enrich, sources = c("this", "are", "not", "modules", "names")))
+    expect_error(plot_enrichment(res_enrich, sources = matrix(1:9, ncol = 3)))
+    expect_error(plot_enrichment(res_enrich, sources = data.frame(a = letters[1:5], b = c("this", "are", "not", "modules", "names"))))
+  })
 
-test_that("output is a ggplot or plotly object", {
-  expect_true(any(class(plot_enrichment(res_enrich)) %in% c("ggplot", "plotly")))
-})
-
+  test_that("output is a ggplot or plotly object", {
+    expect_true(any(class(plot_enrichment(res_enrich)) %in% c("ggplot", "plotly")))
+  })
+}
 
 # ==== associate_phenotype ====
 
