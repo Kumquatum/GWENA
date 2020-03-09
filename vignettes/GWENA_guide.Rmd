@@ -44,6 +44,7 @@ Current pipeline involves steps in Figure 1 and will be detailed in each followi
 
 ```{r, message=FALSE, warning=FALSE}
 library(GWENA)
+library(magrittr)
 ```
 
 <!-- ## Quick start  -->
