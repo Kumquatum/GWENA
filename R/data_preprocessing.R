@@ -8,6 +8,7 @@
 #'
 #' @importFrom dplyr select
 #' @importFrom magrittr %>%
+#' @importFrom dplyr top_frac select
 #'
 #' @export
 
@@ -26,8 +27,8 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
   var <- lapply(data_expr, function(row) do.call(type, list(row)))
 
   # Filtering
-  top_pct <- data.frame(gene = names(var), var = unlist(var), stringsAsFactors = FALSE) %>% top_frac(pct, var)
-  filtered_data_expr <- data_expr %>% dplyr::select(one_of(top_pct$gene))
+  top_pct <- data.frame(gene = names(var), var = unlist(var), stringsAsFactors = FALSE) %>% dplyr::top_frac(pct, var)
+  filtered_data_expr <- data_expr %>% dplyr::select(dplyr::one_of(top_pct$gene))
 
   return(filtered_data_expr)
 }
