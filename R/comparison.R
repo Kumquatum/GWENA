@@ -85,7 +85,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   # Basic checks on modules_list (single cond or multiple cond list ?) + removing conditions into it which are not defined in data_expr_list
   match_cond_modules_data <- names(modules_list) %in% conditions # Looking at conditions cited or not in modules_list
   if (any(match_cond_modules_data)) { # Meaning it could be a list of modules by condition
-    if (!all(match_cond_modules_data)) { # Removing conditions defined in modules_list but not present in data_list
+    if (!all(match_cond_modules_data)) { # Removing conditions defined in modules_list but not present in data_expr_list
       warning("Conditions defined in modules_list not present in data_expr_list. Removing them.")
       modules_list <- modules_list[which(match_cond_modules_data)]
     }
@@ -157,7 +157,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
 
   # Preservation
   preservation <- quiet(NetRep::modulePreservation(
-    network = net_list, data = data_list, correlation = cor_list,
+    network = net_list, data = data_expr_list, correlation = cor_list,
     moduleAssignments = modules_reformated, discovery = ref_set, test = test_set,
     alternative = test_tail_side, nPerm = n_perm, nThreads = n_threads,
     simplify = FALSE, ...))
