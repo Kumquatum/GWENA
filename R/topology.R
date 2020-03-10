@@ -340,10 +340,3 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   legend("topright", label_legend_edge, col='gray', title = "Weight", lwd = scale_edge_width, bty = "n")
 
 }
-
-
-#
-#
-# plot_modules_both_cond <- function(graph_module_1, graph_module_2, hubs, ...) {
-#
-# }
