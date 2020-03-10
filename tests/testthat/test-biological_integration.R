@@ -47,7 +47,7 @@ test_that("input is a gost result", {
 
 test_that("gost objects in list are compatible", {
   expect_error(join_gost(list(classic_gost, custom_gost_entrez))) # not same length
-  expect_warning(join_gost(list(classic_gost, gprofiler2::gost(query_entrez[28:140], organism = gmt_entrez_id)))) # not same id type (27:140 arbitrairy to get gost result)
+  expect_warning(join_gost(list(classic_gost, gprofiler2::gost(query_entrez[12:124], organism = gmt_entrez_id)))) # not same id type (27:140 arbitrairy to get gost result)
   mock_custom_gost <- custom_gost_symbols
   mock_custom_gost$meta$query_metadata$ordered <- TRUE
   expect_warning(join_gost(list(classic_gost, mock_custom_gost))) # element different
