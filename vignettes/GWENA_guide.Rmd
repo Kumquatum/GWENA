@@ -247,23 +247,52 @@ Inside the module are genes which are key genes in the biological functions cove
 * Kleinberg's score: Select genes which Kleinberg's score superior to provided threshold.
 
 
+### 7. Comparison of conditions
+
+Similarly to gene differential expression, co-expression networks can be compared between condition to not only detect differences of expression but also differences in patterns of co-expression. These may indicate break of inhibition, inefficiency of a factor of transcription, etc.
+
+Depending of your study, you might want to focus on the modules preserved between conditions, or the one unpreserved. Ex : if you're looking for housekeeping genes, you should test for the modules preserved; but if you're looking for the genes that drive a disease, you should test for the unpreserved ones.
+
+Here in GWENA we'll use a comparison test based on random re-assignment of gene names inside module to see whether patterns inside modules change. This permutation test is repeated a large number of time to ensure the significance of the result.
+
+In order to achieve comparison, we'll have to recompute the network and the module detection by condition. To avoid save cpu, memory and time, we'll switch the parameter `` to TRUE so the final object of the network building keep the similarity matrix used in the comparison test.
+
+```{r condition_comparison}
+samples_by_cond <- sapply(kuehne_traits$Condition %>% unique, function(cond){
+  apply(kuehne_traits[which(kuehne_traits$Condition == cond), c("Slide", "Exp")], 1, paste, collapse = "_")
+}, simplify = FALSE)
+  
+expr_by_cond <- sapply(samples_by_cond %>% names, function(cond){
+  kuehne_expr_filtered[which(rownames(kuehne_expr_filtered) %in% samples_by_cond[[cond]]),]
+}, simplify = FALSE)
+
+net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 2, keep_cor_mat = TRUE)
+mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"), 
+                      MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
+
+comparison <- compare_conditions(expr_by_cond, 
+                                 lapply(net_by_cond, `[[`, "network"), 
+                                 lapply(net_by_cond, `[[`, "cor_mat"),  
+                                 lapply(mod_by_cond, `[[`, "modules"),
+                                 comparison_type = "preserved")
+```
+
+`r knitr::kable(comparison$result$young$old$comparison, caption =  "Modules preservation with young as reference")`
+
+The detail of the statistics pvalues can also be seen as a heatmap. Since all statistics need to be significant to consider a module preserved/unpreserved/one of them, it can be interesting to see which statistics prevented a module to be significant.
+
+```{r plot_comparison_stats}
+plot_comparison_stats(comparison$result$young$old$p.values)
+```
+
+<!-- Comparison can also be done with more than 2 conditions. In that case, we can do a cross comparison with each condition as reference, and see the proportion of modules preserved for exemple between each one. -->
+<!-- Inserer heatmap avec les proportions de modules conservés -->
 
 
 
+<!-- ## The modularity of GWENA -->
 
-
-
-
-
-
-## Main steps detail with change in pipeline's modules
-
-
-
-
-
-
-
+<!-- This package as been designed as a fully modular pipeline. By this, we mean that any step of the pipeline as described before, can be performed by another software or package you would prefere. For exemple, other methodes for co-expression network building and module detection exists. You could  -->
 
 
 <div style="text-align:center; font-size:70%; margin-top:50px"> 
