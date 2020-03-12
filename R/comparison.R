@@ -142,6 +142,8 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
     modules_reformated <- lapply(names(modules_list), function(x){
       setNames(rep(as.numeric(x), length(modules_list[[x]])), modules_list[[x]]) }) %>% unlist
   }
+
+  # Setting tests depending on input params
   test_tail_side <- switch(comparison_type,
                            "unpreserved" = "less",
                            "preserved" = "greater",
@@ -154,6 +156,15 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
     test_set <- test
     ref_set <- ref
   }
+
+  # Ensuring tables are matrices
+  for (table in c("data_expr_list", "cor_list", "net_list")) {
+    assign(table, lapply(get(table), function(cond) {
+      if (!is.matrix(cond)) { cond <- as.matrix(cond)
+      } else { cond } }))
+  }
+
+
 
   # Preservation
   preservation <- quiet(NetRep::modulePreservation(
