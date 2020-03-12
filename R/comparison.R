@@ -226,3 +226,39 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
 
   return(preservation)
 }
+
+
+
+#' Heatmap of comparison statistics
+#'
+#' Plot heatmap of p values for the module comparison statistics evaluated through the permutation test.
+#'
+#' @param comparison_pvalues matrix or data.frame, table containing the p values for the statistics on each module
+#' @param pvalue_th decimal, threshold of pvalue below which statistics are considered as significant
+#' @param low_color,mid_color,high_color string, color to use as lower, middle, and higher end of the legend. Can
+#' either be the color name or hexadecimal code (e.g.: “red” or “#FF1234” )
+#'
+#' @importFrom magrittr %>%
+#' @importFrom ggplot2 ggplot geom_tile scale_fill_gradientn coord_equal theme_minimal theme aes element_text
+#' @importFrom tibble rownames_to_column
+#' @importFrom tidyr pivot_longer
+#'
+#' @export
+
+plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05, low_color = "#031643", mid_color = "#A0A3D3", high_color = "#FFFFFF") {
+  df <- comparison_pvalues %>%
+    as.data.frame %>%
+    tibble::rownames_to_column("module") %>%
+    tidyr::pivot_longer(-module, names_to = "statistics", values_to = "pvalue")
+
+  breaks <- c(seq(from = 0, to = pvalue_th, length.out = 4), pvalue_th + 0.01, 1) %>% round(digits = 3)
+
+  ggplot2::ggplot(df, ggplot2::aes(statistics, module, fill = pvalue)) +
+    ggplot2::geom_tile(color = "white", size = 1) +
+    ggplot2::scale_fill_gradientn(colors = c(low_color, mid_color, high_color, high_color),
+                                  values = c(0, pvalue_th, pvalue_th + 0.000001, 1), limits = c(0, 1),
+                                  guide = "legend", breaks = breaks) +
+    ggplot2::coord_equal() +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))
+}
