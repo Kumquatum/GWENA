@@ -128,9 +128,9 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
       if (min(cor_mat < -1) || max(cor_mat) > 1) stop("Provided correlation function returned values outside [-1,1].")
       return(cor_mat)
     }, simplify = FALSE)
-  }
+  } else { cor_func <- "unknown"}
 
-  # Params preparation
+  # Adapting modules format
   if (is_multi_cond_modules_list) {
     # list by condition of gene named vector of modules values
     modules_reformated <- sapply(modules_list, function(cond){
@@ -191,19 +191,27 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   }
   preservation <- prune_list(preservation)
 
-
+  # Adding summarising table about module's preservation
   for (ref_i in names(preservation)) {
     for (test_j in names(preservation[[ref_i]])) {
       comparison <- preservation[[ref_i]][[test_j]][["p.values"]] %>%
         apply(1, function(mod_stats){
           if (all(mod_stats < pvalue_th/2)) { "unpreserved"
           } else if (all(mod_stats > (1 - pvalue_th/2))) { "preserved"
-          } else { "" }
+          } else { "not significant" }
         }) %>% data.frame(module = names(.), comparison = ., stringsAsFactors = FALSE)
 
       preservation[[ref_i]][[test_j]][["comparison"]] <- comparison
     }
   }
+
+  # Adding metadata about the comparison
+  preservation <- list(result = preservation,
+                       metadata = list(
+                         pvalue_th = pvalue_th,
+                         cor_func = cor_func,
+                         comparison_type = comparison_type
+                       ))
 
   return(preservation)
 }
