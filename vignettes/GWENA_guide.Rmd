@@ -40,13 +40,6 @@ Current pipeline involves steps in Figure 1 and will be detailed in each followi
 <!-- It can be performed using the function wrapping all steps `TODO nom fonction full analysis`, or using each function for each step. -->
 
 
-## Loading
-
-```{r, message=FALSE, warning=FALSE}
-library(GWENA)
-library(magrittr)
-```
-
 <!-- ## Quick start  -->
 <!-- `# TODO : script avec fonction full analysis` -->
 
@@ -55,6 +48,13 @@ library(magrittr)
 <!-- ``` -->
 
 ## Main steps detail with default pipeline
+
+### 0. Setup
+
+```{r, message=FALSE, warning=FALSE}
+library(GWENA)
+library(magrittr) # It is not mandatory, but in this guide we use the pipe `%>%` to ease lisibility
+```
 
 ### 1. Input data
 
