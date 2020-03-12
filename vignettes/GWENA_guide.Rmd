@@ -233,9 +233,9 @@ For this reason it is a good practice to plot only interesting modules. The modu
 Since co-expression network are complete graph, all nodes are connected with each other even if the strengh of the link is weak (at the module scale, not the network). In order to remove this noise and bring some clarity in visualisation, this links below a threshold are removed.
 
 ```{r graph}
-module_1 <- detection$modules$`1`
-graph <- build_graph_from_sq_mat(net$network[module_1, module_1])
-plot_module(graph, weight_th = 0.99, edge_scaling = 0.1, node_scaling = 0.5)
+module_2 <- detection$modules$`2`
+graph <- build_graph_from_sq_mat(net$network[module_2, module_2])
+plot_module(graph, weight_th = 0.99999)
 ```
 
 As you can see, adjustments on node size and edges width can be applied to improve clarity
