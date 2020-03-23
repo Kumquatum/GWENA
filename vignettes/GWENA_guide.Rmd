@@ -89,7 +89,7 @@ Expression data can either be from RNA-seq or microarray. You can use the import
 
 In this vignette, we will be using the transcriptomic dataset [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) from the [Kuehne et al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3) and the associated phenotypic traits matrix. Microarray was an Agilent-039494 SurePrint G3 Human GE v2 8x60K, mono channel. These data were gathered in a context of skin aging study and been processed and normalized along with the R script given in [Additional data n°10](https://static-content.springer.com/esm/art%3A10.1186%2Fs12864-017-3547-3/MediaObjects/12864_2017_3547_MOESM10_ESM.zip). 
 
-> Note: [GWENA doesn't provide normalization methods](FAQ.html/#).
+> Note: [GWENA does not provide normalization methods](FAQ.html/#).
 
 ```{r data_input}
 # Number of genes
@@ -122,7 +122,7 @@ Multiple types of filtration have been natively implemented :
 <!-- * For microarray: -->
 <!--   * TODO if one is implemented one day -->
 
-> Note: The authors of [WGCNA](https://cran.r-project.org/package=WGCNA)(used in GWENA for network building) advise [against using differentialy expressed (DE) genes](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html) as a filter since it method is based on unsupervised clustering. Moreover, using DE genes will break the scale-free property (small-world network) on which the adjacency matrix is calculated.
+> Note: The authors of [WGCNA](https://cran.r-project.org/package=WGCNA) (used in GWENA for network building) advise [against using differentialy expressed (DE) genes](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html) as a filter since it method is based on unsupervised clustering. Moreover, using DE genes will break the scale-free property (small-world network) on which the adjacency matrix is calculated.
 
 In this example, we will be filtering the low variable genes with `filter_low_var` function.
 
@@ -204,7 +204,7 @@ These profile informations along with the genes sets inside modules are usefull 
 
 #### 5.1. Functional enrichment
 
-A popular way to explore the modules consist to link know biological gene sets to it. Among the available ones, [Gene Ontology (GO)](https://www.nature.com/articles/srep18871#ref-CR1) and the [Kyoto Encyclopedia of Genes and Genomes (KEGG)](https://www.nature.com/articles/srep18871#ref-CR2) are the more used. Along with [WikiPathways](https://doi.org/10.1093/nar/gkx1064), [Reactome](https://www.nature.com/articles/srep18871#ref-CR4), [Human Phenotype Ontology (HPO)](https://doi.org/10.1093%2Fnar%2Fgkt1026), they give a systemic aspect to the gene sets from the modules. In oppositions, references like [TRANSFAC](https://doi.org/10.1093%2Fbib%2Fbbn016), [miRTarBase](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3013699), [Human Protein Atlas (HPA)](https://dx.doi.org/10.1126%2Fscience.1260419), and [CORUM](http://www.ncbi.nlm.nih.gov/pubmed/30357367) give a more linear point of view but with a larger scale information like tissue/cell/condition information.
+A popular way to explore the modules consists to link known biological gene sets to it. Among the available ones, [Gene Ontology (GO)](https://www.nature.com/articles/srep18871#ref-CR1) and the [Kyoto Encyclopedia of Genes and Genomes (KEGG)](https://www.nature.com/articles/srep18871#ref-CR2) are the most used. Along with [WikiPathways](https://doi.org/10.1093/nar/gkx1064), [Reactome](https://www.nature.com/articles/srep18871#ref-CR4), [Human Phenotype Ontology (HPO)](https://doi.org/10.1093%2Fnar%2Fgkt1026), they give a systemic aspect to the gene sets from the modules. In oppositions, references like [TRANSFAC](https://doi.org/10.1093%2Fbib%2Fbbn016), [miRTarBase](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3013699), [Human Protein Atlas (HPA)](https://dx.doi.org/10.1126%2Fscience.1260419), and [CORUM](http://www.ncbi.nlm.nih.gov/pubmed/30357367) give a more linear point of view but with a larger information scale like tissue/cell/condition information.
 
 Using the [over-representation analysis (ORA)](http://doi.org/10.1371/journal.pcbi.1002375) tool [GOSt](https://biit.cs.ut.ee/gprofiler/gost) from g:Profiler, we can retieve the biological association for each module and plot it as follow.
 
@@ -225,7 +225,7 @@ phenotype_association <- associate_phenotype(detection$modules_eigengenes,
 plot_modules_phenotype(phenotype_association)
 ```
 
-The combination of information with the previous functional enrichment can guide further analysis. Ex: aging is a condition related to the variations of the cell potential: the progressive degradation of quality in cell proliferation and differentiation is the first steps towards malfunctions which induce tissue degradation.
+The combination of information with the previous functional enrichment can guide further analysis. For example, aging is a condition related to the variations of the cell potential: the progressive degradation of quality in cell proliferation and differentiation is the first steps towards malfunctions which induce tissue degradation.
 
 <!-- ### 5.3. differentialy expressed genes (maybe ?) -->
 
@@ -249,7 +249,7 @@ plot_module(graph, weight_th = 0.99999)
 
 ### 7. Comparison of conditions
 
-Co-expression networks can be compared between conditions to detect differences of patterns of co-expression. These may indicate break of inhibition, inefficiency of a factor of transcription, etc. Depending on the study, one might want to focus on the modules preserved between conditions, or the unpreserved one. For example, if you're looking for housekeeping genes, you should test for the modules preserved; but if you're looking for the genes that drive a disease, you should test for the unpreserved ones.
+Co-expression networks can be compared between conditions to detect differences of patterns of co-expression. These may indicate break of inhibition, inefficiency of a factor of transcription, etc. Depending on the study, one might want to focus on the modules preserved between conditions, or the unpreserved one. For example, if you are looking for housekeeping genes, you should test for the modules preserved; but if you are looking for the genes that drive a disease, you should test for the unpreserved ones.
 
 GWENA use a comparison test based on random re-assignment of gene names inside module to see whether patterns inside modules change (from [NetRep](https://cran.r-project.org/web/packages/NetRep/vignettes/NetRep.html) package). This permutation test is repeated a large number of time to ensure the significance of the result.
 
