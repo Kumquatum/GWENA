@@ -58,6 +58,10 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   if (!is.list(cor_list) && !is.null(cor_list)) stop("cor_list must be a list or NULL")
   if (!is.null(cor_list)) {
     if (!all(conditions %in% names(cor_list))) stop("Names in cor_list don't match with conditions.")
+    lapply(cor_list, function(cond) {
+      if (!is.matrix(cond) && !is.data.frame(cond)) stop("All correlation tables in cor_list must be either data.frames of matrices")
+      if (any(!(lapply(cond, is.numeric) %>% unlist))) stop("All correlation tables in cor_list must only contain only decimal values")
+    })
     all_cor <- cor_list %>% unlist # avoid to do a lapply
     if (min(all_cor) < -1 || max(all_cor) > 1) stop("Provided correlation_list contains values outside [-1,1].")
   }
