@@ -1,5 +1,5 @@
 ---
-title: "GWENA - Guide"
+title: "GWENA - Tutorial"
 author: "Gwenaëlle Lemoine"
 date: "`r Sys.Date()`"
 output: 
@@ -23,147 +23,163 @@ knitr::opts_chunk$set(
 )
 ```
 
-*Citation: TODO quand la ref + DOI de la publi sera dispo*
+<!-- *Citation: TODO when article published* -->
 
 ## Overview
 
-Comprehension of complex biological systems now require an approach based on interactions between each actor, meaning a network. Their interpretation often involve both a knowledge-driven and a data driven analysis. Current methods respectively focus on functional enrichment and hub genes detection. Combining them with the comparison of conditions and an extended topology analysis within a single pipeline can lead to better results exploitation. 
+Understanding of complex biological systems can now be improved through the harvest of large data-sets from high-throughput transcriptomics technologies. This however require approaches able to manage such amout of data. One can be to gene network analysis. Based on interactions study between each gene, their interpretation often involve both a knowledge-driven and a data driven analysis. Current methods focus on functional enrichment and hub genes detection, respectively. Combining them with the comparison of biological or experimental conditions and an extended analysis of the network topology within a single pipeline can lead to better results exploitation. 
 
-This document gives an overview of the R package **GWENA** (Gene Whole co-Expression Network Analysis) which regroups this process into a single pipeline and tool to ease the work of bioinformaticians in their analysis of multiple conditions through the co-expression spectrum, therefore helping the discovery of meaningful biological conclusions.
+This document gives an overview of the R package **GWENA** (Gene Whole co-Expression Network Analysis) which regroups this process into a single pipeline. This package aim to ease the work of scientists in their analysis of multiple conditions through the co-expression method for gene network analysis. Therefore discovery of meaningful biological conclusions can be helped.
 
-Current pipeline involves steps in Figure 1 and will be detailed in each following section.
+Figure 1 details the steps involved in the current analysis pipeline. They will be detailed in the following sections.
 
 .
 
-> ![Figure 1. Analysis pipeline for GWENA, from raw data to full characterization of the modules and comparison of conditions.](figure_pipeline_schema.png)
+> ![Figure 1. Analysis pipeline of GWENA, from expression data to characterization of the modules and comparison of conditions.](figure_pipeline_schema.png)
 
 <!-- It can be performed using the function wrapping all steps `TODO nom fonction full analysis`, or using each function for each step. -->
 
 
 <!-- ## Quick start  -->
-<!-- `# TODO : script avec fonction full analysis` -->
+<!-- `# TODO: script function full analysis when implemented` -->
 
-<!-- ```{r setup, eval = FALSE} -->
-<!-- # TODO: ajouter wrapper -->
+<!-- ```{r wrapper, eval = FALSE} -->
+<!-- # TODO: add example with wrapper -->
 <!-- ``` -->
 
 ## Main steps detail with default pipeline
 
-### 0. Setup
+### 0. Starting with GWENA
 
-```{r, message=FALSE, warning=FALSE}
+Installation can either be from:
+
+1. the official version from the last Bioconductor release (3.11 on R-4.0.0).
+2. the last stable version from the Bioc Devel branch.
+3. the day-to-day developpment version from the [github repository](https://github.com/Kumquatum/GWENA).
+
+```{r install, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly=TRUE))
+  install.packages("BiocManager")
+
+# 1. From Bioconductor release
+BiocManager::install("GWENA")
+
+# 2. From Bioconductor devel
+BiocManager::install("GWENA", version = "devel")
+
+# 3. From Github repository
+BiocManager::install("Kumquatum/GWENA")
+# OR
+if (!requireNamespace("devtools", quietly=TRUE))
+  install.packages("devtools")
+devtools::install_github("Kumquatum/GWENA")
+
+```
+
+Then simply load GWENA as usual:
+
+```{r load, message=FALSE, warning=FALSE}
 library(GWENA)
-library(magrittr) # It is not mandatory, but in this guide we use the pipe `%>%` to ease lisibility
+library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to ease readability
 ```
 
 ### 1. Input data
 
-Input data supported by this package can be either from RNA-seq or microarray. You can use the import function of your choice (read.csv, read.table, ect.) as long as the final format is a data.frame with genes as columns and samples as rows. Transcriptomic data must have been resumed to the gene level (if you have no idea how to do so, see [How can I resume my transcriptomic data to the gene level ?](FAQ.html/#how-can-i-resume-my-transcriptomic-data-to-the-gene-level) from the [FAQ](FAQ.html)) . 
+Expression data can either be from RNA-seq or microarray. You can use the import function of your choice (read.csv, read.table, etc.) as long as the final format is a data.frame with genes as columns and samples as rows. Transcriptomic data must have been reduced to the gene level (See [How can I resume my transcriptomic data to the gene level ?](FAQ.html/#how-can-i-reduce-my-transcriptomic-data-to-the-gene-level) from the [FAQ](FAQ.html)) since GWENA is deisgned to build **gene** co-expression networks. 
 
-<!-- TODO Si le package n'implémente pas de méthode, laisser cette phrase et la compléter en indiquant dans la section en question les moyens de résumé à l'échelle gene comme collapseRows de WGCNA, ou ... ? RSEM ? RNA-SeQC ? etc. -->
+In this vignette, we will be using the transcriptomic dataset [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) from the [Kuehne et al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3) and the associated phenotypic traits matrix. Microarray was an Agilent-039494 SurePrint G3 Human GE v2 8x60K, mono channel. These data were gathered in a context of skin aging study and been processed and normalized along with the R script given in [Additional data n°10](https://static-content.springer.com/esm/art%3A10.1186%2Fs12864-017-3547-3/MediaObjects/12864_2017_3547_MOESM10_ESM.zip). 
 
-In this vignette, we will be using the transcriptomic dataset [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) from the [Kuehne et al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3) and the associated phenotipic traits matrix. Data has been processed along with the R script given in Additionnal data n°10 and will be our example data set here. The aim of this study was the investigation of the roles of transcriptomics, metabolomics and their junction in skin aging.
-
-* Transcriptomic data type: microarray (Agilent-039494 SurePrint G3 Human GE v2 8x60K, mono channel)
-* `r ncol(kuehne_expr)` genes
-* `r nrow(kuehne_expr)` samples
-* `r length(table(kuehne_traits$Condition))` conditions : `r unique(kuehne_traits$Condition)[1]` et `r unique(kuehne_traits$Condition)[2]`
+> Note: [GWENA doesn't provide normalization methods](FAQ.html/#).
 
 ```{r data_input}
-kuehne_expr[1:5,1:5]
+# Number of genes
+ncol(kuehne_expr)
+# Number of samples
+nrow(kuehne_expr)
+# Conditions 
+unique(kuehne_traits$Condition)
 
+# Overview of expression table
+kuehne_expr[1:5,1:5]
+# Overview of traits table
 kuehne_traits[1:5,]
 ```
 
-> Note : GWENA doesn't provide normalization methods. Explaination can be found in FAQ at [Why GWENA doesn't provide normalization methods ?](FAQ.html/#)
 
 ### 2. Gene filtering
 
-Even if co-expression method will filter out low co-expressed genes, it is interesting in terms of computer power to reduce the dataset to work with. This will require less memory to store the data, and less CPU power and memory when working on it. Howerver, this step need to be carefully studied as it will impact the modules building. 
-
-The [authors of WGCNA advise against using differentialy expressed (DE) genes](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html) as a filter since the tool is based on unsupervised clustering. Moreover, using DE genes will broke the scale-free property (small-world network) on which the adjacency matrix is calculated.
+Even if the co-expression method is designed to manage and filter out low co-expressed genes, it is still interesting to reduce the dataset to work with. This step will allow to use less memory for data storage and less CPU power and memory for processing. However, filtering needs to be carefully studied as it will impact the gene modules building. 
 
 Multiple types of filtration have been natively implemented :
 
-* For all :
-  * Filtration on low variation
-* For RNA-seq data :
-  * at least one : only one sample need to have a value above min_count in the gene
-  * mean : the mean of all samples for the gene need to be above min_count
-  * all : all samples for the gene need to be above min_count
-* For microarray
-  * TODO
+* For RNA-seq and microarray:
+  * Filtering on low variation of expression
+* For RNA-seq data:
+  * at least one: only one sample needs to have a value above minimal count threshold in the gene
+  * mean: the means of all samples for the gene needs to be above min_count
+  * all: all samples for the gene need to be above min_count
+  
+<!-- * For microarray: -->
+<!--   * TODO if one is implemented one day -->
 
-<!-- Remettre le TODO sous For all car il faudra ajouter d'autres méthodes de filtration ? -->
+> Note: The authors of [WGCNA](https://cran.r-project.org/package=WGCNA)(used in GWENA for network building) advise [against using differentialy expressed (DE) genes](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html) as a filter since it method is based on unsupervised clustering. Moreover, using DE genes will break the scale-free property (small-world network) on which the adjacency matrix is calculated.
 
-In this example, we'll be filtering the low variating genes.
+In this example, we will be filtering the low variable genes with `filter_low_var` function.
 
 ```{r filtration}
 kuehne_expr_filtered <- filter_low_var(kuehne_expr, pct = 0.7, type = "median")
+
+# Remaining number of genes
+ncol(kuehne_expr_filtered)
 ```
-
-Remaining number of genes : `r ncol(kuehne_expr_filtered)`
-
-<!-- ```{r plot_expr} -->
-<!-- library(ggplot2) -->
-<!-- tit = kuehne_expr %>% t %>% -->
-<!--   apply(1, var) %>% -->
-<!--   data.frame(gene = names(.), var_nofilter = .) %>% -->
-<!--   bind_cols(kuehne_expr_filtered %>% t %>% -->
-<!--               apply(1, var) %>% -->
-<!--               data.frame(gene = names(.), var_filter = .)) %>% -->
-<!--   tibble::rownames_to_column(var = gene) %>% -->
-<!--   tidyr::pivot_longer(-gene, names_to = "filter", values_to = "variation") %>% -->
-<!--   ggplot(aes(x = variation, colour = filter)) + geom_density()  -->
-
-
-<!-- tut <- kuehne_expr %>%  -->
-<!--   tibble::rownames_to_column(var = "sample") %>% -->
-<!--   tidyr::pivot_longer(-sample, names_to = "gene", values_to = "expression") -->
-<!-- ggplot(tut, aes(expression, colour = sample)) + geom_density() -->
-<!-- ``` -->
-
 
 
 ### 3. Network building 
 
-Gene co-expression networks consist in an ensemble of genes (nodes) linked to each other (edges) according to the strengh of their relation. This strengh estimation begins by the computation of a **similarity score**. It can be a distance (euclidian, minkowski, ...) but is usually a correlation. Among these, Pearson's one is the more popular. However in GWENA we chosed Spearman correlation by default since it is less sensible to outliers which are frequent in transcriptomics.
+Gene co-expression networks are an ensemble of genes (nodes) linked to each other (edges) according to the strengh of their relation. This strength is estimated by the computation of a **(dis)similarity score** which can start with a distance (euclidian, minkowski, ...) but is usually a correlation. Among these, Pearson's one is the most popular, however in GWENA we select Spearman correlation by default. It is less sensible to outliers which are frequent in transcriptomics datasets and does not assume normal distribution of data.
 
-This first score can then be adjusted to reflect the reality. It's the case of WGCNA which base its adjustement on the [scale-free](https://en.wikipedia.org/wiki/Scale-free_network) property of gene networks. The distribution of the nodes degree in these networks follows a power law. Next step consists to select the best fitting power law to the correlations, so they can be adjusted by it in the end.
+Built of co-expression network goes through this sub-steps :
 
-Another adjustement takes into account the [topology of the network](https://en.wikipedia.org/wiki/Network_topology). It holds trails to understand the underlying biological processes. In this case, it's the topological overlap[^1] of two nodes which is used to reflect it.
+1. Computation of a **correlation** (or distance) between each pair of genes.
+2. Fitting of a power law to the distribution of this correlations.
+3. Computation of an **adjacency score** by adjusting previous correlation by the fitted power law. 
+4. Computation of a **topological overlap score** by taking into account the topology of the network.
 
-<!-- The built of our co-expression network goes through this sub-steps : -->
-<!-- 1. Computing correlation between each pair of genes. -->
-<!-- 2. Trying to fit a power law to the distribution of this correlations to adjust them by it. This results in a similarity score for each pair of genes. -->
-<!-- 3. This score is itselft re-adjust by taking into acount the topology of the network. -->
+These successive adjustments improve the detection of modules for the next step.
 
 ```{r net_building}
-# In order to fasten the example process here, we only take a sample of the genes
+# In order to fasten the example execution time, we only take an arbitary sample of the genes. 
 kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 
 net <- build_net(kuehne_expr_filtered, cor_func = "spearman", n_threads = 2)
+
+# Power selected :
+net$metadata$power
+# Fit of the power law to data ($R^2$) :
+net$metadata$fit_power_table[net$metadata$fit_power_table$Power == net$metadata$power, "SFT.R.sq"]
 ```
 
-* Power selected : `r net$metadata$power`
-* Fit of the power law to data ($R^2$) : `r net$metadata$fit_power_table[net$metadata$fit_power_table$Power == net$metadata$power, "SFT.R.sq"]`
 
 ### 4. Modules detection
 
-At this point, our network is a [complete graph](https://en.wikipedia.org/wiki/Complete_graph) : all nodes are connected to all other nodes with different strengh. Some strong links are often localized around the same genes, allowing to observe groups of genes closely related. In co-expression networks this groups are called modules and assumed to be representatives of genes working together to a same set of function.
+At this point, the network is a [complete graph](https://en.wikipedia.org/wiki/Complete_graph): all nodes are connected to all other nodes with different strengths. Among the genes, groups of them are strongly related between multiple other. In co-expression networks these groups are called **modules** and assumed to be representative of genes working together to a same set of function.
 
-They can be detected using unsupervised learning (here hierarchical clustering) or other adapted clustering method. 
+They can be detected using unsupervised learning (here hierarchical clustering) or other adapted clustering method (kmeans, Gaussian mixture models, etc.). 
 
 ```{r modules_detection}
 detection <- detect_modules(kuehne_expr_filtered, net$network, merge_cut_height = 0.997, detailled_result = TRUE)
 ```
 
-Since this operation tend to create multiple little modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), they are ussually merged into one.
+**Important**: Module 0 is containing genes which did not fit into any module.
 
-* Number of modules before merging : `r length(unique(detection$modules_premerge))-1` 
-* Number of modules after merging : `r length(unique(detection$modules))-1`
+Since this operation tends to create multiple little modules with highly similar expression profile (based on the [eigengene](FAQ.html/#what-is-an-eigengene) of each), they are usually merged into one.
 
 ```{r bipartite_graph_merge}
+# Number of modules before merging :
+length(unique(detection$modules_premerge))
+# Number of modules after merging: 
+length(unique(detection$modules))
+
 plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
 ```
 
@@ -175,34 +191,33 @@ ggplot2::ggplot(data.frame(detection$modules %>% stack), ggplot2::aes(x = ind)) 
   ggplot2::xlab("Module")
 ```
 
-<!-- As explain before, each module regroups genes which have a strong similarity. This means the expression profiles are also similar, as shown below. -->
-Each of the modules present a specific profile, which can be plotted in two figures to separate the positive (+ facet) and negative (- facet) correlations profile. As a summary of this profiles, an eigengene (red line) acting like a signature can be stacked on this representation. 
+Each of the modules present a distinct profile, which can be plotted in two figures to separate the positive (+ facet) and negative (- facet) correlations profile. As a summary of this profiles, an eigengene (red line) acting like a signature can be stacked on this representation. 
 
 ```{r plot_module_profile}
 plot_expression_profiles(kuehne_expr_filtered, detection$modules)
 ```
 
-These informations along to the genes sets inside modules are now usefull to relate external gene information, or more generally, biological information.
+These profile informations along with the genes sets inside modules are usefull to relate external gene information, or more generally, biological information.
 
 
 ### 5. Biological integration
 
-#### 5.1. Functionnal enrichment
+#### 5.1. Functional enrichment
 
-A popular way to explore the modules consist to link know biological gene sets to it. Among the available ones, Gene Ontology (GO) and the Kyoto Encyclopedia of Genes and Genomes (KEGG) are the more used. Along with WikiPathways, Reactome, Human Phenotype Ontology (HPO), they give a systemic aspects to the gene sets from the modules. In oppositions, references like TRANSFAC, miRTarBase, Human Protein Atlas (HPA), and CORUM give a more linear point of view but with a larger scale information like tissue/cell/condition information.
+A popular way to explore the modules consist to link know biological gene sets to it. Among the available ones, [Gene Ontology (GO)](https://www.nature.com/articles/srep18871#ref-CR1) and the [Kyoto Encyclopedia of Genes and Genomes (KEGG)](https://www.nature.com/articles/srep18871#ref-CR2) are the more used. Along with [WikiPathways](https://doi.org/10.1093/nar/gkx1064), [Reactome](https://www.nature.com/articles/srep18871#ref-CR4), [Human Phenotype Ontology (HPO)](https://doi.org/10.1093%2Fnar%2Fgkt1026), they give a systemic aspect to the gene sets from the modules. In oppositions, references like [TRANSFAC](https://doi.org/10.1093%2Fbib%2Fbbn016), [miRTarBase](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3013699), [Human Protein Atlas (HPA)](https://dx.doi.org/10.1126%2Fscience.1260419), and [CORUM](http://www.ncbi.nlm.nih.gov/pubmed/30357367) give a more linear point of view but with a larger scale information like tissue/cell/condition information.
 
-Using the over-representation analysis (ORA) function GOSt implemented in the g:Profiler tool, we can retieve the biological association for each module and plot it as follow.
+Using the [over-representation analysis (ORA)](http://doi.org/10.1371/journal.pcbi.1002375) tool [GOSt](https://biit.cs.ut.ee/gprofiler/gost) from g:Profiler, we can retieve the biological association for each module and plot it as follow.
 
 ```{r modules_enrichment}
 enrichment <- bio_enrich(detection$modules)
 plot_enrichment(enrichment)
 ```
 
-In these module, the functionnal activity seems to be linked to the processes of membrane communication. Moreover, the type of processes suggest an activity about cell cycle of life (differentiation, autophagy and content degradation).
+With this information, preliminary information can be retrieved. For example, module 2 functional activity seems to be linked to the processes of membrane communication.
 
 #### 5.2. Phenotypic association
 
-If phenotypic informations are available about the samples provided, an association test can help to determine if a module is specifically linked to a trait. In this cas, the module 1 seems to be strongly linked to the `Age` trait.
+If phenotypic information is available about the samples provided, an association test can help to determine if a module is specifically linked to a trait. In this case, module 1 seems to be strongly linked to the `Age` trait.
 
 ```{r modules_phenotype}
 phenotype_association <- associate_phenotype(detection$modules_eigengenes, 
@@ -210,27 +225,20 @@ phenotype_association <- associate_phenotype(detection$modules_eigengenes,
 plot_modules_phenotype(phenotype_association)
 ```
 
-The combination of information with the previous functionnal enrichment can orientate further analysis. Aging is a condition related to the variations of the cell potential : the progressive degradation of quality in cell proliferation and differentiation is the first steps towards malfunctions which induce tissue degradation. Multiple genes are known to be affected or related to these mechanisms, however they can't fully explain this phenomenon. 
+The combination of information with the previous functional enrichment can guide further analysis. Ex: aging is a condition related to the variations of the cell potential: the progressive degradation of quality in cell proliferation and differentiation is the first steps towards malfunctions which induce tissue degradation.
 
-<!-- ### 5.3. Differentially expressed genes (maybe ?) -->
+<!-- ### 5.3. differentialy expressed genes (maybe ?) -->
 
 ### 6. Graph analysis
 
-<!-- missing informations -->
-<!-- looking to neighboor genes -->
-<!-- adding data driven information with less bias -->
-<!-- hubgenes -->
+Information can be retrieved from the network itself. For example, hub genes are genes highly connected known to be associated with key biological functions. They can be detected by different methods :
 
-<!-- Alternative text -->
-<!-- To recover this missing information, a common method in co-expression analysis is to use topology information. Neighborhood genes, patterns of interactions and other graph infromations can retrieve information yet to be biologicaly confirmed. Neighborhood genes have already be founded to be regulators or indirect factors of a condition (like gene-coded protein which would be catalyzed and from whom the product would impact the condition).  -->
+* Highest connectivity: Select the top n (n depending on parameter given) highest connected genes. Similar to WGCNA's selection of hub genes
+* Superior degree: Select genes which degree is greater than average connection degree of the network. Definition from network theory.
+* Kleinberg's score: Select genes which Kleinberg's score superior to provided threshold.
 
-To recover this missing information, a common method is to look to the genes linked to the known one inside co-expression networks. These neighborhood genes may act as regulators or indirect factors of the condition (like gene-coded protein which would be catalyzed and from whom the product would impact the condition). Multiple metrics, in the sens of graph theory, exist to assess the closely lineked genes.
-Moreover, information can itself come from the network, meaning data-driven information, by opposition to the functionnal enrichment which is knowledge driven (information from biological databases is "matched" onto studied data). For example, hub genes are genes which are central in the network in terms of centrality and 
-
-Manipulation of graph objects can be quite demanding in memory and CPU usage. Caution is advised when choosing to plot the whole network if it is larger than 100 genes (therefore nodes). 
-
-For this reason it is a good practice to plot only interesting modules. The module 1 from our example present a significant link to aging based on phenotype association and also many terms of biological enrichment. We will continue our topological analysis with it.
-Since co-expression network are complete graph, all nodes are connected with each other even if the strengh of the link is weak (at the module scale, not the network). In order to remove this noise and bring some clarity in visualisation, this links below a threshold are removed.
+Manipulation of graph objects can be quite demanding in memory and CPU usage. Caution is advised when choosing to plot the whole network if it is larger than 100 genes. 
+Since a co-expression network is a complete graph, readability is hard because of all beeing connected with each other. In order to clarity visualization, edges with a similarity score below a threshold are removed.
 
 ```{r graph}
 module_2 <- detection$modules$`2`
@@ -238,24 +246,14 @@ graph <- build_graph_from_sq_mat(net$network[module_2, module_2])
 plot_module(graph, weight_th = 0.99999)
 ```
 
-As you can see, adjustments on node size and edges width can be applied to improve clarity
-
-Inside the module are genes which are key genes in the biological functions covered. This are called "hub genes". In order to detect them, multiple algorithms are available:
-
-* Highest connectivity: Select the top n (n depending on parameter given) highest connected genes. Similar to WGCNA's selection of hub genes
-* Superior degree: Select genes which degree is greater than average connection degree of the network. Definition from network theory.
-* Kleinberg's score: Select genes which Kleinberg's score superior to provided threshold.
-
 
 ### 7. Comparison of conditions
 
-Similarly to gene differential expression, co-expression networks can be compared between condition to not only detect differences of expression but also differences in patterns of co-expression. These may indicate break of inhibition, inefficiency of a factor of transcription, etc.
+Co-expression networks can be compared between conditions to detect differences of patterns of co-expression. These may indicate break of inhibition, inefficiency of a factor of transcription, etc. Depending on the study, one might want to focus on the modules preserved between conditions, or the unpreserved one. For example, if you're looking for housekeeping genes, you should test for the modules preserved; but if you're looking for the genes that drive a disease, you should test for the unpreserved ones.
 
-Depending of your study, you might want to focus on the modules preserved between conditions, or the one unpreserved. Ex : if you're looking for housekeeping genes, you should test for the modules preserved; but if you're looking for the genes that drive a disease, you should test for the unpreserved ones.
+GWENA use a comparison test based on random re-assignment of gene names inside module to see whether patterns inside modules change (from [NetRep](https://cran.r-project.org/web/packages/NetRep/vignettes/NetRep.html) package). This permutation test is repeated a large number of time to ensure the significance of the result.
 
-Here in GWENA we'll use a comparison test based on random re-assignment of gene names inside module to see whether patterns inside modules change. This permutation test is repeated a large number of time to ensure the significance of the result.
-
-In order to achieve comparison, we'll have to recompute the network and the module detection by condition. To avoid save cpu, memory and time, we'll switch the parameter `` to TRUE so the final object of the network building keep the similarity matrix used in the comparison test.
+In order to achieve comparison, build of the network and detection of the modules need to be performed for each condition. Saving cpu, memory and time, can be achieve by switching the parameter `keep_cor_mat` from the `build_net` function to TRUE so the similarity matrix is kept in the returned object.
 
 ```{r condition_comparison}
 samples_by_cond <- sapply(kuehne_traits$Condition %>% unique, function(cond){
@@ -274,8 +272,11 @@ comparison <- compare_conditions(expr_by_cond,
                                  lapply(net_by_cond, `[[`, "network"), 
                                  lapply(net_by_cond, `[[`, "cor_mat"),  
                                  lapply(mod_by_cond, `[[`, "modules"),
-                                 comparison_type = "preserved")
+                                 comparison_type = "preserved", 
+                                 pvalue_th = 0.05)
 ```
+
+The final object contains a table resuming the comparison of the module, directly available with `comparison$result$young$old$comparison`
 
 `r knitr::kable(comparison$result$young$old$comparison, caption =  "Modules preservation with young as reference")`
 
