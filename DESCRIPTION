@@ -1,16 +1,15 @@
 Package: GWENA
 Title: Pipeline for augmented co-expression analysis
-Version: 0.0.0.9000
+Version: 0.99.0
 Authors@R: 
     person(given = "Gwenaëlle",
            family = "Lemoine",
            role = c("aut", "cre"),
            email = "lemoine.gwenaelle@gmail.com",
            comment = c(ORCID = "0000-0003-4747-1937"))
-Description: Analyse transcriptomics data (either microarray or RNA-seq) through co-expression prism. 
-    Meaning data pre-processing and built of modules based on expression intensities. Then add multiple
-    biological information (functional enrichment, topological analysis, differential co-expression, 
-    network visualisation, differential expression, etc.9) in order to draw a full picture of the context.
+Description: Analyse transcriptomics data (either microarray or RNA-seq) through co-expression network analysis
+             pipeline. Include filtration of the transcriptomic data, network build, gene clustering (modules), 
+             biological integration (gene enrichment, phenotypic association), topological analysis, and modules comparison.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
