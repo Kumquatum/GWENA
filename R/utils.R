@@ -31,11 +31,11 @@ quiet <- function(func) {
 #' @export
 
 is_network <- function(network) {
-  if (!(is.data.frame(network) || is.matrix(network))) return(list(bool = FALSE, reason = "network must be a data.frame or a matrix"))
-  if (is.null(colnames(network)) || is.null(rownames(network))) return(list(bool = FALSE, reason = "network must have colnames and rownames"))
+  if (!(is.data.frame(network) | is.matrix(network))) return(list(bool = FALSE, reason = "network must be a data.frame or a matrix"))
+  if (is.null(colnames(network)) | is.null(rownames(network))) return(list(bool = FALSE, reason = "network must have colnames and rownames"))
   if (!all(colnames(network) %in% rownames(network))) return(list(bool = FALSE, reason = "colnames and rownames form network doesn't match"))
   if (ncol(network) != nrow(network)) return(list(bool = FALSE, reason = "network must be a squared matrix"))
-  if ((any(network > 1) || any(network < -1)) && !any(is.na(network))) return(list(bool = FALSE, reason = "network should be filled with value in the [-1,1] range"))
+  if ((any(network > 1) | any(network < -1)) && !any(is.na(network))) return(list(bool = FALSE, reason = "network should be filled with value in the [-1,1] range"))
   #else
   return(list(bool = TRUE, reason = NULL))
 }
@@ -156,11 +156,11 @@ is_gost <- function(gost_result) {
 #' @export
 
 is_data_expr <- function(data_expr) {
-  if (!(is.data.frame(data_expr) || is.matrix(data_expr))) return(list(bool = FALSE, reason = "data_expr should be a data.frame or a matrix."))
+  if (!(is.data.frame(data_expr) | is.matrix(data_expr))) return(list(bool = FALSE, reason = "data_expr should be a data.frame or a matrix."))
   if (any(is.na(data_expr))) return(list(bool = FALSE, reason = "data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject."))
   if (min(data_expr) < 0) return(list(bool = FALSE, reason = "data_expr cannot contain any negative value."))
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
-  if (is.null(colnames(data_expr)) || is.null(rownames(data_expr))) return(list(bool = FALSE, reason = "data_expr should have colnames and rownames"))
+  if (is.null(colnames(data_expr)) | is.null(rownames(data_expr))) return(list(bool = FALSE, reason = "data_expr should have colnames and rownames"))
   return(list(bool = TRUE, reason = NULL))
 }
 

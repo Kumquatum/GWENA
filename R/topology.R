@@ -14,9 +14,9 @@
 
 build_graph_from_sq_mat <- function(sq_mat) {
   # Checks
-  if (!(is.matrix(sq_mat) || is.data.frame((sq_mat)))) stop("sq_mat should be a matrix or a data.frame")
+  if (!(is.matrix(sq_mat) | is.data.frame((sq_mat)))) stop("sq_mat should be a matrix or a data.frame")
   if (any(is.na(sq_mat))) warning("sq_mat should not contain any missing value")
-  if ((any(sq_mat > 1) || any(sq_mat < -1)) && !any(is.na(sq_mat))) stop("sq_mat should be filled with value in the [-1,1] range")
+  if ((any(sq_mat > 1) | any(sq_mat < -1)) && !any(is.na(sq_mat))) stop("sq_mat should be filled with value in the [-1,1] range")
   if (nrow(sq_mat) != ncol(sq_mat)) stop("sq_mat must be a squared matrix")
 
   # From matrix to graph
@@ -54,7 +54,7 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
     .check_module(modules, is.list(modules))}
   if (length(top_n) > 1) stop("top_n must be a single numeric value")
   if (!is.numeric(top_n)) stop("top_n must be a numeric value")
-  if (top_n < 1 || top_n %% 1 != 0) stop("If not NULL, block_size must be a whole number >= 1")
+  if (top_n < 1 | top_n %% 1 != 0) stop("If not NULL, block_size must be a whole number >= 1")
 
   # Highly connected genes selection
   if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
@@ -102,7 +102,7 @@ get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
   if (!is.null(weight_th)) {
     if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
     if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
-    if (weight_th < 0 || weight_th >= 1) stop("weight_th must be a in [0;1[")
+    if (weight_th < 0 | weight_th >= 1) stop("weight_th must be a in [0;1[")
   }
   # TODO : check if can avoid transforming to igraph object. It takes a lot of time...
 
@@ -162,12 +162,12 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL
   if (!is.null(k_th)) {
     if (length(k_th) > 1) stop("k_th must be a single numeric value")
     if (!is.numeric(k_th)) stop("k_th must be a numeric value")
-    if (k_th < 0 || k_th >= 1) stop("k_th must be a in [0;1[")
+    if (k_th < 0 | k_th >= 1) stop("k_th must be a in [0;1[")
   }
   if (!is.null(top_n)) {
     if (length(top_n) > 1) stop("top_n must be a single numeric value")
     if (!is.numeric(top_n)) stop("top_n must be a numeric value")
-    if (top_n < 1 || top_n %% 1 != 0) stop("If not NULL, block_size must be a whole number >= 1")
+    if (top_n < 1 | top_n %% 1 != 0) stop("If not NULL, block_size must be a whole number >= 1")
   }
 
   if (is.null(modules)) { # considered network is already a single module, or looking for hubs independently of modules split
@@ -269,7 +269,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   }
   if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
   if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
-  if (weight_th < 0 || weight_th >= 1) stop("weight_th must be a in [0;1[")
+  if (weight_th < 0 | weight_th >= 1) stop("weight_th must be a in [0;1[")
   if (!is.null(enrichment)) .check_gost(enrichment)
   if (!is.character(layout) && !is.matrix(layout) && !is.function(layout)) {
     stop("layout must be a layout function, its name as a string, or a matrix giving position of each node ") }

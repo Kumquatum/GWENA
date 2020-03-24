@@ -63,7 +63,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
       if (any(!(lapply(cond, is.numeric) %>% unlist))) stop("All correlation tables in cor_list must only contain only decimal values")
     })
     all_cor <- cor_list %>% unlist # avoid to do a lapply
-    if (min(all_cor) < -1 || max(all_cor) > 1) stop("Provided correlation_list contains values outside [-1,1].")
+    if (min(all_cor) < -1 | max(all_cor) > 1) stop("Provided correlation_list contains values outside [-1,1].")
   }
   if (!is.character(ref)) stop("ref must be a string or a vector of strings")
   if (all(ref != "cross comparison") && !(all(ref %in% conditions))) stop("ref must be a condition name, or a vector of it, matching conditions.")
@@ -73,7 +73,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   } else if (!(all(test %in% conditions))) { stop("test must be a condition name, or a vector of it, matching conditions.") }
   if (!is.list(modules_list)) stop("modules_list must be a single list of modules or a list by condition of the modules")
   cor_func <- match.arg(cor_func)
-  if (cor_func == "other" && (is.null(your_func) || !is.function(your_func))) stop("If you specify other, your_func must be a function.")
+  if (cor_func == "other" && (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
   if (!is.numeric(n_perm)) stop("n_perm must be a numeric value")
   if (n_perm %% 1 != 0) stop("n_perm must be a whole number")
   comparison_type <- match.arg(comparison_type)
@@ -84,7 +84,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   }
   if (!is.numeric(pvalue_th)) stop("pvalue_th must be a numeric value")
   if (length(pvalue_th) != 1) stop("pvalue_th must be a single value")
-  if (pvalue_th <= 0 || pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
+  if (pvalue_th <= 0 | pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
 
   # Basic checks on modules_list (single cond or multiple cond list ?) + removing conditions into it which are not defined in data_expr_list
   match_cond_modules_data <- names(modules_list) %in% conditions # Looking at conditions cited or not in modules_list
@@ -129,7 +129,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
         cor_to_use <- .cor_func_match(cor_func)
       }
       cor_mat <- cor_to_use(data_expr %>% as.matrix)
-      if (min(cor_mat < -1) || max(cor_mat) > 1) stop("Provided correlation function returned values outside [-1,1].")
+      if (min(cor_mat < -1) | max(cor_mat) > 1) stop("Provided correlation function returned values outside [-1,1].")
       return(cor_mat)
     }, simplify = FALSE)
   } else { cor_func <- "unknown"}

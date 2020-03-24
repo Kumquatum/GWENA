@@ -37,7 +37,7 @@ join_gost <- function(gost_result) {
             "Queries different between reference (first element of gost_result) and gost_result element n\u00B0", x, ". It may be due to different type of ID (Ensembl, Entrez, etc.).
             IDs from reference will be kept.")
         } else if (name == "numeric_ns") {
-          if (is.vector(ref$meta$query_metadata$numeric_ns, "numeric") || is.vector(addon$meta$query_metadata$numeric_ns, "numeric")) {
+          if (is.vector(ref$meta$query_metadata$numeric_ns, "numeric") | is.vector(addon$meta$query_metadata$numeric_ns, "numeric")) {
             if (ref$meta$query_metadata$numeric_ns != addon$meta$query_metadata$numeric_ns) {
               warning("Different type of IDs. ", ref$meta$query_metadata$numeric_ns, " (reference) and ", addon$meta$query_metadata$numeric_ns,
                       " (list element \u00B0", x, ")")}}
@@ -100,7 +100,7 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
   }
   if (!is.null(custom_gmt)) {
     if (is.list(custom_gmt)) {
-      if (any(lapply(custom_gmt, function(x) !is.character(x) || length(x) != 1 ) %>% unlist)) {
+      if (any(lapply(custom_gmt, function(x) !is.character(x) | length(x) != 1 ) %>% unlist)) {
         stop("all element of the list must be string reprensenting paths")}
       if (!all(lapply(custom_gmt, file.exists))) stop("all custom_gmt path provided must exist")
     } else if (is.character(custom_gmt) && length(custom_gmt) == 1) {
@@ -207,12 +207,12 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all", col
 
 associate_phenotype <- function(eigengenes, phenotypes) {
   # Checks
-  if (!(is.data.frame(eigengenes) || is.matrix(eigengenes))) stop("eigengenes should be a data.frame or matrix")
+  if (!(is.data.frame(eigengenes) | is.matrix(eigengenes))) stop("eigengenes should be a data.frame or matrix")
   if (is.null(colnames(eigengenes))) stop("eigengenes should have modules reference as colnames")
-  if (!all(lapply(eigengenes, function(x) is.character(x) || is.numeric(x) || is.logical(x)) %>% unlist)) {
+  if (!all(lapply(eigengenes, function(x) is.character(x) | is.numeric(x) | is.logical(x)) %>% unlist)) {
     stop("eigengenes content should be only characters, numeric, or booleans") }
-  if (!(is.data.frame(phenotypes) || is.matrix(phenotypes))) stop("phenotypes should be a data.frame or matrix")
-  if (!all(lapply(phenotypes, function(x) is.character(x) || is.numeric(x) || is.logical(x)) %>% unlist)) {
+  if (!(is.data.frame(phenotypes) | is.matrix(phenotypes))) stop("phenotypes should be a data.frame or matrix")
+  if (!all(lapply(phenotypes, function(x) is.character(x) | is.numeric(x) | is.logical(x)) %>% unlist)) {
     stop("eigengenes content should be only characters, numeric, or booleans") }
   if (nrow(eigengenes) != nrow(phenotypes)) stop("Number of row should be the same between eigengene and phenotypes (samples)")
 
@@ -278,7 +278,7 @@ plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05){
     stop("rownames of assocaition and pval must be the same") }
   if (!is.numeric(pvalue_th)) stop("pvalue_th must be a numeric value")
   if (length(pvalue_th) != 1) stop("pvalue_th must be a single value")
-  if (pvalue_th <= 0 || pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
+  if (pvalue_th <= 0 | pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
 
   # Data preparation
   df_cor <- modules_phenotype$association %>%

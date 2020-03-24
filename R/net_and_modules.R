@@ -57,12 +57,12 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
   # Checking args
   if (!is.matrix(cor_mat)) stop("cor_mat should be a matrix")
   if (any(is.na(cor_mat))) warning("cor_mat should not contain any missing value. It may be due to non variating probe/transcript when you computed your correlation matrix.")
-  if ((any(cor_mat > 1) || any(cor_mat < -1)) && !any(is.na(cor_mat))) stop("cor_mat should be filled with value in the [-1,1] range")
+  if ((any(cor_mat > 1) | any(cor_mat < -1)) && !any(is.na(cor_mat))) stop("cor_mat should be filled with value in the [-1,1] range")
   if (nrow(cor_mat) != ncol(cor_mat)) stop("cor_mat should be a squared matrix")
   if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number")
   if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1")
   network_type <- match.arg(network_type)
-  if (!is.null(block_size) && (block_size < 2 || block_size %% 1 != 0)) stop("If not NULL, block_size must be a whole number > 1")
+  if (!is.null(block_size) && (block_size < 2 | block_size %% 1 != 0)) stop("If not NULL, block_size must be a whole number > 1")
 
   # Calculating similarity
   similarity <- matrix()
@@ -133,7 +133,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
   # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
   # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
   cor_func <- match.arg(cor_func)
-  if (cor_func == "other" && (is.null(your_func) || !is.function(your_func))) stop("If you specify other, your_func must be a function.")
+  if (cor_func == "other" && (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
   # network_type <- match.arg(network_type)
 
   # Cor selection
@@ -148,7 +148,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 
   # If personnal function, checking it returns a matrix with values in [-1;1]
   if (cor_func == "other"){
-    if (min(cor_mat) < -1 || max(cor_mat) > 1) stop("your_func must be a function which returns values in [-1;1]")
+    if (min(cor_mat) < -1 | max(cor_mat) > 1) stop("your_func must be a function which returns values in [-1;1]")
   }
 
   # Getting fit
@@ -199,12 +199,12 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
   # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
   # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
   cor_func <- match.arg(cor_func)
-  if (cor_func == "other" && (is.null(your_func) || !is.function(your_func))) stop("If you specify other, your_func must be a function.")
-  if (!is.null(power_value) && (power_value < 1 || power_value %% 1 != 0)) stop("If not NULL, power_value must be a whole number >= 1.")
+  if (cor_func == "other" && (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
+  if (!is.null(power_value) && (power_value < 1 | power_value %% 1 != 0)) stop("If not NULL, power_value must be a whole number >= 1.")
   network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
   if (!is.null(n_threads)) {
-    if (!is.numeric(n_threads) || n_threads < 2 || n_threads %% 1 != 0) stop("n_threads must be a whole number > 2")}
+    if (!is.numeric(n_threads) | n_threads < 2 | n_threads %% 1 != 0) stop("n_threads must be a whole number > 2")}
 
   # WGCNA's multi-threading
   quiet(WGCNA::enableWGCNAThreads(n_threads))
@@ -216,7 +216,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
     cor_to_use <- .cor_func_match(cor_func)
   }
   cor_mat <- cor_to_use(data_expr %>% as.matrix)
-  if (min(cor_mat < -1) || max(cor_mat) > 1) stop("Provided correlation function returned values outside [-1,1].")
+  if (min(cor_mat < -1) | max(cor_mat) > 1) stop("Provided correlation function returned values outside [-1,1].")
 
   # Getting power
   if (is.null(power_value)) {
@@ -278,9 +278,9 @@ detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(da
                               detailled_result = TRUE, ...) {
   # Checks
   .check_data_expr(data_expr)
-  if (!(is.data.frame(network) || is.matrix(network))) stop("network should be a data.frame or a matrix.")
+  if (!(is.data.frame(network) | is.matrix(network))) stop("network should be a data.frame or a matrix.")
   if (ncol(network) != nrow(network)) stop("network should be squarred")
-  if (is.null(rownames(network)) || !all(colnames(network) %in% rownames(network))) stop("network should have the same genes names as colnames and rownames")
+  if (is.null(rownames(network)) | !all(colnames(network) %in% rownames(network))) stop("network should have the same genes names as colnames and rownames")
   # TODO : finish checks
 
   # Order network matrix in the same order as data_expr
@@ -357,7 +357,7 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
   if (!is.list(modules_premerge)) stop("modules_premerge must be a named list with modules id as names, and vectors of gene names as content")
   if (!is.list(modules_merged)) stop("modules_merged must be a named list with modules id as names, and vectors of gene names as content")
   if (length(modules_premerge) < 2) stop("modules_premerge must contain at least 2 modules")
-  if (length(modules_merged) < 1 || length(modules_merged) > length(modules_premerge))
+  if (length(modules_merged) < 1 | length(modules_merged) > length(modules_premerge))
     stop("modules_premerge must contain at least 1 module and less or equal number of module")
   if (is.null(names(modules_premerge))) stop("modules_premerge must be named with modules id as names ")
   if (is.null(names(modules_merged))) stop("modules_merged must be named with modules id as names ")
@@ -416,7 +416,7 @@ plot_expression_profiles <- function(data_expr, modules) {
   } else if (!is.list(modules) && length(modules) < 2) {
     warning("modules represent a single modules and only contains one gene name")
   }
-  # if (!(is.vector(modules, "character") || (is.vector(modules, "numeric") && all(modules %% 1 == 0)))) {
+  # if (!(is.vector(modules, "character") | (is.vector(modules, "numeric") && all(modules %% 1 == 0)))) {
   #   stop("modules_premerge must be a vector of whole number or string") }
 
   # Tables preparation for ggplot
