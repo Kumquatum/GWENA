@@ -158,6 +158,7 @@ is_gost <- function(gost_result) {
 is_data_expr <- function(data_expr) {
   if (!(is.data.frame(data_expr) | is.matrix(data_expr))) return(list(bool = FALSE, reason = "data_expr should be a data.frame or a matrix."))
   if (any(is.na(data_expr))) return(list(bool = FALSE, reason = "data_expr cannot contain any missing value. To approximate them, see FAQ answer on this subject."))
+  if (!(is.numeric(unlist(data_expr)))) return(list(bool = FALSE), reason = "data_expr must contain only numeric values.")
   if (min(data_expr) < 0) return(list(bool = FALSE, reason = "data_expr cannot contain any negative value."))
   if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name.")
   if (is.null(colnames(data_expr)) | is.null(rownames(data_expr))) return(list(bool = FALSE, reason = "data_expr should have colnames and rownames"))
