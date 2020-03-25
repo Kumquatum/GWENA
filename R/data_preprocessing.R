@@ -1,10 +1,11 @@
-#' Filtering on low variating genes
+#' Filtering genes with low variability
 #'
 #' Remove low variating genes based on the percentage given and the type of variation specified.
 #'
-#' @param data_expr matrix of data (either microarray or RNA-seq) to be filtered, with genes as column and samples as row
-#' @param pct number in 0 and 1 specifying the percentage of gene to keep
-#' @param type string which should be either "mean" or "median"
+#' @param data_expr matrix or data.frame, table of expression values (either microarray or RNA-seq),
+#' with genes as column and samples as row
+#' @param pct float, percentage of gene to keep, value must be in ]0;1[
+#' @param type string, function name used for filtration. Should be either "mean", "median", or "mad"
 #'
 #' @importFrom dplyr select
 #' @importFrom magrittr %>%
@@ -14,8 +15,7 @@
 
 filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad")){
   # Checking args
-  if (!(is.data.frame(data_expr) | is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix")
-  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name")
+  .check_data_expr(data_expr)
   if (!is.numeric(pct) | length(pct) != 1) stop("pct should be a single number")
   if (pct <= 0 | pct >= 1) stop("pct should be between 0 and 1")
   type <- match.arg(type)
@@ -27,7 +27,8 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
   var <- lapply(data_expr, function(row) do.call(type, list(row)))
 
   # Filtering
-  top_pct <- data.frame(gene = names(var), var = unlist(var), stringsAsFactors = FALSE) %>% dplyr::top_frac(pct, var)
+  top_pct <- data.frame(gene = names(var), var = unlist(var), stringsAsFactors = FALSE) %>%
+    dplyr::top_frac(pct, var)
   filtered_data_expr <- data_expr %>% dplyr::select(dplyr::one_of(top_pct$gene))
 
   return(filtered_data_expr)
@@ -38,11 +39,13 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 #'
 #' Keeping genes with at least one sample with count above min_count in RNA-seq data.
 #'
-#' @param data_expr matrix of RNA-seq data to be filtered, with genes as column and samples as row.
-#' @param min_count minimal number of count to be considered in method
-#' @param method name of the method for filtering. Must be one of "at least one", "mean", or " all", above min_count.
+#' @param data_expr matrix or data.frame, table of expression values (either microarray or RNA-seq),
+#' with genes as column and samples as row.
+#' @param min_count integer, minimal number of count to be considered in method.
+#' @param method string, name of the method for filtering. Must be one of "at least one", "mean", or " all"
 #'
-#' @details Low counts in RNA-seq can bring noise to gene co-expression module building, so filtering them help to improve quality.
+#' @details Low counts in RNA-seq can bring noise to gene co-expression module building, so filtering them
+#' help to improve quality.
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr select
@@ -51,8 +54,7 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 
 filter_RNA_seq <- function(data_expr, min_count = 5, method = c("at least one", "mean", "all")){
   # Checking args
-  if (!(is.data.frame(data_expr) | is.matrix(data_expr))) stop("data_expr should be a data.frame or a matrix")
-  if (ncol(data_expr) < nrow(data_expr)) warning("Number of columns inferior to number of rows. Check if columns are the genes name")
+  .check_data_expr(data_expr)
   if (!is.numeric(min_count) | length(min_count) != 1) stop("min_count should be a single number")
   if (min_count <= 1) stop("min_count should be superior to 1")
   method <- match.arg(method)

@@ -2,16 +2,17 @@
 % Please edit documentation in R/data_preprocessing.R
 \name{filter_low_var}
 \alias{filter_low_var}
-\title{Filtering on low variating genes}
+\title{Filtering genes with low variability}
 \usage{
 filter_low_var(data_expr, pct = 0.8, type = c("mean", "median", "mad"))
 }
 \arguments{
-\item{data_expr}{matrix of data (either microarray or RNA-seq) to be filtered, with genes as column and samples as row}
+\item{data_expr}{matrix or data.frame, table of expression values (either microarray or RNA-seq),
+with genes as column and samples as row}
 
-\item{pct}{number in 0 and 1 specifying the percentage of gene to keep}
+\item{pct}{float, percentage of gene to keep, value must be in ]0;1[}
 
-\item{type}{string which should be either "mean" or "median"}
+\item{type}{string, function name used for filtration. Should be either "mean", "median", or "mad"}
 }
 \description{
 Remove low variating genes based on the percentage given and the type of variation specified.
