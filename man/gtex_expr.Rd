@@ -4,7 +4,7 @@
 \name{gtex_expr}
 \alias{gtex_expr}
 \title{Transcriptomic muscle data from GTEx consorsium RNA-seq data}
-\format{A data frame with XX TODO rows (samples) and YY TODO columns (genes)}
+\format{A data frame with 50 rows (samples) and 15000 columns (genes)}
 \source{
 \url{https://gtexportal.org/home/datasets}
 }
@@ -12,21 +12,6 @@
 gtex_expr
 }
 \description{
-A subset of GTEx RNA-seq dataset containing read counts collapsed to gene level. Obtained from the following script :
-library(dplyr)
-}
-\details{
-# Keeping only 15 000 genes for demo purposes. If you wish to keep everythong, remove "| head -n 15003 "
-bash_cmds <- "wget -qO- https://storage.googleapis.com/gtex_analysis_v8/rna_seq_data/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_reads.gct.gz | gunzip | head -n 15003 > gtex_RNAseq_trunc.gct;
-wget -qO gtex_sample_attributes.txt https://storage.googleapis.com/gtex_analysis_v8/annotations/GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt"
-system(bash_cmds)
-
-gtex_muscle_sample <- data.table::fread("gtex_sample_attributes.txt") %>%
-  select(SAMPID, SMTSD) %>% filter(SMTSD == "Muscle - Skeletal")
-
-gtex_expr <- data.table::fread("gtex_RNAseq_trunc.gct") %>%
-  tibble::column_to_rownames("Name") %>% select(-Description) %>% t %>% as.data.frame %>% # formatting
-  tibble::rownames_to_column("sample") %>% filter(sample %in% gtex_muscle_sample$SAMPID) %>% # keeping only muscle data
-  tibble::remove_rownames() %>% tibble::column_to_rownames("sample") %>% .[1:50, ] # formatting and keeping only 50 samples
+A subset of GTEx RNA-seq dataset containing read counts collapsed to gene level.
 }
 \keyword{datasets}
