@@ -9,7 +9,8 @@
   \item{Slide}{Reference number of the microarray's slide.}
   \item{Array}{Array number, 8 by slide usually}
   \item{Exp}{Experiment number}
-  \item{Condition}{Either old (between 55 and 66 years old) or young (between 20 to 25 years old)}
+  \item{Condition}{Either old (between 55 and 66 years old) or young (between 20 to 25
+  years old)}
   \item{Age}{Real age of the donor}
 }}
 \source{
@@ -19,6 +20,7 @@
 kuehne_traits
 }
 \description{
-A dataset containing the phenotype of the donors and technical information about the experiment
+A dataset containing the phenotype of the donors and technical information about the
+experiment
 }
 \keyword{datasets}
