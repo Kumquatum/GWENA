@@ -3,7 +3,7 @@ library(data.table)
 library(usethis)
 
 bash_cmds <- "wget -qO- https://storage.googleapis.com/gtex_analysis_v8/annotations/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt > gtex_phenotype.txt"
-system(bash_cmds)
+system2(bash_cmds)
 
 rownames_gtex_expr <- rownames(gtex_expr) %>% sort()
 
