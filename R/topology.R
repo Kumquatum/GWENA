@@ -217,7 +217,7 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = 5, k_th = NULL) {
 #'
 #' @export
 
-get_hub_genes <- function(network, modules, method = c("highest connectivity", "superior degree", "Kleinberg's score")) {
+get_hub_genes <- function(network, modules = NULL, method = c("highest connectivity", "superior degree", "Kleinberg's score")) {
   # Checks
   method = match.arg(method)
 
