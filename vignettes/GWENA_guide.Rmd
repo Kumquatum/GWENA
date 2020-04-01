@@ -27,11 +27,19 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-Understanding of complex biological systems can now be improved through the harvest of large data-sets from high-throughput transcriptomics technologies. This however require approaches able to manage such amout of data. One can be to gene network analysis. Based on interactions study between each gene, their interpretation often involve both a knowledge-driven and a data driven analysis. Current methods focus on functional enrichment and hub genes detection, respectively. Combining them with the comparison of biological or experimental conditions and an extended analysis of the network topology within a single pipeline can lead to better results exploitation. 
+**GWENA** (Gene Whole co-Expression Network Analysis) is an R package to perform gene co-expression network analysis in a single pipeline. This pipeline includes functional enrichment of modules of co-expressed genes, phenotypcal association, topological analysis and comparisons of networks between conditions.
 
-This document gives an overview of the R package **GWENA** (Gene Whole co-Expression Network Analysis) which regroups this process into a single pipeline. This package aim to ease the work of scientists in their analysis of multiple conditions through the co-expression method for gene network analysis. Therefore discovery of meaningful biological conclusions can be helped.
+Using transcriptomics data from either RNA-seq  or microarray, the package follows the steps displayed in Figure 1:
 
-Figure 1 details the steps involved in the current analysis pipeline. They will be detailed in the following sections.
+1. **Input**: data is provided as a data.frame or a matrix of expression intensities (pre-normalized).
+2. **Gene filtering**: data is filtered according to the transcriptomic technology used.
+3. **Network building**: a matrix of similarity score is computed between each gene with Spearman correlation, then transformed into an adjacency matrix, and finally into a topological overlap matrix.
+4. **Modules detection**: groups of genes with closest similarity scores are detected as modules.
+5. **Biological integration**: gene set enrichment analysis and phenotypic association (if phenotypes are provided) are performed on modules.
+6. **Graph and topological analysis**: identification of hub genes is made available, as well as modules visualization.
+7. **Networks comparison**: if multiple conditions are available (time points, treatments, phenotype, etc.), analysis of modules preservation/non-preservation between conditions can be performed.
+
+This document gives a brief tutorial using a subset of a microarray data set to show the content and value of each step in the pipeline.
 
 .
 
