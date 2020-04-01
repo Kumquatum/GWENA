@@ -59,20 +59,17 @@ filter_RNA_seq <- function(data_expr, min_count = 5, method = c("at least one", 
   if (min_count <= 1) stop("min_count should be superior to 1")
   method <- match.arg(method)
 
-  # Convert to data.frame if matrix
-  if (!is.data.frame(data_expr)) data_expr <- data_expr %>% as.data.frame
+  # Casting to matrix (needed for matrixStats)
+  if (!is.matrix(data_expr)) data_expr <- data_expr %>% as.matrix
 
   # Filtering
-  good_gene <- lapply(data_expr, function(x) {
-    {
-    if (method == "at least one") {any(x > min_count)}
-    else if (method == "mean") {mean(x) > min_count}
-    else {all(x > min_count)} # Meaning "all"
-    }
-    }) %>% unlist %>% .[which(. == TRUE)] %>% names
+  if (method == "at least one") { i <- matrixStats::colMaxs(data_expr) > min_count }
+  else if (method == "mean") { i <- matrixStats::colMeans2(data_expr) > min_count }
+  else if (method == "all") { i <- matrixStats::colMins(data_expr) > min_count }
+  else { stop(paste0("Invalid method value: ", method)) } # Should never be triggered because of check
 
-  filtered_data_expr <- data_expr %>% dplyr::select(one_of(good_gene))
+  # Casting to data.frame
+  if (!is.data.frame(data_expr)) data_expr <- data_expr %>% as.data.frame
 
-  return(filtered_data_expr)
+  return(data_expr[, i])
 }
-
