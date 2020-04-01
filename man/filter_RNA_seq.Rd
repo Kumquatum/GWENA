@@ -15,10 +15,20 @@ with genes as column and samples as row.}
 
 \item{method}{string, name of the method for filtering. Must be one of "at least one", "mean", or " all"}
 }
+\value{
+A data.frame of filtered genes
+}
 \description{
 Keeping genes with at least one sample with count above min_count in RNA-seq data.
 }
 \details{
 Low counts in RNA-seq can bring noise to gene co-expression module building, so filtering them
 help to improve quality.
+}
+\examples{
+df <- matrix(abs(rnorm(15*45)), 15) * 3
+colnames(df) <- paste0("gene_", 1:ncol(df))
+rownames(df) <- paste0("sample_", 1:nrow(df))
+df_filtered <- filter_RNA_seq(df)
+
 }

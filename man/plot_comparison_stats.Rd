@@ -5,8 +5,8 @@
 \title{Heatmap of comparison statistics}
 \usage{
 plot_comparison_stats(comparison_pvalues, pvalue_th = 0.05,
-  low_color = "#031643", mid_color = "#A0A3D3",
-  high_color = "#FFFFFF")
+  low_color = "#031643", pvalue_th_color = "#A0A3D3",
+  unsignificant_color = "#FFFFFF")
 }
 \arguments{
 \item{comparison_pvalues}{matrix or data.frame, table containing the p values for the statistics on each module}
@@ -16,6 +16,20 @@ plot_comparison_stats(comparison_pvalues, pvalue_th = 0.05,
 \item{low_color, mid_color, high_color}{string, color to use as lower, middle, and higher end of the legend. Can
 either be the color name or hexadecimal code (e.g.: “red” or “#FF1234” )}
 }
+\value{
+A ggplot object representing a heatmap of the comparison statistics for each module
+}
 \description{
 Plot heatmap of p values for the module comparison statistics evaluated through the permutation test.
+}
+\examples{
+df <- data.frame(avg.weight = abs(rnorm(4, 0.1, 0.1)),
+                 coherence = abs(rnorm(4, 0.1, 0.1)),
+                 cor.cor = abs(rnorm(4, 0.1, 0.1)),
+                 cor.degree = abs(rnorm(4, 0.1, 0.1)),
+                 cor.contrib = abs(rnorm(4, 0.1, 0.1)),
+                 avg.cor = abs(rnorm(4, 0.1, 0.1)),
+                 avg.contrib = abs(rnorm(4, 0.1, 0.1)))
+plot_comparison_stats(df)
+
 }

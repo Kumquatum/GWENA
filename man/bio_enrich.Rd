@@ -14,10 +14,23 @@ bio_enrich(module, custom_gmt = NULL, ...)
 \item{...}{any other parameter you can provide to gprofiler2::gost function.}
 }
 \value{
-a gprofiler2::gost output, meaning a named list containing a 'result' data.frame with enrichement information on the
+A gprofiler2::gost output, meaning a named list containing a 'result' data.frame with enrichement information on the
 differents databases and custom gmt files, and a 'meta' list containing informations on the input args, the version of gost,
 timestamp, etc. For more detail, see ?gprofiler2::gost.
 }
 \description{
 Enrich genes list from modules.
+}
+\examples{
+custom_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "GWENA", mustWork = TRUE)
+
+single_module <- c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11", "MCL1", "IL1B", "SPTAN1",
+                   "DIABLO", "BAX", "BIK", "IL1A", "BID", "CDKN1A", "GADD45A")
+single_module_enriched <- bio_enrich(single_module, custom_path)
+
+multi_module <- list(mod1 = single_module,
+                     mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
+                              "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
+multi_module_enriched <- bio_enrich(multi_module, custom_path)
+
 }

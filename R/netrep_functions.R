@@ -27,14 +27,20 @@
 #'   are supported.
 #' @param table vector or \code{NULL}: the values to be matched against.
 #'   \link[base]{Long vectors} are not supported.
+#'
+#' @return A vector of the same length as x.
+#'
 #' @name matchsub
 NULL
+
 #' @rdname matchsub
 #' @keywords internal
 `%nin%` <- function(x, table) !(x %in% table)
+
 #' @rdname matchsub
 #' @keywords internal
 `%sub_in%` <- function(x, table) x[x %in% table]
+
 #' @rdname matchsub
 #' @keywords internal
 `%sub_nin%` <- function(x, table) x[x %nin% table]

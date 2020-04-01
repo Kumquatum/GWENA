@@ -17,3 +17,10 @@ A ggplot representing expression profile and eigengene by module
 \description{
 Plot expression profiles for all modules with eigengene highlighted
 }
+\examples{
+df <- kuehne_expr[1:24, 1:350]
+net <- build_net(df)
+detection <- detect_modules(df, net$network, detailled_result = TRUE)
+plot_expression_profiles(df, detection$modules)
+
+}

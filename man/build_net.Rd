@@ -43,3 +43,7 @@ list containing network matrix, metadata of input parameters and power fitting i
 \description{
 Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
 }
+\examples{
+build_net(kuehne_expr[, 1:350])
+
+}

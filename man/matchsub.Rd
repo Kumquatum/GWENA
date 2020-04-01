@@ -20,6 +20,9 @@ are supported.}
 \item{table}{vector or \code{NULL}: the values to be matched against.
 \link[base]{Long vectors} are not supported.}
 }
+\value{
+A vector of the same length as x.
+}
 \description{
 This set of functions provides shortcuts for value matching and subsetting,
 on top of the functionality provided by \code{\link[base]{\%in\%}}.

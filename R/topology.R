@@ -10,6 +10,12 @@
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
 #'
+#' @return An igraph object
+#'
+#' @examples
+#' mat <- matrix(runif(40*40), 40)
+#' build_graph_from_sq_mat(mat)
+#'
 #' @export
 
 build_graph_from_sq_mat <- function(sq_mat) {
@@ -41,9 +47,15 @@ build_graph_from_sq_mat <- function(sq_mat) {
 #' or an already split module
 #' @param top_n integer, number of genes to be considered as hub genes
 #'
-#' @return list of vectors, or single vector of gene names
+#' @return A list of vectors, or single vector of gene names
 #'
 #' @importFrom magrittr %>%
+#'
+#' @examples
+#' mat <- matrix(runif(40*40), 40)
+#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
+#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' get_hub_high_co(mat)
 #'
 #' @export
 
@@ -90,7 +102,13 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 #'
 #' @importFrom igraph delete.edges degree E
 #'
-#' @return list of vectors, or single vector of gene names
+#' @return A list of vectors, or single vector of gene names
+#'
+#' @examples
+#' mat <- matrix(runif(40*40), 40)
+#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
+#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' get_hub_degree(mat)
 #'
 #' @export
 
@@ -144,7 +162,14 @@ get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
 #'
 #' @importFrom igraph hub_score
 #'
-#' @return list of vectors, or single vector of gene names
+#' @return A list of vectors, or single vector of gene names
+#'
+#' @examples
+#' mat <- matrix(runif(40*40), 40)
+#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
+#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' get_hub_degree(mat)
+#' get_hub_kleinberg(mat, top_n = NULL, k_th = 0.9)
 #'
 #' @export
 
@@ -255,6 +280,13 @@ get_hub_genes <- function(network, modules = NULL, method = c("highest connectiv
 #'
 #' @import igraph
 #' @importFrom magrittr %>%
+#'
+#' @return NULL, invisible
+#'
+#' @examples
+#' mat <- matrix(runif(40*40), 40)
+#' g <- build_graph_from_sq_mat(mat)
+#' plot_module(g)
 #'
 #' @export
 

@@ -11,6 +11,14 @@
 #' @importFrom magrittr %>%
 #' @importFrom dplyr top_frac select
 #'
+#' @return A data.frame of filtered genes
+#'
+#' @examples
+#' df <- matrix(abs(rnorm(15*45)), 15)
+#' colnames(df) <- paste0("gene_", 1:ncol(df))
+#' rownames(df) <- paste0("sample_", 1:nrow(df))
+#' df_filtered <- filter_low_var(df)
+#'
 #' @export
 
 filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad")){
@@ -49,6 +57,15 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr select
+#' @importFrom tidyr one_of
+#'
+#' @return A data.frame of filtered genes
+#'
+#' @examples
+#' df <- matrix(abs(rnorm(15*45)), 15) * 3
+#' colnames(df) <- paste0("gene_", 1:ncol(df))
+#' rownames(df) <- paste0("sample_", 1:nrow(df))
+#' df_filtered <- filter_RNA_seq(df)
 #'
 #' @export
 

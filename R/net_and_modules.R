@@ -123,6 +123,9 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #'
 #' @importFrom magrittr %>%
 #'
+#' @examples
+#' get_fit.expr(kuehne_expr[, 1:100])
+#'
 #' @export
 
 get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"),
@@ -185,6 +188,9 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' @importFrom WGCNA adjacency.fromSimilarity TOMsimilarity
 #' @importFrom magrittr %>% set_colnames set_rownames
+#'
+#' @examples
+#' build_net(kuehne_expr[, 1:350])
 #'
 #' @export
 
@@ -272,6 +278,11 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #' @importFrom WGCNA mergeCloseModules
 #' @importFrom dynamicTreeCut cutreeDynamic
 #'
+#' @examples
+#' df <- kuehne_expr[1:24, 1:350]
+#' net <- build_net(df)
+#' detect_modules(df, net$network)
+#'
 #' @export
 
 detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(data_expr) / 2), merge_close_modules = TRUE, merge_cut_height = 0.25,
@@ -350,6 +361,12 @@ detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(da
 #' @importFrom magrittr %>% set_colnames
 #' @importFrom dplyr left_join mutate_if distinct arrange
 #'
+#' @examples
+#' df <- kuehne_expr[1:24, 1:350]
+#' net <- build_net(df)
+#' detection <- detect_modules(df, net$network, detailled_result = TRUE)
+#' plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
+#'
 #' @export
 
 plot_modules_merge <- function(modules_premerge, modules_merged) {
@@ -401,6 +418,12 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 #' @importFrom tidyr pivot_longer
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate left_join group_by rename select
+#'
+#' @examples
+#' df <- kuehne_expr[1:24, 1:350]
+#' net <- build_net(df)
+#' detection <- detect_modules(df, net$network, detailled_result = TRUE)
+#' plot_expression_profiles(df, detection$modules)
 #'
 #' @export
 

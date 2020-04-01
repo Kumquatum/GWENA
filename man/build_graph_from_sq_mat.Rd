@@ -9,6 +9,14 @@ build_graph_from_sq_mat(sq_mat)
 \arguments{
 \item{sq_mat}{matrix or data.frame, squared matrix representing}
 }
+\value{
+An igraph object
+}
 \description{
 Takes a squared matrix containing the pairwise similarity scores for each gene and return a igraph object.
+}
+\examples{
+mat <- matrix(runif(40*40), 40)
+build_graph_from_sq_mat(mat)
+
 }

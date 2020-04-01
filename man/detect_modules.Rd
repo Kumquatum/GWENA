@@ -29,3 +29,9 @@ list containing modules detected, modules_eigengenes, and if asked for, modules 
 \description{
 Detect the modules by hierarchical clustering .
 }
+\examples{
+df <- kuehne_expr[1:24, 1:350]
+net <- build_net(df)
+detect_modules(df, net$network)
+
+}

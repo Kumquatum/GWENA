@@ -11,6 +11,19 @@ plot_modules_phenotype(modules_phenotype, pvalue_th = 0.05)
 
 \item{pvalue_th}{float, threshold in ]0;1[ under which module will be considered as significantly associated}
 }
+\value{
+A ggplot object representing a heatmap with phenotype association and related pvalues
+}
 \description{
 Plot a heatmap of the correlation between all modules and the phenotypic variables and the p value associated
+}
+\examples{
+eigengene_mat <- data.frame(mod1 = rnorm(20, 0.1, 0.2),
+mod2 = rnorm(20, 0.2, 0.2))
+phenotype_mat <- data.frame(phenA = sample(c("X", "Y", "Z"), 20, replace = TRUE),
+                            phenB = sample(c("U", "V"), 20, replace = TRUE),
+                            stringsAsFactors = FALSE)
+association <- associate_phenotype(eigengene_mat, phenotype_mat)
+plot_modules_phenotype(association)
+
 }

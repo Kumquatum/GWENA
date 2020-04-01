@@ -4,8 +4,9 @@
 \alias{get_hub_genes}
 \title{Determine hub genes inside each module}
 \usage{
-get_hub_genes(network, modules, method = c("highest connectivity",
-  "superior degree", "Kleinberg's score"))
+get_hub_genes(network, modules = NULL,
+  method = c("highest connectivity", "superior degree",
+  "Kleinberg's score"))
 }
 \arguments{
 \item{network}{matrix or data.frame, square table representing connectivity between each genes as returned by
@@ -17,7 +18,7 @@ or an already split module}
 \item{method}{string, name of the method to be used for hub gene detection. See details.}
 }
 \value{
-list of vectors representing hub genes, by module
+A list of vectors representing hub genes, by module
 }
 \description{
 Return genes considered as hub genes inside each module of a network following the selected method. Method will be lauched with default
@@ -29,4 +30,11 @@ parameters. If specific parameters desired, please use directly the function \co
   \item{superior degree}{Select genes which degree is greater than average connection degree of the network. Definition from network theory.}
   \item{Kleinberg's score}{Select genes which Kleinberg's score superior to provided threshold.}
 }
+}
+\examples{
+mat <- matrix(runif(40*40), 40)
+colnames(mat) <- paste0("gene_", 1:ncol(mat))
+rownames(mat) <- paste0("gene_", 1:nrow(mat))
+get_hub_genes(mat)
+
 }

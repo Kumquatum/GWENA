@@ -16,3 +16,10 @@ set to FALSE
 \description{
 Check content of a given object to determine if it's a gost object
 }
+\examples{
+single_module <- c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11", "MCL1", "IL1B", "SPTAN1",
+                   "DIABLO", "BAX", "BIK", "IL1A", "BID", "CDKN1A", "GADD45A")
+single_module_enriched <- bio_enrich(single_module)
+is_gost(single_module_enriched)
+
+}

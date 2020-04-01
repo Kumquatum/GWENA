@@ -14,6 +14,16 @@ with genes as column and samples as row}
 
 \item{type}{string, function name used for filtration. Should be either "mean", "median", or "mad"}
 }
+\value{
+A data.frame of filtered genes
+}
 \description{
 Remove low variating genes based on the percentage given and the type of variation specified.
+}
+\examples{
+df <- matrix(abs(rnorm(15*45)), 15)
+colnames(df) <- paste0("gene_", 1:ncol(df))
+rownames(df) <- paste0("sample_", 1:nrow(df))
+df_filtered <- filter_low_var(df)
+
 }

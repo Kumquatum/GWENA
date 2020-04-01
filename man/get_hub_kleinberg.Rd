@@ -4,7 +4,7 @@
 \alias{get_hub_kleinberg}
 \title{Determine hub genes based on Kleinberg's score}
 \usage{
-get_hub_kleinberg(network, modules = NULL, top_n = NULL, k_th = NULL)
+get_hub_kleinberg(network, modules = NULL, top_n = 5, k_th = NULL)
 }
 \arguments{
 \item{network}{matrix or data.frame, square table representing connectivity between each genes as returned by
@@ -18,7 +18,7 @@ or an already split module}
 \item{k_th}{decimal, Kleinberg's score threshold above or equal to which genes are considered as hubs}
 }
 \value{
-list of vectors, or single vector of gene names
+A list of vectors, or single vector of gene names
 }
 \description{
 Compute Kleinberg's score (defined as the principal eigenvector of A*t(A), where A is the similarity matrix of the graph)
@@ -28,4 +28,12 @@ of each gene by module if provided or for whole network if not, and return the t
 If you provide a top_n value, you can't provide a k_th value and vice versa. If none of them is provided
 top_n = 5.
 For more information on Kleinberg's score, look at \code{\link[igraph]{hub_score}} from igraph.
+}
+\examples{
+mat <- matrix(runif(40*40), 40)
+colnames(mat) <- paste0("gene_", 1:ncol(mat))
+rownames(mat) <- paste0("gene_", 1:nrow(mat))
+get_hub_degree(mat)
+get_hub_kleinberg(mat, top_n = NULL, k_th = 0.9)
+
 }

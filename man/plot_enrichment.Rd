@@ -20,10 +20,22 @@ plot_enrichment(enrich_output, modules = "all", sources = "all",
 
 \item{...}{any other parameter you can provide to gprofiler2::gostplot.}
 }
+\value{
+A plotly object representing enrichment for specified modules
+}
 \description{
 Wrapper of the gprofiler2::gostplot function. Adding support of colorblind palet and selection of subsets if
 initial multiple query, and/or sources to plot.
 }
 \details{
 Note: The colorblind friendly palette is limited to maximum 8 colors, therefore 8 sources of enrichment.
+}
+\examples{
+custom_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "GWENA", mustWork = TRUE)
+multi_module <- list(mod1 = single_module,
+                     mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
+                              "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
+multi_module_enriched <- bio_enrich(multi_module, custom_path)
+plot_enrichment(multi_module_enriched)
+
 }

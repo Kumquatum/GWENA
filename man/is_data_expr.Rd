@@ -16,3 +16,10 @@ set to FALSE
 \description{
 Check an object to be a data.frame or a matrix compatible of genes and samples.
 }
+\examples{
+expr <- matrix(runif(15*40), 15)
+colnames(expr) <- paste0("gene_", 1:ncol(expr))
+rownames(expr) <- paste0("gene_", 1:nrow(expr))
+is_data_expr(expr)
+
+}

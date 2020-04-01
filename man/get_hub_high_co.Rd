@@ -16,8 +16,15 @@ or an already split module}
 \item{top_n}{integer, number of genes to be considered as hub genes}
 }
 \value{
-list of vectors, or single vector of gene names
+A list of vectors, or single vector of gene names
 }
 \description{
 Compute connectivity of each gene by module if provided or for whole network if not, and return the top_n highest connected ones.
+}
+\examples{
+mat <- matrix(runif(40*40), 40)
+colnames(mat) <- paste0("gene_", 1:ncol(mat))
+rownames(mat) <- paste0("gene_", 1:nrow(mat))
+get_hub_high_co(mat)
+
 }

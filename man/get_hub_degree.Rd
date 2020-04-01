@@ -16,7 +16,7 @@ or an already split module}
 \item{weight_th}{decimal, weight threshold under or equal to which edges will be removed}
 }
 \value{
-list of vectors, or single vector of gene names
+A list of vectors, or single vector of gene names
 }
 \description{
 Remove edges from the graph which value is under weight_th then compute degree of each node (gene).
@@ -25,4 +25,11 @@ Hub gene are genes whose degree value is above average degree value of the thres
 \details{
 GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
 are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same.
+}
+\examples{
+mat <- matrix(runif(40*40), 40)
+colnames(mat) <- paste0("gene_", 1:ncol(mat))
+rownames(mat) <- paste0("gene_", 1:nrow(mat))
+get_hub_degree(mat)
+
 }

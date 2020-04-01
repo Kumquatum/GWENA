@@ -39,3 +39,7 @@ network_type indicate which transformation will be applied on the correlation ma
   \item{signed hybrid}{will replace all negative values by 0 (moving from [-1;1] to [0;1])}
 }
 }
+\examples{
+get_fit.expr(kuehne_expr[, 1:100])
+
+}

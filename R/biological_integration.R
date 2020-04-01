@@ -1,25 +1,36 @@
 #' Join gprofiler2::gost results
 #'
-#' Takes list of gprofiler2::gost results and join them. Usefull to join results of gprofiler2::gost with custom gmt to
-#' other gprofiler2::gost results.
+#' Takes list of gprofiler2::gost results and join them. Usefull to join
+#' results of gprofiler2::gost with custom gmt to other gprofiler2::gost
+#' results.
 #'
 #' @param gost_result list of gprofiler2::gost result
 #'
-#' @details First element of the list is taken as reference for checks on gost_result elements compatibility. If warnings
-#' returned, value from reference will be used.
-#' Also, timestamp is set to timestamp of the join
+#' @details First element of the list is taken as reference for checks on
+#' gost_result elements compatibility. If warnings returned, value from
+#' reference will be used. Also, timestamp is set to timestamp of the join
 #'
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 #' @importFrom rlist list.merge
 #' @importFrom purrr compact
 #'
+#' @return A gprofiler2::gost result
+#'
+#' @examples
+#' query <- c("ENSG00000184349", "ENSG00000158955", "ENSG00000091140",
+#'            "ENSG00000163114", "ENSG00000163132", "ENSG00000019186")
+#' g1 <- gprofiler2::gost(query, sources = "GO")
+#' g2 <- gprofiler2::gost(query, sources = "REAC")
+#' gj <- join_gost(list(g1,g2))
+#'
 #' @export
 
 join_gost <- function(gost_result) {
   # Check format
   if (isTRUE(all.equal(names(gost_result), c("result", "meta")))) {
-    stop("You provided a single gprofiler2::gost result, it must be a list of at least 2 gprofiler2::gost")}
+    stop("You provided a single gprofiler2::gost result, it must be a list",
+         "of at least 2 gprofiler2::gost")}
   lapply(gost_result, .check_gost) # All elements of gost_result list must be gprofiler2::gost results
   if (length(gost_result) < 2) stop("gost_result must contain at least 2 gprofiler2::gost element")
 
@@ -77,13 +88,25 @@ join_gost <- function(gost_result) {
 #' @param custom_gmt string or list, path to a gmt file or a list of these path.
 #' @param ... any other parameter you can provide to gprofiler2::gost function.
 #'
-#' @return a gprofiler2::gost output, meaning a named list containing a 'result' data.frame with enrichement information on the
+#' @return A gprofiler2::gost output, meaning a named list containing a 'result' data.frame with enrichement information on the
 #' differents databases and custom gmt files, and a 'meta' list containing informations on the input args, the version of gost,
 #' timestamp, etc. For more detail, see ?gprofiler2::gost.
 #'
 #' @importFrom gprofiler2 gost
 #' @importFrom purrr compact
 #' @importFrom magrittr %>%
+#'
+#' @examples
+#' custom_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "GWENA", mustWork = TRUE)
+#'
+#' single_module <- c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11", "MCL1", "IL1B", "SPTAN1",
+#'                    "DIABLO", "BAX", "BIK", "IL1A", "BID", "CDKN1A", "GADD45A")
+#' single_module_enriched <- bio_enrich(single_module, custom_path)
+#'
+#' multi_module <- list(mod1 = single_module,
+#'                      mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
+#'                               "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
+#' multi_module_enriched <- bio_enrich(multi_module, custom_path)
 #'
 #' @export
 
@@ -157,6 +180,16 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom gprofiler2 gostplot
 #'
+#' @return A plotly object representing enrichment for specified modules
+#'
+#' @examples
+#' custom_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "GWENA", mustWork = TRUE)
+#' multi_module <- list(mod1 = single_module,
+#'                      mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
+#'                               "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
+#' multi_module_enriched <- bio_enrich(multi_module, custom_path)
+#' plot_enrichment(multi_module_enriched)
+#'
 #' @export
 
 plot_enrichment <- function(enrich_output, modules = "all", sources = "all", colorblind = TRUE, custom_palette = NULL, ...) {
@@ -199,9 +232,18 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all", col
 #'
 #' @param eigengenes matrix or data.frame, eigengenes of the modules. Provided by the output of modules_detection.
 #' @param phenotypes matrix or data.frame, phenotypes for each sample to associate.
-
 #' @importFrom WGCNA corPvalueStudent
 #' @importFrom dplyr select
+#'
+#' @return A list of two data.frames : associations modules/phenotype and p.values associated to this associations
+#'
+#' @examples
+#' eigengene_mat <- data.frame(mod1 = rnorm(20, 0.1, 0.2),
+#' mod2 = rnorm(20, 0.2, 0.2))
+#' phenotype_mat <- data.frame(phenA = sample(c("X", "Y", "Z"), 20, replace = TRUE),
+#'                             phenB = sample(c("U", "V"), 20, replace = TRUE),
+#'                             stringsAsFactors = FALSE)
+#' association <- associate_phenotype(eigengene_mat, phenotype_mat)
 #'
 #' @export
 
@@ -260,6 +302,17 @@ associate_phenotype <- function(eigengenes, phenotypes) {
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr mutate select bind_cols
+#'
+#' @return A ggplot object representing a heatmap with phenotype association and related pvalues
+#'
+#' @examples
+#' eigengene_mat <- data.frame(mod1 = rnorm(20, 0.1, 0.2),
+#' mod2 = rnorm(20, 0.2, 0.2))
+#' phenotype_mat <- data.frame(phenA = sample(c("X", "Y", "Z"), 20, replace = TRUE),
+#'                             phenB = sample(c("U", "V"), 20, replace = TRUE),
+#'                             stringsAsFactors = FALSE)
+#' association <- associate_phenotype(eigengene_mat, phenotype_mat)
+#' plot_modules_phenotype(association)
 #'
 #' @export
 

@@ -36,10 +36,19 @@ the graph. For more information, see \code{\link[igraph]{igraph.plotting}}}
 
 \item{...}{any other parameter compatible with the \code{\link[igraph]{plot.igraph}} function}
 }
+\value{
+NULL, invisible
+}
 \description{
 Display a graph representing the co-expression network and different informations like hubs, enrichments
 }
 \details{
 Take care of you intend to compare modules' graphs, the same size of node will not correspond to the
 same values because of the scaling.
+}
+\examples{
+mat <- matrix(runif(40*40), 40)
+g <- build_graph_from_sq_mat(mat)
+plot_module(g)
+
 }

@@ -39,10 +39,22 @@
 #' @importFrom magrittr %>%
 #' @importFrom purrr compact
 #'
-#' @export
+#' @examples
+#' expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
+#'                      cond2 = kuehne_expr[25:48, 1:350])
+#' net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 2, keep_cor_mat = TRUE)
+#' mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"),
+#'                       MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
+#' comparison <- compare_conditions(expr_by_cond,
+#'                                  lapply(net_by_cond, `[[`, "network"),
+#'                                  lapply(net_by_cond, `[[`, "cor_mat"),
+#'                                  lapply(mod_by_cond, `[[`, "modules"))
 #'
 #' @return A nested list where first element is each ref provided, second level each condition to test, and then elements containing
-#' information on the comparison. See
+#' information on the comparison. See NetRep::modulePreservation() for more detail.
+#'
+#' @export
+#'
 
 compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules_list, ref = names(data_expr_list)[1], test = NULL,
                            cor_func = c("pearson", "spearman", "bicor", "other"), your_func = NULL, n_perm = 10000,
@@ -246,6 +258,18 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
 #' @importFrom ggplot2 ggplot geom_tile scale_fill_gradientn coord_equal theme_minimal theme aes element_text
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
+#'
+#' @return A ggplot object representing a heatmap of the comparison statistics for each module
+#'
+#' @examples
+#' df <- data.frame(avg.weight = abs(rnorm(4, 0.1, 0.1)),
+#'                  coherence = abs(rnorm(4, 0.1, 0.1)),
+#'                  cor.cor = abs(rnorm(4, 0.1, 0.1)),
+#'                  cor.degree = abs(rnorm(4, 0.1, 0.1)),
+#'                  cor.contrib = abs(rnorm(4, 0.1, 0.1)),
+#'                  avg.cor = abs(rnorm(4, 0.1, 0.1)),
+#'                  avg.contrib = abs(rnorm(4, 0.1, 0.1)))
+#' plot_comparison_stats(df)
 #'
 #' @export
 

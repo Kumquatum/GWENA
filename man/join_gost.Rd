@@ -9,12 +9,24 @@ join_gost(gost_result)
 \arguments{
 \item{gost_result}{list of gprofiler2::gost result}
 }
+\value{
+A gprofiler2::gost result
+}
 \description{
-Takes list of gprofiler2::gost results and join them. Usefull to join results of gprofiler2::gost with custom gmt to
-other gprofiler2::gost results.
+Takes list of gprofiler2::gost results and join them. Usefull to join
+results of gprofiler2::gost with custom gmt to other gprofiler2::gost
+results.
 }
 \details{
-First element of the list is taken as reference for checks on gost_result elements compatibility. If warnings
-returned, value from reference will be used.
-Also, timestamp is set to timestamp of the join
+First element of the list is taken as reference for checks on
+gost_result elements compatibility. If warnings returned, value from
+reference will be used. Also, timestamp is set to timestamp of the join
+}
+\examples{
+query <- c("ENSG00000184349", "ENSG00000158955", "ENSG00000091140",
+           "ENSG00000163114", "ENSG00000163132", "ENSG00000019186")
+g1 <- gprofiler2::gost(query, sources = "GO")
+g2 <- gprofiler2::gost(query, sources = "REAC")
+gj <- join_gost(list(g1,g2))
+
 }

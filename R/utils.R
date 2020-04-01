@@ -28,6 +28,12 @@ quiet <- function(func) {
 #' @return list, a boolean as first element and in second element NULL or the reason why boolean is
 #' set to FALSE
 #'
+#' @examples
+#' net <- netrix(runif(40*40), 40)
+#' colnames(net) <- paste0("gene_", 1:ncol(net))
+#' rownames(net) <- paste0("gene_", 1:nrow(net))
+#' is_network(net)
+#'
 #' @export
 
 is_network <- function(network) {
@@ -67,6 +73,16 @@ is_network <- function(network) {
 #'
 #' @return list, a boolean as first element and in second element NULL or the reason why boolean is
 #' set to FALSE
+#'
+#' @examples
+#' single_module <- c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11", "MCL1", "IL1B", "SPTAN1",
+#'                    "DIABLO", "BAX", "BIK", "IL1A", "BID", "CDKN1A", "GADD45A")
+#' is_module(single_module)
+#'
+#' multi_module <- list(mod1 = single_module,
+#'                      mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
+#'                               "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
+#' is_module(mods$modules, is_list = TRUE)
 #'
 #' @export
 
@@ -110,6 +126,12 @@ is_module <- function(module, is_list = FALSE) {
 #' @return list, a boolean as first element and in second element NULL or the reason why boolean is
 #' set to FALSE
 #'
+#' @examples
+#' single_module <- c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11", "MCL1", "IL1B", "SPTAN1",
+#'                    "DIABLO", "BAX", "BIK", "IL1A", "BID", "CDKN1A", "GADD45A")
+#' single_module_enriched <- bio_enrich(single_module)
+#' is_gost(single_module_enriched)
+#'
 #' @export
 
 is_gost <- function(gost_result) {
@@ -152,6 +174,12 @@ is_gost <- function(gost_result) {
 #'
 #' @return list, a boolean as first element and in second element NULL or the reason why boolean is
 #' set to FALSE
+#'
+#' @examples
+#' expr <- matrix(runif(15*40), 15)
+#' colnames(expr) <- paste0("gene_", 1:ncol(expr))
+#' rownames(expr) <- paste0("gene_", 1:nrow(expr))
+#' is_data_expr(expr)
 #'
 #' @export
 

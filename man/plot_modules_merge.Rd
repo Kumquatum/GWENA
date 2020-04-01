@@ -20,3 +20,10 @@ Plot a bipartite graph to see in which modules all modules have been merged
 \details{
 Both vectors must be in the same gene order before passing them to the function. No check is applied on this.
 }
+\examples{
+df <- kuehne_expr[1:24, 1:350]
+net <- build_net(df)
+detection <- detect_modules(df, net$network, detailled_result = TRUE)
+plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
+
+}

@@ -50,7 +50,7 @@ pvalue_th is splitted in two for each side (preserved/not preserved).}
 }
 \value{
 A nested list where first element is each ref provided, second level each condition to test, and then elements containing
-information on the comparison. See
+information on the comparison. See NetRep::modulePreservation() for more detail.
 }
 \description{
 Take modules built from multiples conditions and search for preservation, non-preservation or one of them, against one or mutliple
@@ -63,4 +63,16 @@ conditions of reference. Use 7 topological features to perform the differents te
   \item{}{To avoid recalculation, correlations matrices can be obtain by setting \code{keep_cor_mat} in \code{\link[GWENA]{build_net}} to TRUE.}
   \item{}{Description of the 7 topological features used for preservation testing is available in \code{\link[NetRep]{modulePreservation}}.}
 }
+}
+\examples{
+expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
+                     cond2 = kuehne_expr[25:48, 1:350])
+net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 2, keep_cor_mat = TRUE)
+mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"),
+                      MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
+comparison <- compare_conditions(expr_by_cond,
+                                 lapply(net_by_cond, `[[`, "network"),
+                                 lapply(net_by_cond, `[[`, "cor_mat"),
+                                 lapply(mod_by_cond, `[[`, "modules"))
+
 }
