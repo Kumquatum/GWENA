@@ -32,7 +32,8 @@ Imports:
     igraph (>= 1.2.4.1),
     RColorBrewer (>= 1.1-2),
     purrr (>= 0.3.3),
-    rlist (>= 0.4.6.1)
+    rlist (>= 0.4.6.1),
+    matrixStats (>= 0.55.0)
 VignetteBuilder: knitr
 biocViews: Software, GeneExpression, Network, Clustering, GraphAndNetwork,
            GeneSetEnrichment, Pathways, Visualization, RNASeq, Transcriptomics, 

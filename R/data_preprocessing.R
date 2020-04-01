@@ -58,6 +58,7 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 #' @importFrom magrittr %>%
 #' @importFrom dplyr select
 #' @importFrom tidyr one_of
+#' @importFrom matrixStats colMaxs colMeans2 colMins
 #'
 #' @return A data.frame of filtered genes
 #'
