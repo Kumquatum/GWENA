@@ -16,7 +16,7 @@ build_graph_from_sq_mat <- function(sq_mat) {
   # Checks
   if (!(is.matrix(sq_mat) | is.data.frame((sq_mat)))) stop("sq_mat should be a matrix or a data.frame")
   if (any(is.na(sq_mat))) warning("sq_mat should not contain any missing value")
-  if ((any(sq_mat > 1) | any(sq_mat < -1)) && !any(is.na(sq_mat))) stop("sq_mat should be filled with value in the [-1,1] range")
+  if ((any(sq_mat > 1) | any(sq_mat < -1)) & !any(is.na(sq_mat))) stop("sq_mat should be filled with value in the [-1,1] range")
   if (nrow(sq_mat) != ncol(sq_mat)) stop("sq_mat must be a squared matrix")
 
   # From matrix to graph
