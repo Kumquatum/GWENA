@@ -148,15 +148,12 @@ get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
 #'
 #' @export
 
-get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL) {
+get_hub_kleinberg <- function(network, modules = NULL, top_n = 5, k_th = NULL) {
   # Checks
   .check_network(network)
   if (!is.null(modules)) {
     .check_module(modules, is.list(modules))}
-  if (is.null(top_n) && is.null(k_th)) {
-    top_n <- 5
-    warning("No top_n or k_th value provided. Default: top_n = ", top_n) }
-  if (!is.null(top_n) && !is.null(k_th)) {
+  if (!is.null(top_n) & !is.null(k_th)) {
     k_th <- NULL
     warning("Conflict: top_n and k_th value provided. Keeping only top_n value") }
   if (!is.null(k_th)) {
@@ -210,7 +207,13 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = NULL, k_th = NULL
 #'   \item{Kleinberg's score}{Select genes which Kleinberg's score superior to provided threshold.}
 #' }
 #'
-#' @return list of vectors representing hub genes, by module
+#' @return A list of vectors representing hub genes, by module
+#'
+#' @examples
+#' mat <- matrix(runif(40*40), 40)
+#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
+#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' get_hub_genes(mat)
 #'
 #' @export
 
@@ -263,15 +266,15 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   if (!igraph::is.igraph(graph_module)) stop("graph_module must be an igraph object")
   named_num_vec <- char_vec <- FALSE
   if (!is.null(hubs)) {
-    if (is.vector(hubs, "numeric") && !is.null(names(hubs))) named_num_vec <- TRUE # Named vector with numeric values
+    if (is.vector(hubs, "numeric") & !is.null(names(hubs))) named_num_vec <- TRUE # Named vector with numeric values
     if (is.vector(hubs, "character")) char_vec <- TRUE # Vector of characters
-    if (!(named_num_vec && char_vec)) stop("hubs must be a named vector of numeric values, or a vector of characters")
+    if (!(named_num_vec & char_vec)) stop("hubs must be a named vector of numeric values, or a vector of characters")
   }
   if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
   if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
   if (weight_th < 0 | weight_th >= 1) stop("weight_th must be a in [0;1[")
   if (!is.null(enrichment)) .check_gost(enrichment)
-  if (!is.character(layout) && !is.matrix(layout) && !is.function(layout)) {
+  if (!is.character(layout) & !is.matrix(layout) & !is.function(layout)) {
     stop("layout must be a layout function, its name as a string, or a matrix giving position of each node ") }
 
   # Keeping only gene names if hubs is a named numeric vector
