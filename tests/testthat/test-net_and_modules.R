@@ -151,7 +151,7 @@ test_that("output format is ok (detailled_result = TRUE)", {
   expect_true(is.vector(res_detection$modules %>% unlist, "character"))
   expect_true(is.vector(res_detection$modules_premerge %>% unlist, "character"))
   expect_true(is.data.frame(res_detection$modules_eigengenes) && ncol(res_detection$modules_eigengenes) == length(res_detection$modules))
-  expect_true(class(res_detection$dendrograms) == "hclust")
+  expect_true(is(res_detection$dendrograms, "hclust"))
 })
 test_that("output format is ok (detailled_result = FALSE)", {
   res_detection_not_detailled <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network, detailled_result = FALSE)
