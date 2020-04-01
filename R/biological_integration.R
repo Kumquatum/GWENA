@@ -184,7 +184,8 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
 #'
 #' @examples
 #' custom_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "GWENA", mustWork = TRUE)
-#' multi_module <- list(mod1 = single_module,
+#' multi_module <- list(mod1 = c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11", "MCL1", "IL1B", "SPTAN1",
+#'                               "DIABLO", "BAX", "BIK", "IL1A", "BID", "CDKN1A", "GADD45A"),
 #'                      mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
 #'                               "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
 #' multi_module_enriched <- bio_enrich(multi_module, custom_path)

@@ -13,7 +13,7 @@ plot_comparison_stats(comparison_pvalues, pvalue_th = 0.05,
 
 \item{pvalue_th}{decimal, threshold of pvalue below which statistics are considered as significant}
 
-\item{low_color, mid_color, high_color}{string, color to use as lower, middle, and higher end of the legend. Can
+\item{low_color, pvalue_th_color, unsignificant_color}{string, color to use as lower, middle, and higher end of the legend. Can
 either be the color name or hexadecimal code (e.g.: “red” or “#FF1234” )}
 }
 \value{

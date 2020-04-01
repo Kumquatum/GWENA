@@ -251,7 +251,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
 #'
 #' @param comparison_pvalues matrix or data.frame, table containing the p values for the statistics on each module
 #' @param pvalue_th decimal, threshold of pvalue below which statistics are considered as significant
-#' @param low_color,mid_color,high_color string, color to use as lower, middle, and higher end of the legend. Can
+#' @param low_color,pvalue_th_color,unsignificant_color string, color to use as lower, middle, and higher end of the legend. Can
 #' either be the color name or hexadecimal code (e.g.: “red” or “#FF1234” )
 #'
 #' @importFrom magrittr %>%

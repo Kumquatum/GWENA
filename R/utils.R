@@ -29,7 +29,7 @@ quiet <- function(func) {
 #' set to FALSE
 #'
 #' @examples
-#' net <- netrix(runif(40*40), 40)
+#' net <- matrix(runif(40*40), 40)
 #' colnames(net) <- paste0("gene_", 1:ncol(net))
 #' rownames(net) <- paste0("gene_", 1:nrow(net))
 #' is_network(net)
@@ -82,7 +82,7 @@ is_network <- function(network) {
 #' multi_module <- list(mod1 = single_module,
 #'                      mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
 #'                               "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
-#' is_module(mods$modules, is_list = TRUE)
+#' is_module(multi_module$modules, is_list = TRUE)
 #'
 #' @export
 

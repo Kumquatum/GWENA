@@ -190,7 +190,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @importFrom magrittr %>% set_colnames set_rownames
 #'
 #' @examples
-#' build_net(kuehne_expr[, 1:350])
+#' build_net(kuehne_expr[, 1:350], n_threads = 2)
 #'
 #' @export
 
@@ -214,6 +214,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 
   # WGCNA's multi-threading
   quiet(WGCNA::enableWGCNAThreads(n_threads))
+  # TODO : change this function for an internal one because WGCNA's function isn't prefixed, causing warnings
 
   # Correlation selection and correlation matrix computation
   if (cor_func == "other") {
@@ -280,7 +281,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
-#' net <- build_net(df)
+#' net <- build_net(df, n_threads = 2)
 #' detect_modules(df, net$network)
 #'
 #' @export
@@ -363,7 +364,7 @@ detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(da
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
-#' net <- build_net(df)
+#' net <- build_net(df, n_threads = 2)
 #' detection <- detect_modules(df, net$network, detailled_result = TRUE)
 #' plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
 #'
@@ -421,7 +422,7 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
-#' net <- build_net(df)
+#' net <- build_net(df, n_threads = 2)
 #' detection <- detect_modules(df, net$network, detailled_result = TRUE)
 #' plot_expression_profiles(df, detection$modules)
 #'

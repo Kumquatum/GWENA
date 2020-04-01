@@ -22,7 +22,7 @@ Both vectors must be in the same gene order before passing them to the function.
 }
 \examples{
 df <- kuehne_expr[1:24, 1:350]
-net <- build_net(df)
+net <- build_net(df, n_threads = 2)
 detection <- detect_modules(df, net$network, detailled_result = TRUE)
 plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
 

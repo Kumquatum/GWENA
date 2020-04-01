@@ -18,7 +18,7 @@ Check content of a given object to determine if it's a network, meaning a square
 score between genes.
 }
 \examples{
-net <- netrix(runif(40*40), 40)
+net <- matrix(runif(40*40), 40)
 colnames(net) <- paste0("gene_", 1:ncol(net))
 rownames(net) <- paste0("gene_", 1:nrow(net))
 is_network(net)
