@@ -249,7 +249,21 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
 #'
 #' @export
 
-plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05, low_color = "#031643", mid_color = "#A0A3D3", high_color = "#FFFFFF") {
+plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05, low_color = "#031643", pvalue_th_color = "#A0A3D3", unsignificant_color = "#FFFFFF") {
+  # Checks
+  if (!is.data.frame(comparison_pvalues) & !is.matrix(comparison_pvalues)) stop("comparison_pvalues should be a data.frame or a matrix.")
+  if (any(!is.numeric(unlist(comparison_pvalues)))) stop("comparison_pvalues should only contains numeric values")
+  if (any(unlist(comparison_pvalues) < 0)) stop("comparison_pvalues should only contains positive values")
+  if (any(unlist(comparison_pvalues) > 1)) stop("comparison_pvalues should only contains values between 0 and 1")
+  if (!is.numeric(pvalue_th)) stop("pvalue_th must be a numeric value")
+  if (length(pvalue_th) != 1) stop("pvalue_th must be a single value")
+  if (pvalue_th <= 0 | pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
+  lapply(c("low_color", "pvalue_th_color", "unsignificant_color"), function(color) {
+    var <- get(color)
+    if (!is.character(var)) stop(color, " should be a character")
+    if (!is.character(var)) stop(color, " should be a color specified by a name or an hexadecimal code")
+  })
+
   df <- comparison_pvalues %>%
     as.data.frame %>%
     tibble::rownames_to_column("module") %>%
@@ -259,7 +273,7 @@ plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05, low_colo
 
   ggplot2::ggplot(df, ggplot2::aes(statistics, module, fill = pvalue)) +
     ggplot2::geom_tile(color = "white", size = 1) +
-    ggplot2::scale_fill_gradientn(colors = c(low_color, mid_color, high_color, high_color),
+    ggplot2::scale_fill_gradientn(colors = c(low_color, pvalue_th_color, unsignificant_color, unsignificant_color),
                                   values = c(0, pvalue_th, pvalue_th + 0.000001, 1), limits = c(0, 1),
                                   guide = "legend", breaks = breaks) +
     ggplot2::coord_equal() +
