@@ -85,31 +85,54 @@ devtools::install_github("Kumquatum/GWENA")
 
 ```
 
-Then simply load GWENA as usual:
+Package loading:
 
 ```{r load, message=FALSE, warning=FALSE}
 library(GWENA)
-library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to ease readability
+library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to ease readability.
 ```
+
 
 ### 1. Input data
 
-Expression data can either be from RNA-seq or microarray. You can use the import function of your choice (read.csv, read.table, etc.) as long as the final format is a data.frame with genes as columns and samples as rows. Transcriptomic data must have been reduced to the gene level (See [How can I resume my transcriptomic data to the gene level ?](FAQ.html/#how-can-i-reduce-my-transcriptomic-data-to-the-gene-level) from the [FAQ](FAQ.html)) since GWENA is deisgned to build **gene** co-expression networks. 
+#### The expression data
 
-In this vignette, we will be using the transcriptomic dataset [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) from the [Kuehne et al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3) and the associated phenotypic traits matrix. Microarray was an Agilent-039494 SurePrint G3 Human GE v2 8x60K, mono channel. These data were gathered in a context of skin aging study and been processed and normalized along with the R script given in [Additional data n°10](https://static-content.springer.com/esm/art%3A10.1186%2Fs12864-017-3547-3/MediaObjects/12864_2017_3547_MOESM10_ESM.zip). 
+GWENA support expression matrix data coming from either RNA-seq or microarray experiments. Expression data have to be stored as text or spreadsheet files and formatted with genes as columns and samples as rows. To read this file with R, use the appropriate function according to the data separator (e.g. read.csv, read.table). Moreover, the expression data have to be normalized and transcripts expression reduced to the gene level (See [How can I reduce my transcriptomic data to the gene level ?](FAQ.html/#how-can-i-reduce-my-transcriptomic-data-to-the-gene-level) since GWENA is designed to build **gene** co-expression networks.
 
-> Note: [GWENA does not provide normalization methods](FAQ.html/#).
+In this vignette, we use the microarray data set [GSE85358](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE85358) from the [Kuehne et al. study](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3). This data was gathered for a skin ageing study and has been processed and normalized with the R script provided in [Additional data n°10](https://static-content.springer.com/esm/art%3A10.1186%2Fs12864-017-3547-3/MediaObjects/12864_2017_3547_MOESM10_ESM.zip) of the corresponding article.
 
-```{r data_input}
+```{r data_input_expr}
+# Import expression table
+data("kuehne_expr")
+# If kuehne_expr was in a file :
+# kuehne_expr = read.table(<path_to_file>, header=TRUE, row.names=1)
+
 # Number of genes
 ncol(kuehne_expr)
 # Number of samples
 nrow(kuehne_expr)
-# Conditions 
-unique(kuehne_traits$Condition)
 
 # Overview of expression table
 kuehne_expr[1:5,1:5]
+
+# Checking expression data set is correctly defined
+is_data_expr(kuehne_expr)
+```
+
+
+#### The metadata
+
+To be able to perform the phenotypic association step of the pipeline (optional), we need to specify in another matrix the information associated with each sample (e.g. condition, treatment, phenotype, experiment date...). This information is often provided in a separate file (also text or spreadsheet) and can be read in R with read.csv or read.table functions.
+
+```{r data_input_phenotype}
+# Import phenotype table (also called traits)
+data("kuehne_traits")
+# If kuehne_traits was in a file :
+# kuehne_traits = read.table(<path_to_file>, header=TRUE, row.names=1)
+
+# Phenotype
+unique(kuehne_traits$Condition)
+
 # Overview of traits table
 kuehne_traits[1:5,]
 ```
