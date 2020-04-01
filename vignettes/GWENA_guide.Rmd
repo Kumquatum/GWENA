@@ -55,15 +55,16 @@ This document gives a brief tutorial using a subset of a microarray data set to 
 <!-- # TODO: add example with wrapper -->
 <!-- ``` -->
 
-## Main steps detail with default pipeline
+## Main steps of the pipeline
 
 ### 0. Starting with GWENA
 
 Installation can either be from:
 
-1. the official version from the last Bioconductor release (3.11 on R-4.0.0).
+1. the official version of the last Bioconductor release (recommended).
 2. the last stable version from the Bioc Devel branch.
-3. the day-to-day developpment version from the [github repository](https://github.com/Kumquatum/GWENA).
+3. the day-to-day development version from the [Github repository](https://github.com/Kumquatum/GWENA).
+
 
 ```{r install, eval=FALSE}
 if (!requireNamespace("BiocManager", quietly=TRUE))
