@@ -55,5 +55,5 @@ It is distributed in the hope that it will be useful, but without any warranty a
 
 
 ## Contact
-* If you have any question, feel free to send a mail to the author and maintainer Gwenaëlle Lemoine at lemoine.gwenaelle@gmail.com.
+* If you have any question, feel free to send a mail to the author and maintainer Gwenaëlle Lemoine at lemoine.gwenaelle[@t)gmail{d0t]com.
 * To report a bug, please use the [Github issues system](https://github.com/Kumquatum/GWENA/issues).
