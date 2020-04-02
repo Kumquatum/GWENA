@@ -45,7 +45,7 @@ devtools::install_github("Kumquatum/GWENA")
 ```
 
 ## Package tutorial
-A vignette is available at [vignette/GWENA_guide.Rmd](vignette/GWENA_guide.Rmd). To have the already compile html version, use `vignette("GWENA_guide")`.
+A vignette is available at [vignette/GWENA_guide.Rmd](vignette/GWENA_guide.Rmd). To see the html version, use `vignette("GWENA_guide")`.
 Note: if you want to install from Github, please specify `build_vignettes = TRUE` in `install_github`.
 
 
