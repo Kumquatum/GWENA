@@ -327,6 +327,67 @@ plot_comparison_stats(comparison$result$young$old$p.values)
 
 <!-- This package as been designed as a fully modular pipeline. By this, we mean that any step of the pipeline as described before, can be performed by another software or package you would prefere. For exemple, other methodes for co-expression network building and module detection exists. You could  -->
 
+## Frequently asked questions
+
+**1. How can I reduce my transcriptomic data to the gene level?**
+
+* Microarray: Microarrays are designed XXXXXX TODO
+* RNA-seq: Gold
+
+
+**2. What is an eigengene?**
+
+A module's eigengene is a gene (real or estimated) whose expression profile summarizes the profile of expression of the whole module. In WGCNA, it is the first component of an SVD performed on the module's expression matrix.
+
+
+**3. What should I do if I get warning/error "No fitting power could be found for provided fit_cut_off" ?**
+
+You should first verify your data. This implies :
+* Your data are RNA-seq or microarray data
+* You have gene names as columns and samples as row or if you use `get_fit.cor` you had it when you computed your correlation matrix on it
+* You didn't filtered your data in a way that breaks the scale-free property. Classic wrong filter is usign only differentially expressed genes (see [question 2. from WGCNA package FAQ](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html))
+If you verified these causes, you may have set a fit_cut_off too high (default is 0.9 default).
+
+
+**4. Why do the first modules have so many genes as the last ones have very few?**
+
+* **Resolution** is usually the main answer. As the number of sample by conditions decrease, the correlations tend to increase. This leads to highly correlated genes that ends up in the same modules. You could try another clustering method to split these huge modules, however, they often turn out to be artificial split which won't give significant biological integration.
+* **Expression drivers** can also impact it. If you have phenotipic variables strongly impacting your expression, this may result in a huge variation factor that will regroup genes impacted by it together
+
+
+**5. Why GWENA doesn't provide normalization methods ?**
+
+GWENA is design to support both RNA-seq and microarray data. However each of these technologies have its own normalization methods, partly because of the distribution of the expression (discrete against continuous). Also microarrays normalization steps aim to remove noise like mRNA quality variability, batch effect, background effect, etc. While RNA-seq normalization steps aim to account for differences of gene length, sequencing depths, GC content, etc. but can also take into account classic noise like batch effect. 
+
+Some of this normalization methods require metadata and specific constructor package in the case of microarrays. To avoid over-complexification of the input for this pipeline and since the experimenters are in the best position to know the best normalisations to apply, we prefer to ask for already normalized methods.
+
+
+**6. Why forcing expression datasets to have no NA values?**
+
+As you may know in R, missing values in cor and cov function by default propagate missing values in each column and row where there are found. Multiple options are available in these function to manage missing values. However some of them are not available for all type of correlations available, and not all imputations methods are wise to use (take a look at this article: [Pairwise-complete correlation considered dangerous](https://bwlewis.github.io/covar/missing.html)).
+Since WGCNA running requires no missing values, I prefere forcing to have a complete dataset. You have therefore the full understanding of the imputation you compute for your missing values. If you have no idea how to do it, see [Dealing with missing data:  Key assumptions and methods for applied analysis](https://www.bu.edu/sph/files/2014/05/Marina-tech-report.pdf) for general information about missing values imputation, and [Dealing with missing values in large-scale studies: microarray data imputation and beyond](https://academic.oup.com/bib/article/11/2/253/216449) for more transcriptomic-specific imputation.
+
+
+**7. Why did you wrapped multiple functions of WGCNA like `pickSoftThreshold` or `adjacency` ? Wasn't they already working?**
+
+Short answer is "Yes they were". However, the parameters of these functions and their syntax didn't eased tehir use. Moreover, the current succession of functions to built modules repeated multiple times the correlation computation which takes quite some time. Also, I took the opportunity to integrate native sperman correlation.
+
+
+**8. Why didn't you use S3 class to create objects usable by your functions ?**
+
+GWENA architecture is designed to be modular, meaning each step method is easily exchangeable for another method (i.e. changing the detection step which is a hierarchical cultering to a kmeans) as long as the input and output format are the same. Also using native data types ensure the ease of compatibility with other tools (i.e. using cytoscape for the visualization step instead of the GWENA's one).
+
+
+**9. Why the arg `network_type = "signed"` implies a modification of the similarity score even though it is already signed?**
+
+Since a correlation matrix is already signed, one could as what is this `similarity <- (1 + cor_mat) / 2` operation. It is simply because ulterior steps of estimating a scale-free index in WGCNA implies a log10 transformation. Therefore you can't have negative numbers. Because a correlation matrix have values in [0;1], the operation will keep the distribution and avoid negative values.
+
+
+**10. Why `plot_expression_profiles()` computes a PCA for eigengenes instead of using eigengenes given by `detect_modules()`?**
+
+Eigenenes provided by `detect_modules` are from a SVD, and PCA is equivalent to performing the SVD on the centered data ([see 'Running PCA and SVD in R '](https://genomicsclass.github.io/book/pages/pca_svd.html)). Because expression profiles are using centered values (for clarity of representation), the PCA to represent eigengenes is more accurate.
+
+
 
 <div style="text-align:center; font-size:70%; margin-top:50px"> 
   ______
