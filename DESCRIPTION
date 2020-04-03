@@ -38,3 +38,4 @@ VignetteBuilder: knitr
 biocViews: Software, GeneExpression, Network, Clustering, GraphAndNetwork,
            GeneSetEnrichment, Pathways, Visualization, RNASeq, Transcriptomics, 
            mRNAMicroarray, Microarray, NetworkEnrichment
+BugReports: https://github.com/Kumquatum/GWENA/issues
