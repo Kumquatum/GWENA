@@ -292,7 +292,11 @@ get_hub_genes <- function(network, modules = NULL, method = c("highest connectiv
 
 plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment = NULL,
                         title = "Module", degree_node_scaling = TRUE, node_scaling_max = 6,
-                        edge_scaling_max = 1, nb_row_legend = 6, layout = "auto", ...) {
+                        edge_scaling_max = 1, nb_row_legend = 6, layout = "auto",
+                        vertex.label.cex = 0.7, vertex.label.color = "gray20",
+                        vertex.label.family = "Helvetica", edge.color = "gray70",
+                        vertex.frame.color = "white", vertex.color = "gray60",
+                        vertex.label.dist = 1, legend_cex = 0.8, ...) {
   # TODO: add a layer arg that could take a list where each named element could be list of genes of interest (like one displaying gene known in aging and another for inflammation)
   # Checks
   if (!igraph::is.igraph(graph_module)) stop("graph_module must be an igraph object")
@@ -308,6 +312,10 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   if (!is.null(enrichment)) .check_gost(enrichment)
   if (!is.character(layout) & !is.matrix(layout) & !is.function(layout)) {
     stop("layout must be a layout function, its name as a string, or a matrix giving position of each node ") }
+  if (!is.logical(degree_node_scaling)) stop("degree_node_scaling must be a boolean value")
+  if (isTRUE(degree_node_scaling) & exists("vertex.size")) stop("If degree_node_scaling is TRUE, you cannot specify a vertex.size")
+  if (!is.numeric(node_scaling_max)) stop("node_scaling_max must be a numeric value")
+  if (!is.null(edge_scaling_max) & exists("edge.width")) stop("If edge_scaling_max is not NULL, you cannot specify a edge.width")
 
   # Keeping only gene names if hubs is a named numeric vector
   if (named_num_vec) hubs <- names(hubs)
@@ -336,26 +344,38 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
     node_scaling_min <- 1
     vertex_size <- sapply(deg, function(x) {
       (x - min(deg)) / (max(deg) - min(deg)) * (node_scaling_max - node_scaling_min) + node_scaling_min})
-  } else { vertex_size <- node_scaling_max }
+  } else {
+    if (exists("vertex.size")){
+      vertex_size <- vertex.size
+    } else {
+      vertex_size <- node_scaling_max
+    }
+  }
 
-  edge_scaling_min <- 0.2
-  edge <- E(graph_to_plot)$weight
-  edge_width <- sapply(edge, function(x) {
-    (x - min(edge)) / (max(edge) - min(edge)) * (edge_scaling_max - edge_scaling_min) + edge_scaling_min})
+  if (exists("edge.width")){
+    edge_width <- edge.width
+  } else {
+    edge_scaling_min <- 0.2
+    edge <- E(graph_to_plot)$weight
+    edge_width <- sapply(edge, function(x) {
+      (x - min(edge)) / (max(edge) - min(edge)) * (edge_scaling_max - edge_scaling_min) + edge_scaling_min})
+  }
+
 
   igraph::plot.igraph(graph_to_plot,
-                      vertex.label.color = "gray20",
-                      vertex.label.family = "Helvetica",
-                      vertex.label.cex = 0.7,
-                      vertex.label.dist = 1,
+                      vertex.label.color = vertex.label.color,
+                      vertex.label.family = vertex.label.family,
+                      vertex.label.cex = vertex.label.cex,
+                      vertex.label.dist = vertex.label.dist,
+                      edge.color = edge.color,
+                      vertex.frame.color = vertex.frame.color,
+                      vertex.color = vertex.color,
                       vertex.size = vertex_size,
                       edge.width = edge_width,
-                      edge.color = "gray70",
-                      vertex.frame.color = "white",
-                      vertex.color = "gray60",
                       layout = l,
                       main = title,
                       ...)
+
 
   # Legend nodes
   scale_vertex_size <- seq(node_scaling_min, node_scaling_max, length.out = nb_row_legend)
@@ -364,7 +384,8 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   } else { label_legend_node <- as.character(scale_vertex_size) }
 
   a <- legend("bottomright", label_legend_node, pt.cex = scale_vertex_size/200,
-              col = 'white', pch = 21, title = "Degree", bty = "n", y.intersp = 0.7)
+              col = 'white', pch = 21, title = "Degree", bty = "n", y.intersp = 0.7,
+              cex = legend_cex)
   x <- (a$text$x + a$rect$left) / 2
   y <- a$text$y
   symbols(x, y, circles = scale_vertex_size/200, inches = FALSE, add = TRUE, bg = 'gray', fg = 'white')
@@ -372,6 +393,8 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   # Legend vertex
   scale_edge_width <- seq(edge_scaling_min, edge_scaling_max, length.out = nb_row_legend) %>% signif
   label_legend_edge <- seq(min(edge), max(edge), length.out = nb_row_legend) %>% signif %>% as.character
-  legend("topright", label_legend_edge, col='gray', title = "Weight", lwd = scale_edge_width, bty = "n")
+  legend("topright", label_legend_edge, col='gray', title = "Weight", lwd = scale_edge_width, bty = "n",
+         cex = legend_cex, inset = c(-0.7,0))
+         # inset = c(-0.1,0)
 
 }
