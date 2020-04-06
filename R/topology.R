@@ -361,6 +361,9 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
       (x - min(edge)) / (max(edge) - min(edge)) * (edge_scaling_max - edge_scaling_min) + edge_scaling_min})
   }
 
+  # HOTFIX : hotfix to manage no label
+  if (vertex.label.cex == 0) vertex_label = NA
+
 
   igraph::plot.igraph(graph_to_plot,
                       vertex.label.color = vertex.label.color,
@@ -368,6 +371,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
                       vertex.label.cex = vertex.label.cex,
                       vertex.label.dist = vertex.label.dist,
                       edge.color = edge.color,
+                      vertex.label = vertex_label,
                       vertex.frame.color = vertex.frame.color,
                       vertex.color = vertex.color,
                       vertex.size = vertex_size,
@@ -394,7 +398,8 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   scale_edge_width <- seq(edge_scaling_min, edge_scaling_max, length.out = nb_row_legend) %>% signif
   label_legend_edge <- seq(min(edge), max(edge), length.out = nb_row_legend) %>% signif %>% as.character
   legend("topright", label_legend_edge, col='gray', title = "Weight", lwd = scale_edge_width, bty = "n",
-         cex = legend_cex, inset = c(-0.2,0))
-         # inset = c(-0.1,0)
+         cex = legend_cex)
+         # cex = legend_cex, inset = c(-0.2,0))
+
 
 }
