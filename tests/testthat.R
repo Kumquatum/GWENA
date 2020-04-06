@@ -1,4 +1,4 @@
 library(testthat)
-library(GWENapp)
+library(GWENA)
 
-test_check("GWENapp")
+test_check("GWENA")
