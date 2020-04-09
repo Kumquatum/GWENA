@@ -38,6 +38,18 @@ size of all node}
 or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
 the graph. For more information, see \code{\link[igraph]{igraph.plotting}}}
 
+\item{vertex.label.cex, legend_cex}{float, font size for vertex labels. It is interpreted as a multiplication factor of some
+device-dependent base font size. If 0, no labels displayed.}
+
+\item{vertex.label.color, edge.color, vertex.frame.color, vertex.color}{character and/or integer vector , color of the labels.
+It may either contain integer values, named colors or RGB specified colors with three or four bytes. All strings starting
+with ‘#’ are assumed to be RGB color specifications. It is possible to mix named color and RGB colors.}
+
+\item{vertex.label.family}{character, font family to be used for vertex labels.}
+
+\item{vertex.label.dist}{integer, distance of the label from the center of the vertex. If it is 0 then the label is
+centered on the vertex. If it is 1 then the label is displayed beside the vertex.}
+
 \item{...}{any other parameter compatible with the \code{\link[igraph]{plot.igraph}} function}
 }
 \value{

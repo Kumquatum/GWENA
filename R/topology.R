@@ -273,6 +273,14 @@ get_hub_genes <- function(network, modules = NULL, method = c("highest connectiv
 #' @param layout numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
 #' or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
 #' the graph. For more information, see \code{\link[igraph]{igraph.plotting}}
+#' @param vertex.label.cex,legend_cex float, font size for vertex labels. It is interpreted as a multiplication factor of some
+#' device-dependent base font size. If 0, no labels displayed.
+#' @param vertex.label.color,edge.color,vertex.frame.color,vertex.color character and/or integer vector , color of the labels.
+#' It may either contain integer values, named colors or RGB specified colors with three or four bytes. All strings starting
+#' with ‘#’ are assumed to be RGB color specifications. It is possible to mix named color and RGB colors.
+#' @param vertex.label.family character, font family to be used for vertex labels.
+#' @param vertex.label.dist integer, distance of the label from the center of the vertex. If it is 0 then the label is
+#' centered on the vertex. If it is 1 then the label is displayed beside the vertex.
 #' @param ... any other parameter compatible with the \code{\link[igraph]{plot.igraph}} function
 #'
 #' @details Take care of you intend to compare modules' graphs, the same size of node will not correspond to the
