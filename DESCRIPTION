@@ -18,7 +18,8 @@ Depends: R (>= 4.0.0)
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    httr
 Imports: 
     WGCNA (>= 1.67),
     dplyr (>= 0.8.3),
