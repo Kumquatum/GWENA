@@ -6,6 +6,11 @@ arg_method = c("at least one", "mean", "all")
 
 # ==== filter_low_var ====
 
+test_that("good input return no error", {
+  expect_error(filter_low_var(df_expr$df_microarray), NA)
+  expect_error(filter_low_var(se), NA)
+})
+
 test_that("badly formatted input throw an error", {
   # data_expr should be a data.frame or a matrix
   expect_error(filter_low_var(data_expr = df_expr$df_microarray), NA)

@@ -2,7 +2,7 @@
 #'
 #' Remove low variating genes based on the percentage given and the type of variation specified.
 #'
-#' @param data_expr matrix or data.frame, table of expression values (either microarray or RNA-seq),
+#' @param data_expr matrix or data.frame or SummarizedExperiment, table of expression values (either microarray or RNA-seq),
 #' with genes as column and samples as row
 #' @param pct float, percentage of gene to keep, value must be in ]0;1[
 #' @param type string, function name used for filtration. Should be either "mean", "median", or "mad"
@@ -10,6 +10,7 @@
 #' @importFrom dplyr select
 #' @importFrom magrittr %>%
 #' @importFrom dplyr top_frac select
+#' @importFrom SummarizedExperiment assay
 #'
 #' @return A data.frame of filtered genes
 #'
@@ -23,7 +24,9 @@
 
 filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad")){
   # Checking args
-  .check_data_expr(data_expr)
+  if (is(data_expr, "SummarizedExperiment")) {
+    data_expr <- t(SummarizedExperiment::assay(data_expr))
+  } else .check_data_expr(data_expr)
   if (!is.numeric(pct) | length(pct) != 1) stop("pct should be a single number")
   if (pct <= 0 | pct >= 1) stop("pct should be between 0 and 1")
   type <- match.arg(type)

@@ -7,7 +7,7 @@
 filter_low_var(data_expr, pct = 0.8, type = c("mean", "median", "mad"))
 }
 \arguments{
-\item{data_expr}{matrix or data.frame, table of expression values (either microarray or RNA-seq),
+\item{data_expr}{matrix or data.frame or SummarizedExperiment, table of expression values (either microarray or RNA-seq),
 with genes as column and samples as row}
 
 \item{pct}{float, percentage of gene to keep, value must be in ]0;1[}
