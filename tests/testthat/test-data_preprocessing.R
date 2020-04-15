@@ -54,6 +54,11 @@ test_that("output format is ok", {
 
 # ==== filter_RNA_seq ====
 
+test_that("good input return no error", {
+  expect_error(filter_RNA_seq(df_expr$df_rnaseq), NA)
+  expect_error(filter_RNA_seq(se), NA)
+})
+
 test_that("badly formatted input throw an error", {
   # data_expr should be a data.frame or a matrix
   expect_error(filter_RNA_seq(data_expr = df_expr$df_rnaseq), NA)

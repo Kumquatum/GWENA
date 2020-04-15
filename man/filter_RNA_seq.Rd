@@ -8,7 +8,7 @@ filter_RNA_seq(data_expr, min_count = 5, method = c("at least one",
   "mean", "all"))
 }
 \arguments{
-\item{data_expr}{matrix or data.frame, table of expression values (either microarray or RNA-seq),
+\item{data_expr}{matrix or data.frame or SummarizedExperiment, table of expression values (either microarray or RNA-seq),
 with genes as column and samples as row.}
 
 \item{min_count}{integer, minimal number of count to be considered in method.}

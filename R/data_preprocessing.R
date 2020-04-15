@@ -50,7 +50,7 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 #'
 #' Keeping genes with at least one sample with count above min_count in RNA-seq data.
 #'
-#' @param data_expr matrix or data.frame, table of expression values (either microarray or RNA-seq),
+#' @param data_expr matrix or data.frame or SummarizedExperiment, table of expression values (either microarray or RNA-seq),
 #' with genes as column and samples as row.
 #' @param min_count integer, minimal number of count to be considered in method.
 #' @param method string, name of the method for filtering. Must be one of "at least one", "mean", or " all"
@@ -62,6 +62,7 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 #' @importFrom dplyr select
 #' @importFrom tidyr one_of
 #' @importFrom matrixStats colMaxs colMeans2 colMins
+#' @importFrom SummarizedExperiment assay
 #'
 #' @return A data.frame of filtered genes
 #'
@@ -75,7 +76,9 @@ filter_low_var <- function(data_expr, pct = 0.8, type = c("mean", "median", "mad
 
 filter_RNA_seq <- function(data_expr, min_count = 5, method = c("at least one", "mean", "all")){
   # Checking args
-  .check_data_expr(data_expr)
+  if (is(data_expr, "SummarizedExperiment")) {
+    data_expr <- t(SummarizedExperiment::assay(data_expr))
+  } else .check_data_expr(data_expr)
   if (!is.numeric(min_count) | length(min_count) != 1) stop("min_count should be a single number")
   if (min_count <= 1) stop("min_count should be superior to 1")
   method <- match.arg(method)
