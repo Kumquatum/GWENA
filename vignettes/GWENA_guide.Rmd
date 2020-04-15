@@ -138,6 +138,33 @@ kuehne_traits[1:5,]
 ```
 
 
+#### Using `SummarizedExperiment` object
+
+GWENA is also compatible with the use of SummarizedExperiment. The previous dataset can therefore be transformed as one and used in the next steps
+```{r data_input_SummarizedExperiment}
+se_kuehne <- SummarizedExperiment::SummarizedExperiment(
+  assays = list(expr = t(kuehne_expr)),
+  colData = S4Vectors::DataFrame(kuehne_traits)
+)
+
+S4Vectors::metadata(se_kuehne) <- list(
+  experiment_type = "Expression profiling by array",
+  transcriptomic_technology = "Microarray",
+  GEO_accession_id = "GSE85358",
+  overall_design = "Gene expression in epidermal skin samples from the inner forearms 24 young
+  (20 to 25 years) and 24 old (55 to 66 years) human volunteers were analysed using Agilent
+  Whole Human Genome Oligo Microarrays 8x60K V2.",
+  contributors = c("Kuehne A", "Hildebrand J", "Soehle J", "Wenck H", "Terstegen L",
+                   "Gallinat S", "Knott A", "Winnefeld M", "Zamboni N"),
+  title = "An integrative metabolomics and transcriptomics study to identify metabolic
+  alterations in aged skin of humans in vivo",
+  URL = "https://www.ncbi.nlm.nih.gov/pubmed/28201987",
+  PMIDs = 28201987
+)
+```
+
+
+
 ### 2. Gene filtering
 
 Although the co-expression method implemented within GWENA is designed to manage and filter out low co-expressed genes, it is advisable to first reduce the dataset size. Indeed, loading a full expression matrix without filtering for uninformative data will result in excessive processing time, CPU and memory usage, and data storage. However, the author urges the users to proceed carefully during the filtering as it will impact the gene network building.
