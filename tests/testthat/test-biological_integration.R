@@ -141,7 +141,8 @@ if (!is_gprofiler_down) {
   })
 
   test_that("output is a ggplot or plotly object", {
-    expect_true(any(class(plot_enrichment(res_enrich)) %in% c("ggplot", "plotly")))
+    expect_true(any(c(is(plot_enrichment(res_enrich), "ggplot"),
+                      is(plot_enrichment(res_enrich), "plotly"))))
   })
 }
 
@@ -205,7 +206,7 @@ test_that("input signif_th is correctly checked", {
 })
 
 test_that("output is a ggplot", {
-  expect_true("ggplot" %in% class(plot_modules_phenotype(asso_phen)))
+  expect_true(is(plot_modules_phenotype(asso_phen), "ggplot"))
 })
 
 
