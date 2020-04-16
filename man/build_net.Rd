@@ -12,7 +12,7 @@ build_net(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
   "unsigned 2", "signed 2", "none"), n_threads = NULL, ...)
 }
 \arguments{
-\item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}
 
 \item{fit_cut_off}{float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.}
 

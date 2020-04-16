@@ -118,6 +118,11 @@ test_that("output format is ok", {
 
 # ==== build_net ====
 
+test_that("good input return no error", {
+  expect_error(build_net(df_expr$df_microarray), NA)
+  expect_error(build_net(se), NA)
+})
+
 test_that("genes interactions strength is in [0;1]", {
   expect_gte(min(res_net$network %>% c), 0)
   expect_lte(max(res_net$network %>% c), 1)

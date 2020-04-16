@@ -170,7 +170,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' Compute the adjacency matrix, then the TOM to build the network. Than detect the modules by hierarchical clustering and thresholding
 #'
-#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#' @param data_expr matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.
 #' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param cor_func string, name of the correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
@@ -188,6 +188,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #'
 #' @importFrom WGCNA adjacency.fromSimilarity TOMsimilarity
 #' @importFrom magrittr %>% set_colnames set_rownames
+#' @importFrom SummarizedExperiment assay
 #'
 #' @examples
 #' build_net(kuehne_expr[, 1:350], n_threads = 2)
@@ -200,7 +201,9 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
                          n_threads = NULL, ...)  # TODO program the mclapply version
 {
   # Checking
-  .check_data_expr(data_expr)
+  if (is(data_expr, "SummarizedExperiment")) {
+    data_expr <- t(SummarizedExperiment::assay(data_expr))
+  } else .check_data_expr(data_expr)
   # No need to check in theory because checked in get_fit.cor
   # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
   # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
