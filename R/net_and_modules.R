@@ -103,7 +103,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' Computes correlation matrix of the gene expression data, adjust it depending of the type of network, then try to
 #' parameter a power law for best fit
 #'
-#' @param data_expr matrix of data only normalized for constructor specificities, with genes as column and samples as row.
+#' @param data_expr matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.
 #' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param cor_func string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
@@ -268,7 +268,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' Detect the modules by hierarchical clustering .
 #'
-#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#' @param data_expr matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.
 #' @param network matrix or data.frame, strengh of gene co-expression (edge values).
 #' @param min_module_size integer, lowest number of gene allowed in a module. If none provided, estimated.
 #' @param merge_close_modules boolean, does closest modules (based on eigengene) should be merged together.
@@ -291,7 +291,9 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(data_expr) / 2), merge_close_modules = TRUE, merge_cut_height = 0.25,
                               detailled_result = TRUE, ...) {
   # Checks
-  .check_data_expr(data_expr)
+  if (is(data_expr, "SummarizedExperiment")) {
+    data_expr <- t(SummarizedExperiment::assay(data_expr))
+  } else .check_data_expr(data_expr)
   if (!(is.data.frame(network) | is.matrix(network))) stop("network should be a data.frame or a matrix.")
   if (ncol(network) != nrow(network)) stop("network should be squarred")
   if (is.null(rownames(network)) | !all(colnames(network) %in% rownames(network))) stop("network should have the same genes names as colnames and rownames")

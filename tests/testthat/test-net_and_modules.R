@@ -139,6 +139,11 @@ test_that("output format is ok", {
 
 # ==== detect_modules ====
 
+test_that("good input return no error", {
+  expect_error(detect_modules(df_expr$df_microarray, res_net$network), NA)
+  expect_error(detect_modules(df_expr$df_microarray %>% as.matrix, res_net$network), NA)
+  expect_error(detect_modules(se, res_net$network), NA)
+})
 test_that("net is a matrix or data.frame", {
   expect_error(detect_modules(df_expr$df_microarray, 42))
   expect_error(detect_modules(df_expr$df_microarray, "this is not a data.frame or matrix"))
