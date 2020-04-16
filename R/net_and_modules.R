@@ -131,10 +131,9 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "spearman", "bicor", "other"),
                      your_func = NULL, network_type = c("unsigned", "signed", "signed hybrid"), block_size = NULL, ...){
   # Checking args
-  .check_data_expr(data_expr)
-  # No need to check in theory because checked in get_fit.cor
-  # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
-  # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
+  if (is(data_expr, "SummarizedExperiment")) {
+    data_expr <- t(SummarizedExperiment::assay(data_expr))
+  } else .check_data_expr(data_expr)
   cor_func <- match.arg(cor_func)
   if (cor_func == "other" && (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
   # network_type <- match.arg(network_type)

@@ -90,12 +90,16 @@ test_that("output format is ok", {
 
 # ==== get_fit.expr ====
 
+test_that("good input return no error", {
+  expect_error(get_fit.expr(df_expr$df_microarray), NA)
+  expect_error(get_fit.expr(data_expr = df_expr$df_microarray %>% as.matrix), NA)
+  expect_error(get_fit.expr(se), NA)
+})
+
 test_that("data_expr should be a data.frame or a matrix of values >= 0", {
   expect_error(get_fit.expr(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
 })
 test_that("data_expr should be either a matrix or data frame of intensities or counts", {
-  expect_error(get_fit.expr(data_expr = df_expr$df_microarray), NA)
-  expect_error(get_fit.expr(data_expr = df_expr$df_microarray %>% as.matrix), NA)
   expect_error(get_fit.expr(data_expr = "this is not a data.frame nor a matrix"))
   expect_error(get_fit.expr(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
   expect_warning(get_fit.expr(data_expr = df_expr$df_microarray %>% t))
