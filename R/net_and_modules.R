@@ -413,7 +413,7 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 #'
 #' Plot expression profiles for all modules with eigengene highlighted
 #'
-#' @param data_expr matrix or data.frame, expression data with genes as column and samples as row.
+#' @param data_expr matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.
 #' @param modules vector, id (whole number or string) of modules associated to each gene.
 #'
 #' @return A ggplot representing expression profile and eigengene by module
@@ -434,7 +434,9 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 
 plot_expression_profiles <- function(data_expr, modules) {
   # Check
-  .check_data_expr(data_expr)
+  if (is(data_expr, "SummarizedExperiment")) {
+    data_expr <- t(SummarizedExperiment::assay(data_expr))
+  } else .check_data_expr(data_expr)
   if (is.list(modules)) {
     if (any(!unlist(lapply(modules, is.vector, "character")))) {
       stop("If modules is a list of modules, all elements of the list must be vectors of gene names") }
