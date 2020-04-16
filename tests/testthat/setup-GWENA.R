@@ -1,12 +1,12 @@
 # ===== setup ====
 
-# Expression data.frames
+#### Expression data.frames
 df_expr <- list(df_microarray = kuehne_expr[, 5000:7000],
                 df_rnaseq = gtex_expr[, 5000:7000])
 
-# SummarizedExperiment version of kuehne data
+#### SummarizedExperiment version of kuehne data
 se <- SummarizedExperiment::SummarizedExperiment(
-  assays = list(expr = t(kuehne_expr)),
+  assays = list(expr = t(kuehne_expr[, 5000:7000])),
   colData = S4Vectors::DataFrame(kuehne_traits)
 )
 S4Vectors::metadata(se) <- list(
@@ -14,7 +14,7 @@ S4Vectors::metadata(se) <- list(
   URL = "https://www.ncbi.nlm.nih.gov/pubmed/28201987"
 )
 
-# Checking if gprofiler is up. If not, skipping tests.
+#### Checking if gprofiler is up. If not, skipping tests.
 # Note : couldn't check properly API for gost since no GET method set by authors, so
 #        checking through a GET query to the POST method and using error code as check.
 safe_get <- purrr::safely(httr::GET)
@@ -26,7 +26,7 @@ while (i <= 4) {
 if (!is.null(res_get$result)) {is_gprofiler_down <- FALSE } else { is_gprofiler_down <- TRUE }
 
 
-# ==== pipeline ====
+# ==== pipeline steps needed to avoid redundant operations ====
 
 res_net <- build_net(df_expr$df_microarray)
 res_detection <- detect_modules(df_expr$df_microarray, res_net$network)
