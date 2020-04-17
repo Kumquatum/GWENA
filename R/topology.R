@@ -370,7 +370,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   }
 
   # HOTFIX : hotfix to manage no label
-  if (vertex.label.cex == 0) vertex_label = NA
+  if (vertex.label.cex == 0) vertex_label = NA else vertex_label = NULL
 
 
   igraph::plot.igraph(graph_to_plot,
