@@ -284,7 +284,9 @@ phenotype_association <- associate_phenotype(detection$modules_eigengenes,
 
 # With SummarizedExperiment
 phenotype_association <- associate_phenotype(detection$modules_eigengenes,
-                                             SummarizedExperiment::colData(se_kuehne)[, c("Condition", "Age", "Slide")])
+                                             SummarizedExperiment::colData(se_kuehne) %>% 
+                                               as.data.frame %>% 
+                                               dplyr::select(Condition, Age, Slide))
 
 plot_modules_phenotype(phenotype_association)
 ```
@@ -328,8 +330,8 @@ expr_by_cond <- sapply(samples_by_cond %>% names, function(cond){
 }, simplify = FALSE)
 
 # Expression by condition with SummarizedExperiment
-se_expr_by_cond <- sapply(unique(se$Condition), function(cond){
-     se[, se$Condition == cond]
+se_expr_by_cond <- sapply(unique(se_kuehne$Condition), function(cond){
+     se_kuehne[, se_kuehne$Condition == cond]
 })
 
 # Network building and modules detection by condition
