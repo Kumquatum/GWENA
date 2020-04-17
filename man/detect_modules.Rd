@@ -9,7 +9,7 @@ detect_modules(data_expr, network, min_module_size = min(20,
   merge_cut_height = 0.25, detailled_result = TRUE, ...)
 }
 \arguments{
-\item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}
 
 \item{network}{matrix or data.frame, strengh of gene co-expression (edge values).}
 
