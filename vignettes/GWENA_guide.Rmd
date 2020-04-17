@@ -278,8 +278,14 @@ plot_enrichment(enrichment)
 If phenotypic information is available about the samples provided, an association test can help to determine if a module is specifically linked to a trait. In this case, module 1 seems to be strongly linked to `Age`.
 
 ```{r modules_phenotype}
+# With data.frame/matrix
 phenotype_association <- associate_phenotype(detection$modules_eigengenes, 
                                              kuehne_traits %>% dplyr::select(Condition, Age, Slide))
+
+# With SummarizedExperiment
+phenotype_association <- associate_phenotype(detection$modules_eigengenes,
+                                             SummarizedExperiment::colData(se_kuehne)[, c("Condition", "Age", "Slide")])
+
 plot_modules_phenotype(phenotype_association)
 ```
 
@@ -312,6 +318,7 @@ GWENA uses a comparison test based on random re-assignment of gene names inside 
 To perform the comparison, all previous steps leading to modules detection need to be done for each condition. To save CPU, memory and time, the parameter `keep_cor_mat` from the `build_net` function can be switched to TRUE so the similarity matrix is kept and can be passed to `compare_conditions`. If not, the matrix is re-computed in `compare_conditions`.
 
 ```{r condition_comparison}
+# Expression by condition with data.frame/matrix
 samples_by_cond <- sapply(kuehne_traits$Condition %>% unique, function(cond){
   apply(kuehne_traits[which(kuehne_traits$Condition == cond), c("Slide", "Exp")], 1, paste, collapse = "_")
 }, simplify = FALSE)
@@ -320,9 +327,16 @@ expr_by_cond <- sapply(samples_by_cond %>% names, function(cond){
   kuehne_expr_filtered[which(rownames(kuehne_expr_filtered) %in% samples_by_cond[[cond]]),]
 }, simplify = FALSE)
 
+# Expression by condition with SummarizedExperiment
+se_expr_by_cond <- sapply(unique(se$Condition), function(cond){
+     se[, se$Condition == cond]
+})
+
+# Network building and modules detection by condition
 net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 2, keep_cor_mat = TRUE)
 mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"), 
                       MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
+
 
 comparison <- compare_conditions(expr_by_cond, 
                                  lapply(net_by_cond, `[[`, "network"), 
