@@ -12,7 +12,7 @@ compare_conditions(data_expr_list, net_list, cor_list = NULL,
   pvalue_th = 0.05, n_threads = NULL, ...)
 }
 \arguments{
-\item{data_expr_list}{list of data_expr, list of expression data by condition, with genes as column and samples as row.}
+\item{data_expr_list}{list of matrix or data.frame or SummarizedExperiment, list of expression data by condition, with genes as column and samples as row.}
 
 \item{net_list}{list of networks, list of square tables by condition, representing connectivity between
 each genes as returned by build_net.}

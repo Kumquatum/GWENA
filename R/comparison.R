@@ -3,7 +3,7 @@
 #' Take modules built from multiples conditions and search for preservation, non-preservation or one of them, against one or mutliple
 #' conditions of reference. Use 7 topological features to perform the differents test, and use permutation to validate results.
 #'
-#' @param data_expr_list list of data_expr, list of expression data by condition, with genes as column and samples as row.
+#' @param data_expr_list list of matrix or data.frame or SummarizedExperiment, list of expression data by condition, with genes as column and samples as row.
 #' @param net_list list of networks, list of square tables by condition, representing connectivity between
 #' each genes as returned by build_net.
 #' @param cor_list list of matrices and/or data.frames, list of square tables by condition, representing correlation between
@@ -62,7 +62,15 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   # Basic checks
   if (!is.list(data_expr_list)) stop("data_expr_list must be a list.")
   if (length(data_expr_list) < 2) stop("data_expr_list must have at least 2 elements (2 conditions) to run a comparison.")
-  lapply(data_expr_list, .check_data_expr)
+  # lapply(data_expr_list, .check_data_expr)
+  data_expr_list <- lapply(data_expr_list, function(data_expr){
+    if (is(data_expr, "SummarizedExperiment")) {
+      data_expr <- t(SummarizedExperiment::assay(data_expr))
+    } else {
+      .check_data_expr(data_expr)
+    }
+    return(data_expr)
+  })
   conditions <- names(data_expr_list)
   if (!is.list(net_list)) stop("net_list must be a list.")
   if (!all(conditions %in% names(net_list))) stop("Names in net_list don't match with conditions.")

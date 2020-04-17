@@ -3,6 +3,12 @@ library(NetRep)
 
 data("NetRep")
 data_list <- list(cohort1 = discovery_data, cohort2 = test_data, cohort3 = test_data*0.9) %>% lapply(abs)
+data_list_se <- lapply(data_list, function(data_expr) {
+  SummarizedExperiment::SummarizedExperiment(
+    assays = list(expr = t(data_expr)),
+    colData = S4Vectors::DataFrame(kuehne_traits[1:30,])
+  )
+})
 correlation_list <- list(cohort1 = discovery_correlation, cohort2 = test_correlation, cohort3 = test_correlation*0.95)
 network_list <- list(cohort1 = discovery_network, cohort2 = test_network, cohort3 = test_network*0.97)
 module_labels_switched1 <- module_labels %>% replace(c(which(. == 4), which(. == 3)), .[c(which(. == 3), which(. == 4))])
@@ -23,7 +29,10 @@ test_that("Valid input doesn't thow errors", {
                                   ref = c("cohort1", "cohort2")), NA) # multi ref // multi mod
   expect_error(compare_conditions(data_list, network_list, correlation_list, mod_labels_multi_cond,
                                   ref = "cross comparison"), NA) # cross comparison
-  expect_error(compare_conditions(data_list, network_list, NULL, mod_labels_single_cond, cor_func = "other", your_func = cor), NA)
+  expect_error(compare_conditions(data_list, network_list, NULL, mod_labels_single_cond,
+                                  cor_func = "other", your_func = cor), NA)
+  expect_error(compare_conditions(data_list_se, network_list, correlation_list, mod_labels_single_cond,
+                                  ref = "cohort1"), NA) # single ref // single mod in vector // with SummarizedExperiment
 })
 
 test_that("Checks on compatibility conditions/ref/modules_list are correctly done", {
