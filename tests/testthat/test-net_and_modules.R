@@ -123,8 +123,8 @@ test_that("output format is ok", {
 # ==== build_net ====
 
 test_that("good input return no error", {
-  expect_error(build_net(df_expr$df_microarray), NA)
-  expect_error(build_net(se), NA)
+  expect_error(build_net(df_expr$df_microarray, n_threads = 2), NA)
+  expect_error(build_net(se, n_threads = 2), NA)
 })
 
 test_that("genes interactions strength is in [0;1]", {
