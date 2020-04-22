@@ -75,25 +75,25 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   if (!is.list(net_list)) stop("net_list must be a list.")
   if (!all(conditions %in% names(net_list))) stop("Names in net_list don't match with conditions.")
   lapply(net_list, .check_network)
-  if (!is.list(cor_list) && !is.null(cor_list)) stop("cor_list must be a list or NULL")
+  if (!is.list(cor_list) & !is.null(cor_list)) stop("cor_list must be a list or NULL")
   if (!is.null(cor_list)) {
     if (!all(conditions %in% names(cor_list))) stop("Names in cor_list don't match with conditions.")
     lapply(cor_list, function(cond) {
-      if (!is.matrix(cond) && !is.data.frame(cond)) stop("All correlation tables in cor_list must be either data.frames of matrices")
+      if (!is.matrix(cond) & !is.data.frame(cond)) stop("All correlation tables in cor_list must be either data.frames of matrices")
       if (any(!(lapply(cond, is.numeric) %>% unlist))) stop("All correlation tables in cor_list must only contain only decimal values")
     })
     all_cor <- cor_list %>% unlist # avoid to do a lapply
     if (min(all_cor) < -1 | max(all_cor) > 1) stop("Provided correlation_list contains values outside [-1,1].")
   }
   if (!is.character(ref)) stop("ref must be a string or a vector of strings")
-  if (all(ref != "cross comparison") && !(all(ref %in% conditions))) stop("ref must be a condition name, or a vector of it, matching conditions.")
-  if (length(ref) > 1 && any("cross comparison" %in% ref)) stop("If multiple ref given, they should be condition names, and none 'cross comparison'")
-  if (!is.null(test) && !is.character(test)) stop("test must be null, or a string, or a vector of strings")
+  if (all(ref != "cross comparison") & !(all(ref %in% conditions))) stop("ref must be a condition name, or a vector of it, matching conditions.")
+  if (length(ref) > 1 & any("cross comparison" %in% ref)) stop("If multiple ref given, they should be condition names, and none 'cross comparison'")
+  if (!is.null(test) & !is.character(test)) stop("test must be null, or a string, or a vector of strings")
   if (is.null(test)) { test <- conditions[which(!(conditions %in% ref))]
   } else if (!(all(test %in% conditions))) { stop("test must be a condition name, or a vector of it, matching conditions.") }
   if (!is.list(modules_list)) stop("modules_list must be a single list of modules or a list by condition of the modules")
   cor_func <- match.arg(cor_func)
-  if (cor_func == "other" && (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
+  if (cor_func == "other" & (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
   if (!is.numeric(n_perm)) stop("n_perm must be a numeric value")
   if (n_perm %% 1 != 0) stop("n_perm must be a whole number")
   comparison_type <- match.arg(comparison_type)
@@ -202,7 +202,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   # which prevent to compute contingency matrix (and more generaly, it force to have exactly the same conditions in discovery and
   # moduleAssignment. But I want to allow people to pass moduleAssignement for all cond tested even if they're not in discovery,
   # so adding the functionnality
-  if (ref != "cross comparison" && exists("additional_modules_list")) {
+  if (ref != "cross comparison" & exists("additional_modules_list")) {
     additional_modules_reformated <- sapply(additional_modules_list, function(cond){
       lapply(names(cond), function(x){
         setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>% unlist

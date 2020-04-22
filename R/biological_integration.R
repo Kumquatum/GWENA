@@ -118,7 +118,7 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
     if (is.null(names(module))) warning("No name provided for the list of modules.")
   } else if (!is.vector(module, "character")) {
     stop("module must be either a list of modules or a single module represented by a vector of gene names")
-  } else if (!is.list(module) && length(module) < 2) {
+  } else if (!is.list(module) & length(module) < 2) {
     warning("module represent a single module and only contains one gene name")
   }
   if (!is.null(custom_gmt)) {
@@ -126,7 +126,7 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
       if (any(lapply(custom_gmt, function(x) !is.character(x) | length(x) != 1 ) %>% unlist)) {
         stop("all element of the list must be string reprensenting paths")}
       if (!all(lapply(custom_gmt, file.exists))) stop("all custom_gmt path provided must exist")
-    } else if (is.character(custom_gmt) && length(custom_gmt) == 1) {
+    } else if (is.character(custom_gmt) & length(custom_gmt) == 1) {
       if (!file.exists(custom_gmt)) stop("custom_gmt path provided does not exists")
     } else stop("custom_gmt must be a path or a list of path to gmt file(s)")
   }
@@ -198,13 +198,13 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all", col
   .check_gost(enrich_output)
   if (!is.vector(modules, "character")) stop("modules must be a string or vector of characters")
   if (!is.vector(sources, "character")) stop("sources must be a string or vector of characters")
-  if (!("all" %in% modules) && !all(modules %in% enrich_output$meta$query_metadata$queries %>% names)) {
+  if (!("all" %in% modules) & !all(modules %in% enrich_output$meta$query_metadata$queries %>% names)) {
     stop("Specified module must be in enrich_output list of modules names") }
-  if (!("all" %in% sources) && !all(sources %in% enrich_output$meta$query_metadata$sources)) {
+  if (!("all" %in% sources) & !all(sources %in% enrich_output$meta$query_metadata$sources)) {
     stop("Specified sources must be in enrich_output list of sources") }
   if (!is.logical(colorblind)) stop("colorblind should be a boolean")
   if (length(enrich_output$meta$query_metadata$sources) > 12) warning("Cannot use a colorblind palette if more than 12 sources")
-  if (!is.null(custom_palette) && colorblind) warning("colorblind palette will not be used if custom_palette is provided")
+  if (!is.null(custom_palette) & colorblind) warning("colorblind palette will not be used if custom_palette is provided")
 
   # Selection of modules subsets if needed
   if (!("all" %in% modules)) {
@@ -218,7 +218,7 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all", col
   }
 
   # Colorblind pallet
-  if (isTRUE(colorblind) && is.null(custom_palette)) {
+  if (isTRUE(colorblind) & is.null(custom_palette)) {
     palette <- RColorBrewer::brewer.pal(length(enrich_output$meta$query_metadata$sources), "Paired")
   } else palette <- NULL
 

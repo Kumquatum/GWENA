@@ -57,12 +57,13 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
   # Checking args
   if (!is.matrix(cor_mat)) stop("cor_mat should be a matrix")
   if (any(is.na(cor_mat))) warning("cor_mat should not contain any missing value. It may be due to non variating probe/transcript when you computed your correlation matrix.")
-  if ((any(cor_mat > 1) | any(cor_mat < -1)) && !any(is.na(cor_mat))) stop("cor_mat should be filled with value in the [-1,1] range")
+  if ((any(cor_mat > 1) | any(cor_mat < -1)) & !any(is.na(cor_mat))) stop("cor_mat should be filled with value in the [-1,1] range")
   if (nrow(cor_mat) != ncol(cor_mat)) stop("cor_mat should be a squared matrix")
   if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number")
   if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1")
   network_type <- match.arg(network_type)
-  if (!is.null(block_size) && (block_size < 2 | block_size %% 1 != 0)) stop("If not NULL, block_size must be a whole number > 1")
+  if (!is.null(block_size)) {
+    if (block_size < 2 | block_size %% 1 != 0) stop("If not NULL, block_size must be a whole number > 1")}
 
   # Calculating similarity
   similarity <- matrix()
@@ -135,7 +136,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
   cor_func <- match.arg(cor_func)
-  if (cor_func == "other" && (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
+  if (cor_func == "other" & (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
   # network_type <- match.arg(network_type)
 
   # Cor selection
@@ -190,7 +191,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
-#' build_net(kuehne_expr[, 1:350], n_threads = 2)
+#' net <- build_net(kuehne_expr[, 1:350], n_threads = 2)
 #'
 #' @export
 
@@ -207,8 +208,9 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
   # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
   # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
   cor_func <- match.arg(cor_func)
-  if (cor_func == "other" && (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
-  if (!is.null(power_value) && (power_value < 1 | power_value %% 1 != 0)) stop("If not NULL, power_value must be a whole number >= 1.")
+  if (cor_func == "other" & (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
+  if (!is.null(power_value)) {
+    if (power_value < 1 | power_value %% 1 != 0) stop("If not NULL, power_value must be a whole number >= 1.")}
   network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
   if (!is.null(n_threads)) {
@@ -230,7 +232,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
   # Getting power
   if (is.null(power_value)) {
     fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off, network_type = network_type, ...)
-    if (stop_if_no_fit && fit$fit_above_cut_off == FALSE) stop("No fitting power could be found for provided fit_cut_off. You should verify your data (or lower fit_cut_off). See FAQ.")
+    if (stop_if_no_fit & fit$fit_above_cut_off == FALSE) stop("No fitting power could be found for provided fit_cut_off. You should verify your data (or lower fit_cut_off). See FAQ.")
   } else {
     fit <- list(
       power_value = power_value,
@@ -443,10 +445,10 @@ plot_expression_profiles <- function(data_expr, modules) {
     if (is.null(names(modules))) warning("No name provided for the list of modules.")
   } else if (!is.vector(modules, "character")) {
     stop("modules must be either a list of modules or a single module represented by a vector of gene names")
-  } else if (!is.list(modules) && length(modules) < 2) {
+  } else if (!is.list(modules) & length(modules) < 2) {
     warning("modules represent a single modules and only contains one gene name")
   }
-  # if (!(is.vector(modules, "character") | (is.vector(modules, "numeric") && all(modules %% 1 == 0)))) {
+  # if (!(is.vector(modules, "character") | (is.vector(modules, "numeric") & all(modules %% 1 == 0)))) {
   #   stop("modules_premerge must be a vector of whole number or string") }
 
   # Tables preparation for ggplot

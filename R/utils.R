@@ -41,7 +41,7 @@ is_network <- function(network) {
   if (is.null(colnames(network)) | is.null(rownames(network))) return(list(bool = FALSE, reason = "network must have colnames and rownames"))
   if (!all(colnames(network) %in% rownames(network))) return(list(bool = FALSE, reason = "colnames and rownames form network doesn't match"))
   if (ncol(network) != nrow(network)) return(list(bool = FALSE, reason = "network must be a squared matrix"))
-  if ((any(network > 1) | any(network < -1)) && !any(is.na(network))) return(list(bool = FALSE, reason = "network should be filled with value in the [-1,1] range"))
+  if ((any(network > 1) | any(network < -1)) & !any(is.na(network))) return(list(bool = FALSE, reason = "network should be filled with value in the [-1,1] range"))
   #else
   return(list(bool = TRUE, reason = NULL))
 }
