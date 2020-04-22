@@ -202,7 +202,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   # which prevent to compute contingency matrix (and more generaly, it force to have exactly the same conditions in discovery and
   # moduleAssignment. But I want to allow people to pass moduleAssignement for all cond tested even if they're not in discovery,
   # so adding the functionnality
-  if (ref != "cross comparison" & exists("additional_modules_list")) {
+  if (all(ref != "cross comparison") & exists("additional_modules_list")) {
     additional_modules_reformated <- sapply(additional_modules_list, function(cond){
       lapply(names(cond), function(x){
         setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>% unlist
