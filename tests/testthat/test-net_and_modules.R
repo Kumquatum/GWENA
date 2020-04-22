@@ -83,8 +83,11 @@ test_that("output format is ok", {
   expect_true(is.list(res))
   expect_true(all(names(res) == c("power_value", "fit_table", "fit_above_cut_off", "metadata")))
   expect_true(all(names(res$metadata) == c("network_type")))
-  expect_true(is.numeric(res$power_value) && length(res$power_value) == 1)
-  expect_true(is.data.frame(res$fit_table) && colnames(res$fit_table) == c("Power", "SFT.R.sq", "slope", "truncated.R.sq", "mean.k.", "median.k.", "max.k."))
+  expect_true(is.numeric(res$power_value) & length(res$power_value) == 1)
+  expect_true(
+    is.data.frame(res$fit_table) &
+    length(setdiff(colnames(res$fit_table), c("Power", "SFT.R.sq", "slope", "truncated.R.sq",
+                                              "mean.k.", "median.k.", "max.k."))) == 0)
 })
 
 
@@ -115,8 +118,11 @@ test_that("output format is ok", {
   expect_true(is.list(res))
   expect_true(all(names(res) == c("power_value", "fit_table", "fit_above_cut_off", "metadata")))
   expect_true(all(names(res$metadata) == c("network_type", "cor_func")))
-  expect_true(is.numeric(res$power_value) && length(res$power_value) == 1)
-  expect_true(is.data.frame(res$fit_table) && colnames(res$fit_table) == c("Power", "SFT.R.sq", "slope", "truncated.R.sq", "mean.k.", "median.k.", "max.k."))
+  expect_true(is.numeric(res$power_value) & length(res$power_value) == 1)
+  expect_true(
+    is.data.frame(res$fit_table) &
+    length(setdiff(colnames(res$fit_table), c("Power", "SFT.R.sq", "slope", "truncated.R.sq",
+                                              "mean.k.", "median.k.", "max.k."))) == 0)
 })
 
 
@@ -163,7 +169,7 @@ test_that("output format is ok (detailled_result = TRUE)", {
   expect_true(is.list(res_detection$modules_premerge))
   expect_true(is.vector(res_detection$modules %>% unlist, "character"))
   expect_true(is.vector(res_detection$modules_premerge %>% unlist, "character"))
-  expect_true(is.data.frame(res_detection$modules_eigengenes) && ncol(res_detection$modules_eigengenes) == length(res_detection$modules))
+  expect_true(is.data.frame(res_detection$modules_eigengenes) & ncol(res_detection$modules_eigengenes) == length(res_detection$modules))
   expect_true(is(res_detection$dendrograms, "hclust"))
 })
 test_that("output format is ok (detailled_result = FALSE)", {
@@ -171,6 +177,6 @@ test_that("output format is ok (detailled_result = FALSE)", {
   expect_true(all(names(res_detection_not_detailled) == c("modules", "modules_eigengenes")))
   expect_true(is.list(res_detection_not_detailled$modules))
   expect_true(is.vector(res_detection_not_detailled$modules %>% unlist, "character"))
-  expect_true(is.data.frame(res_detection_not_detailled$modules_eigengenes) &&
+  expect_true(is.data.frame(res_detection_not_detailled$modules_eigengenes) &
                 ncol(res_detection_not_detailled$modules_eigengenes) == length(res_detection_not_detailled$modules))
 })
