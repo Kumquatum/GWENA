@@ -210,7 +210,7 @@ These successive adjustments improve the detection of modules for the next step.
 # In order to fasten the example execution time, we only take an arbitary sample of the genes. 
 kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 
-net <- build_net(kuehne_expr_filtered, cor_func = "spearman", n_threads = 2)
+net <- build_net(kuehne_expr_filtered, cor_func = "spearman", n_threads = 1)
 
 # Power selected :
 net$metadata$power
@@ -335,7 +335,7 @@ se_expr_by_cond <- sapply(unique(se_kuehne$Condition), function(cond){
 })
 
 # Network building and modules detection by condition
-net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 2, keep_cor_mat = TRUE)
+net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 1, keep_cor_mat = TRUE)
 mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"), 
                       MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
 

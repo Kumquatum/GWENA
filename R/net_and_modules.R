@@ -191,7 +191,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
-#' net <- build_net(kuehne_expr[, 1:350], n_threads = 2)
+#' net <- build_net(kuehne_expr[, 1:350], n_threads = 1)
 #'
 #' @export
 
@@ -285,7 +285,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
-#' net <- build_net(df, n_threads = 2)
+#' net <- build_net(df, n_threads = 1)
 #' detect_modules(df, net$network)
 #'
 #' @export
@@ -370,7 +370,7 @@ detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(da
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
-#' net <- build_net(df, n_threads = 2)
+#' net <- build_net(df, n_threads = 1)
 #' detection <- detect_modules(df, net$network, detailled_result = TRUE)
 #' plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
 #'
@@ -428,7 +428,7 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
-#' net <- build_net(df, n_threads = 2)
+#' net <- build_net(df, n_threads = 1)
 #' detection <- detect_modules(df, net$network, detailled_result = TRUE)
 #' plot_expression_profiles(df, detection$modules)
 #'

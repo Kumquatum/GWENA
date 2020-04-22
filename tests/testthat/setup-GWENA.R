@@ -28,7 +28,7 @@ if (!is.null(res_get$result)) {is_gprofiler_down <- FALSE } else { is_gprofiler_
 
 # ==== pipeline steps needed to avoid redundant operations ====
 
-res_net <- build_net(df_expr$df_microarray, n_threads = 2)
+res_net <- build_net(df_expr$df_microarray, n_threads = 1)
 res_detection <- detect_modules(df_expr$df_microarray, res_net$network)
 if (!is_gprofiler_down) { res_enrich <- bio_enrich(res_detection$modules) }
 

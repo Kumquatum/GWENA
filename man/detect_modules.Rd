@@ -31,7 +31,7 @@ Detect the modules by hierarchical clustering .
 }
 \examples{
 df <- kuehne_expr[1:24, 1:350]
-net <- build_net(df, n_threads = 2)
+net <- build_net(df, n_threads = 1)
 detect_modules(df, net$network)
 
 }
