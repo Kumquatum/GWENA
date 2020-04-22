@@ -1,6 +1,6 @@
 Package: GWENA
 Title: Pipeline for augmented co-expression analysis
-Version: 0.99.5
+Version: 0.99.6
 Authors@R: 
     person(given = "Gwenaëlle",
            family = "Lemoine",
