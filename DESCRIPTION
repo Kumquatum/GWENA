@@ -1,6 +1,6 @@
 Package: GWENA
 Title: Pipeline for augmented co-expression analysis
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: 
     person(given = "Gwenaëlle",
            family = "Lemoine",
@@ -14,7 +14,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-Depends: R (>= 4.0.0)
+Depends: R (>= 3.6.0)
 Suggests: 
     testthat (>= 2.1.0),
     knitr (>= 1.25),
