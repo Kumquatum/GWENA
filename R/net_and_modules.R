@@ -214,10 +214,13 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
   network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
   if (!is.null(n_threads)) {
-    if (!is.numeric(n_threads) | n_threads < 2 | n_threads %% 1 != 0) stop("n_threads must be a whole number > 2")}
+    if (!is.numeric(n_threads) | n_threads < 1 | n_threads %% 1 != 0) stop("n_threads must be a whole number >= 1")}
 
   # WGCNA's multi-threading
-  quiet(WGCNA::enableWGCNAThreads(n_threads))
+  if (n_threads == 1) {
+    quiet(WGCNA::disableWGCNAThreads())
+  } else quiet(WGCNA::enableWGCNAThreads(n_threads))
+
   # TODO : change this function for an internal one because WGCNA's function isn't prefixed, causing warnings
 
   # Correlation selection and correlation matrix computation
