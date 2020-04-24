@@ -14,18 +14,18 @@ x \%sub_in\% table
 x \%sub_nin\% table
 }
 \arguments{
-\item{x}{vector or \code{NULL}: the values to be matched. \link[base]{Long vectors}
+\item{x}{vector or \code{NULL}: the values to be matched. \link{Long vectors}
 are supported.}
 
 \item{table}{vector or \code{NULL}: the values to be matched against.
-\link[base]{Long vectors} are not supported.}
+\link{Long vectors} are not supported.}
 }
 \value{
 A vector of the same length as x.
 }
 \description{
 This set of functions provides shortcuts for value matching and subsetting,
-on top of the functionality provided by \code{\link[base]{\%in\%}}.
+on top of the functionality provided by \code{\link{\%in\%}}.
 
 \code{\%nin\%} returns a logical vector indicating if elements of \code{x}
 are not in \code{table}, This is the opposite of \code{\%in\%}.

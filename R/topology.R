@@ -272,7 +272,7 @@ get_hub_genes <- function(network, modules = NULL, method = c("highest connectiv
 #' @param nb_row_legend integer, number of levels in the legend.
 #' @param layout numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
 #' or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
-#' the graph. For more information, see \code{\link[igraph]{igraph.plotting}}
+#' the graph. For more information, see \code{\link{igraph.plotting}}
 #' @param vertex.label.cex,legend_cex float, font size for vertex labels. It is interpreted as a multiplication factor of some
 #' device-dependent base font size. If 0, no labels displayed.
 #' @param vertex.label.color,edge.color,vertex.frame.color,vertex.color character and/or integer vector , color of the labels.

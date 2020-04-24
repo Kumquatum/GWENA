@@ -22,7 +22,7 @@ get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
 
 \item{block_size}{integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.}
 
-\item{...}{any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}}
+\item{...}{any other parameter compatible with \code{\link{pickSoftThreshold.fromSimilarity}}}
 }
 \value{
 A list containing power of the law for best fit, fit table, and metadata about the arguments used.

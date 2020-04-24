@@ -33,7 +33,7 @@
 #' @param fit_cut_off float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
 #' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
-#' @param ... any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}
+#' @param ... any other parameter compatible with \code{\link{pickSoftThreshold.fromSimilarity}}
 #'
 #' @details
 #' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
@@ -110,7 +110,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type = c("unsigned"
 #' @param your_func function returning correlation values. Final values must be in [-1;1]
 #' @param network_type string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.
 #' @param block_size integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.
-#' @param ... any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}
+#' @param ... any other parameter compatible with \code{\link{pickSoftThreshold.fromSimilarity}}
 #'
 #' @details
 #' network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
@@ -182,7 +182,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
 #' @param tom_type string, type of the topological overlap matrix to be computed. Either "none", "unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2"
 #' and "signed Nowick 2". See detail at \code{\link[WGCNA]{TOMsimilarityFromExpr}}.
 #' @param n_threads integer, number of threads that can be used to paralellise the computing
-#' @param ... any other parameter compatible with \code{\link[WGCNA]{pickSoftThreshold.fromSimilarity}}
+#' @param ... any other parameter compatible with \code{\link{adjacency.fromSimilarity}}
 #'
 #' @return list containing network matrix, metadata of input parameters and power fitting information.
 #'

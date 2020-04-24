@@ -12,7 +12,7 @@
 #'
 #' @description
 #' This set of functions provides shortcuts for value matching and subsetting,
-#' on top of the functionality provided by \code{\link[base]{\%in\%}}.
+#' on top of the functionality provided by \code{\link{\%in\%}}.
 #'
 #' \code{\%nin\%} returns a logical vector indicating if elements of \code{x}
 #' are not in \code{table}, This is the opposite of \code{\%in\%}.
@@ -23,10 +23,10 @@
 #' \code{\%sub_nin\%} returns the elements \code{x} that are \code{\%nin\%}
 #' \code{table} rather than a logical vector.
 #'
-#' @param x vector or \code{NULL}: the values to be matched. \link[base]{Long vectors}
+#' @param x vector or \code{NULL}: the values to be matched. \link{Long vectors}
 #'   are supported.
 #' @param table vector or \code{NULL}: the values to be matched against.
-#'   \link[base]{Long vectors} are not supported.
+#'   \link{Long vectors} are not supported.
 #'
 #' @return A vector of the same length as x.
 #'
