@@ -89,13 +89,13 @@ devtools::install_github("Kumquatum/GWENA")
 
 Package loading:
 
-```{r load, message=FALSE, warning=FALSE, eval=is_windows, echo=is_windows}
+```{r load_windows, message=FALSE, warning=FALSE, eval=is_windows, echo=is_windows}
 library(GWENA)
 library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to ease readability.
 
 threads_to_use <- 1
 ```
-```{r load, message=FALSE, warning=FALSE, eval=!is_windows, echo=!is_windows}
+```{r load_other_os, message=FALSE, warning=FALSE, eval=!is_windows, echo=!is_windows}
 library(GWENA)
 library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to ease readability.
 
