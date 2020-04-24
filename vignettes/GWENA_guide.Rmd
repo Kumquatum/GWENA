@@ -14,13 +14,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r vignette_setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
   comment = "#>",
   cache = TRUE
 )
+
+is_windows <- identical(.Platform$OS.type, "windows")
 ```
 
 <!-- *Citation: TODO when article published* -->
@@ -87,9 +89,17 @@ devtools::install_github("Kumquatum/GWENA")
 
 Package loading:
 
-```{r load, message=FALSE, warning=FALSE}
+```{r load, message=FALSE, warning=FALSE, eval=is_windows, echo=is_windows}
 library(GWENA)
 library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to ease readability.
+
+threads_to_use <- 1
+```
+```{r load, message=FALSE, warning=FALSE, eval=!is_windows, echo=!is_windows}
+library(GWENA)
+library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to ease readability.
+
+threads_to_use <- 2
 ```
 
 
@@ -210,7 +220,7 @@ These successive adjustments improve the detection of modules for the next step.
 # In order to fasten the example execution time, we only take an arbitary sample of the genes. 
 kuehne_expr_filtered <- kuehne_expr_filtered[, 1:1000]
 
-net <- build_net(kuehne_expr_filtered, cor_func = "spearman", n_threads = 1)
+net <- build_net(kuehne_expr_filtered, cor_func = "spearman", n_threads = threads_to_use)
 
 # Power selected :
 net$metadata$power
@@ -335,7 +345,7 @@ se_expr_by_cond <- sapply(unique(se_kuehne$Condition), function(cond){
 })
 
 # Network building and modules detection by condition
-net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 1, keep_cor_mat = TRUE)
+net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = threads_to_use, keep_cor_mat = TRUE)
 mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"), 
                       MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
 

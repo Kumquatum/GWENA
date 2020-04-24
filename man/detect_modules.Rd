@@ -6,7 +6,8 @@
 \usage{
 detect_modules(data_expr, network, min_module_size = min(20,
   ncol(data_expr)/2), merge_close_modules = TRUE,
-  merge_cut_height = 0.25, detailled_result = TRUE, ...)
+  merge_cut_height = 0.25, detailled_result = TRUE,
+  pam_respects_dendro = FALSE, ...)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}
@@ -20,6 +21,10 @@ detect_modules(data_expr, network, min_module_size = min(20,
 \item{merge_cut_height}{float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.}
 
 \item{detailled_result}{boolean, does pre-merge modules (if applicable) and dendrogram included in output.}
+
+\item{pam_respects_dendro}{boolean, If TRUE, the Partitioning Around Medoids (PAM) stage will respect the dendrogram in the
+sense that objects and small clusters will only be assigned to clusters that belong to the same branch that the objects or
+small clusters being assigned belong to.}
 
 \item{...}{any other parameter compatible with \code{\link[WGCNA]{mergeCloseModules}}}
 }
