@@ -19,6 +19,7 @@ Suggests:
     testthat (>= 2.1.0),
     knitr (>= 1.25),
     rmarkdown (>= 1.16),
+    prettydoc (>= 0.3.0),
     httr (>= 1.4.1),
     S4Vectors (>= 0.22.1)
 Imports: 
