@@ -13,7 +13,7 @@ Description: Analyse transcriptomics data (either microarray or RNA-seq) through
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Depends: R (>= 4.0.0)
 Suggests: 
     testthat (>= 2.1.0),
