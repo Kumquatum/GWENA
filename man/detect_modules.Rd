@@ -4,10 +4,16 @@
 \alias{detect_modules}
 \title{Modules detection in a network}
 \usage{
-detect_modules(data_expr, network, min_module_size = min(20,
-  ncol(data_expr)/2), merge_close_modules = TRUE,
-  merge_cut_height = 0.25, detailled_result = TRUE,
-  pam_respects_dendro = FALSE, ...)
+detect_modules(
+  data_expr,
+  network,
+  min_module_size = min(20, ncol(data_expr)/2),
+  merge_close_modules = TRUE,
+  merge_cut_height = 0.25,
+  detailled_result = TRUE,
+  pam_respects_dendro = FALSE,
+  ...
+)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}

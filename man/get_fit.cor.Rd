@@ -4,8 +4,13 @@
 \alias{get_fit.cor}
 \title{Calculating best fit of a power low on correlation matrix computed on expression data}
 \usage{
-get_fit.cor(cor_mat, fit_cut_off = 0.9, network_type = c("unsigned",
-  "signed", "signed hybrid"), block_size = NULL, ...)
+get_fit.cor(
+  cor_mat,
+  fit_cut_off = 0.9,
+  network_type = c("unsigned", "signed", "signed hybrid"),
+  block_size = NULL,
+  ...
+)
 }
 \arguments{
 \item{cor_mat}{matrix or data.frame of genes correlation.}

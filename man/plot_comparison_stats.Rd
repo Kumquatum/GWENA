@@ -4,9 +4,13 @@
 \alias{plot_comparison_stats}
 \title{Heatmap of comparison statistics}
 \usage{
-plot_comparison_stats(comparison_pvalues, pvalue_th = 0.05,
-  low_color = "#031643", pvalue_th_color = "#A0A3D3",
-  unsignificant_color = "#FFFFFF")
+plot_comparison_stats(
+  comparison_pvalues,
+  pvalue_th = 0.05,
+  low_color = "#031643",
+  pvalue_th_color = "#A0A3D3",
+  unsignificant_color = "#FFFFFF"
+)
 }
 \arguments{
 \item{comparison_pvalues}{matrix or data.frame, table containing the p values for the statistics on each module}

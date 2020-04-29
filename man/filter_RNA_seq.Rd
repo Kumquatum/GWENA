@@ -4,8 +4,11 @@
 \alias{filter_RNA_seq}
 \title{Filtering of low counts}
 \usage{
-filter_RNA_seq(data_expr, min_count = 5, method = c("at least one",
-  "mean", "all"))
+filter_RNA_seq(
+  data_expr,
+  min_count = 5,
+  method = c("at least one", "mean", "all")
+)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame or SummarizedExperiment, table of expression values (either microarray or RNA-seq),

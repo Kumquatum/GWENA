@@ -4,7 +4,9 @@
 \name{gtex_expr}
 \alias{gtex_expr}
 \title{Transcriptomic muscle data from GTEx consorsium RNA-seq data}
-\format{A data frame with 50 rows (samples) and 15000 columns (genes)}
+\format{
+A data frame with 50 rows (samples) and 15000 columns (genes)
+}
 \source{
 \url{https://gtexportal.org/home/datasets}
 }

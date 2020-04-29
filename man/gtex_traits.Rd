@@ -4,7 +4,8 @@
 \name{gtex_traits}
 \alias{gtex_traits}
 \title{Traits data linked to samples in transcriptomic data from GTEx}
-\format{A data frame with 50 rows (samples) and 4 columns :
+\format{
+A data frame with 50 rows (samples) and 4 columns :
 \describe{
   \item{SUBJID}{Subject ID, GTEx Public Donor ID}
   \item{SEX}{Sex, donor's Identification of sex based upon self-report : 1=Male,
@@ -12,7 +13,8 @@
   \item{AGE}{Age range, elapsed time since birth in years}
   \item{DTHHRDY}{Hardy Scale : 0=Ventilator Case, 1=Violent and fast death, 2=Fast
    death of natural causes, 3=Intermediate death, 4=Slow death)}
-}}
+}
+}
 \source{
 \url{https://gtexportal.org/home/datasets}
 }

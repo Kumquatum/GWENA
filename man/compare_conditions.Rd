@@ -4,12 +4,21 @@
 \alias{compare_conditions}
 \title{Compare modules topology between conditions}
 \usage{
-compare_conditions(data_expr_list, net_list, cor_list = NULL,
-  modules_list, ref = names(data_expr_list)[1], test = NULL,
+compare_conditions(
+  data_expr_list,
+  net_list,
+  cor_list = NULL,
+  modules_list,
+  ref = names(data_expr_list)[1],
+  test = NULL,
   cor_func = c("pearson", "spearman", "bicor", "other"),
-  your_func = NULL, n_perm = 10000,
+  your_func = NULL,
+  n_perm = 10000,
   comparison_type = c("unpreserved", "preserved", "one or the other"),
-  pvalue_th = 0.05, n_threads = NULL, ...)
+  pvalue_th = 0.05,
+  n_threads = NULL,
+  ...
+)
 }
 \arguments{
 \item{data_expr_list}{list of matrix or data.frame or SummarizedExperiment, list of expression data by condition, with genes as column and samples as row.}

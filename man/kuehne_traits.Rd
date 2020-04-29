@@ -4,7 +4,8 @@
 \name{kuehne_traits}
 \alias{kuehne_traits}
 \title{Traits data linked to samples in transcriptomic data from the Kuehne et al. publication}
-\format{A data frame with 48 rows (samples) and 5 columns :
+\format{
+A data frame with 48 rows (samples) and 5 columns :
 \describe{
   \item{Slide}{Reference number of the microarray's slide.}
   \item{Array}{Array number, 8 by slide usually}
@@ -12,7 +13,8 @@
   \item{Condition}{Either old (between 55 and 66 years old) or young (between 20 to 25
   years old)}
   \item{Age}{Real age of the donor}
-}}
+}
+}
 \source{
 \url{https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3}
 }

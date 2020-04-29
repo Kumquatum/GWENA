@@ -4,8 +4,14 @@
 \alias{plot_enrichment}
 \title{Plot module from bio_enrich}
 \usage{
-plot_enrichment(enrich_output, modules = "all", sources = "all",
-  colorblind = TRUE, custom_palette = NULL, ...)
+plot_enrichment(
+  enrich_output,
+  modules = "all",
+  sources = "all",
+  colorblind = TRUE,
+  custom_palette = NULL,
+  ...
+)
 }
 \arguments{
 \item{enrich_output}{list, bio_enrich result which are in fact gprofiler2::gost output.}

@@ -4,7 +4,9 @@
 \name{kuehne_expr}
 \alias{kuehne_expr}
 \title{Transcriptomic data from the Kuehne et al. publication}
-\format{A data frame with 48 rows (samples) and 15801 columns (genes).}
+\format{
+A data frame with 48 rows (samples) and 15801 columns (genes).
+}
 \source{
 \url{https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3}
 }

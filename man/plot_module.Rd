@@ -4,14 +4,27 @@
 \alias{plot_module}
 \title{Plot co-expression network}
 \usage{
-plot_module(graph_module, hubs = NULL, weight_th = 0.2,
-  enrichment = NULL, title = "Module", degree_node_scaling = TRUE,
-  node_scaling_max = 6, edge_scaling_max = 1, nb_row_legend = 6,
-  layout = "auto", vertex.label.cex = 0.7,
-  vertex.label.color = "gray20", vertex.label.family = "Helvetica",
-  edge.color = "gray70", vertex.frame.color = "white",
-  vertex.color = "gray60", vertex.label.dist = 1, legend_cex = 0.8,
-  ...)
+plot_module(
+  graph_module,
+  hubs = NULL,
+  weight_th = 0.2,
+  enrichment = NULL,
+  title = "Module",
+  degree_node_scaling = TRUE,
+  node_scaling_max = 6,
+  edge_scaling_max = 1,
+  nb_row_legend = 6,
+  layout = "auto",
+  vertex.label.cex = 0.7,
+  vertex.label.color = "gray20",
+  vertex.label.family = "Helvetica",
+  edge.color = "gray70",
+  vertex.frame.color = "white",
+  vertex.color = "gray60",
+  vertex.label.dist = 1,
+  legend_cex = 0.8,
+  ...
+)
 }
 \arguments{
 \item{graph_module}{igraph object, module to plot.}

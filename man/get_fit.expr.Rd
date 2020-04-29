@@ -4,10 +4,15 @@
 \alias{get_fit.expr}
 \title{Calculating best fit of a power low on expression data}
 \usage{
-get_fit.expr(data_expr, fit_cut_off = 0.9, cor_func = c("pearson",
-  "spearman", "bicor", "other"), your_func = NULL,
+get_fit.expr(
+  data_expr,
+  fit_cut_off = 0.9,
+  cor_func = c("pearson", "spearman", "bicor", "other"),
+  your_func = NULL,
   network_type = c("unsigned", "signed", "signed hybrid"),
-  block_size = NULL, ...)
+  block_size = NULL,
+  ...
+)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}

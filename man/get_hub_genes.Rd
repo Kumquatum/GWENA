@@ -4,9 +4,11 @@
 \alias{get_hub_genes}
 \title{Determine hub genes inside each module}
 \usage{
-get_hub_genes(network, modules = NULL,
-  method = c("highest connectivity", "superior degree",
-  "Kleinberg's score"))
+get_hub_genes(
+  network,
+  modules = NULL,
+  method = c("highest connectivity", "superior degree", "Kleinberg's score")
+)
 }
 \arguments{
 \item{network}{matrix or data.frame, square table representing connectivity between each genes as returned by
