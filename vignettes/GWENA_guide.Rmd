@@ -236,7 +236,7 @@ At this point, the network is a [complete graph](https://en.wikipedia.org/wiki/C
 Such modules can be detected using unsupervised learning or modeling. GWENA use the hierarchical clustering but other methods can be used (kmeans, Gaussian mixture models, etc.). 
 
 ```{r modules_detection}
-detection <- detect_modules(kuehne_expr_filtered, net$network, merge_cut_height = 0.997, detailled_result = TRUE)
+detection <- detect_modules(kuehne_expr_filtered, net$network, detailled_result = TRUE)
 ```
 
 **Important**: Module 0 contains all genes that did not fit into any modules.
@@ -347,7 +347,7 @@ se_expr_by_cond <- sapply(unique(se_kuehne$Condition), function(cond){
 # Network building and modules detection by condition
 net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = threads_to_use, keep_cor_mat = TRUE)
 mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"), 
-                      MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
+                      MoreArgs = list(detailled_result = TRUE), SIMPLIFY = FALSE)
 
 
 comparison <- compare_conditions(expr_by_cond, 

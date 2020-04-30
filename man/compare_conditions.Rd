@@ -78,7 +78,7 @@ expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
                      cond2 = kuehne_expr[25:48, 1:350])
 net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 1, keep_cor_mat = TRUE)
 mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"),
-                      MoreArgs = list(merge_cut_height = 0.997, detailled_result = TRUE), SIMPLIFY = FALSE)
+                      MoreArgs = list(detailled_result = TRUE), SIMPLIFY = FALSE)
 comparison <- compare_conditions(expr_by_cond,
                                  lapply(net_by_cond, `[[`, "network"),
                                  lapply(net_by_cond, `[[`, "cor_mat"),
