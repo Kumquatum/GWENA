@@ -273,18 +273,31 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' Detect the modules by hierarchical clustering .
 #'
-#' @param data_expr matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.
-#' @param network matrix or data.frame, strengh of gene co-expression (edge values).
-#' @param min_module_size integer, lowest number of gene allowed in a module. If none provided, estimated.
-#' @param merge_close_modules boolean, does closest modules (based on eigengene) should be merged together.
-#' @param merge_cut_height float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.
-#' @param detailled_result boolean, does pre-merge modules (if applicable) and dendrogram included in output.
-#' @param pam_respects_dendro boolean, If TRUE, the Partitioning Around Medoids (PAM) stage will respect the dendrogram in the
-#' sense that objects and small clusters will only be assigned to clusters that belong to the same branch that the objects or
+#' @param data_expr matrix or data.frame or SummarizedExperiment, expression
+#' data with genes as column and samples as row.
+#' @param network matrix or data.frame, strengh of gene co-expression (edge
+#' values).
+#' @param min_module_size integer, lowest number of gene allowed in a module.
+#' If none provided, estimated.
+#' @param clustering_th float, threshold to be used by the clustering method.
+#' For now \code{\link[dynamicTreeCut]{cutreeDynamic}}.
+#' @param merge_close_modules boolean, does closest modules (based on
+#' eigengene) should be merged together.
+#' @param merge_threshold float, eigengenes correlation value over which
+#' close modules will be merged. Must be in ]0;1[. See
+#' \code{\link[WGCNA]{mergeCloseModules}}
+#' @param detailled_result boolean, does pre-merge modules (if applicable)
+#' and dendrogram included in output.
+#' @param pam_respects_dendro boolean, If TRUE, the Partitioning Around Medoids
+#' (PAM) stage will respect the dendrogram in the
+#' sense that objects and small clusters will only be assigned to clusters that
+#'  belong to the same branch that the objects or
 #' small clusters being assigned belong to.
-#' @param ... any other parameter compatible with \code{\link[WGCNA]{mergeCloseModules}}
+#' @param ... any other parameter compatible with
+#' \code{\link[WGCNA]{mergeCloseModules}}
 #'
-#' @return list containing modules detected, modules_eigengenes, and if asked for, modules pre-merge and dendrogram
+#' @return list containing modules detected, modules_eigengenes, and if asked
+#' for, modules pre-merge and dendrogram
 #'
 #' @importFrom WGCNA mergeCloseModules
 #' @importFrom dynamicTreeCut cutreeDynamic
@@ -296,15 +309,20 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
 #'
 #' @export
 
-detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(data_expr) / 2), merge_close_modules = TRUE, merge_cut_height = 0.25,
-                              detailled_result = TRUE, pam_respects_dendro = FALSE, ...) {
+detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(data_expr) / 2),
+                           clustering_th = NULL, merge_close_modules = TRUE,
+                           merge_threshold = 0.75, detailled_result = TRUE,
+                           pam_respects_dendro = FALSE, ...) {
   # Checks
   if (is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
-  if (!(is.data.frame(network) | is.matrix(network))) stop("network should be a data.frame or a matrix.")
-  if (ncol(network) != nrow(network)) stop("network should be squarred")
-  if (is.null(rownames(network)) | !all(colnames(network) %in% rownames(network))) stop("network should have the same genes names as colnames and rownames")
+  if (!(is.data.frame(network) | is.matrix(network)))
+    stop("network should be a data.frame or a matrix.")
+  if (ncol(network) != nrow(network))
+    stop("network should be squarred")
+  if (is.null(rownames(network)) | !all(colnames(network) %in% rownames(network)))
+    stop("network should have the same genes names as colnames and rownames")
   # TODO : finish checks
 
   # Order network matrix in the same order as data_expr
@@ -313,22 +331,28 @@ detect_modules <- function(data_expr, network, min_module_size = min(20, ncol(da
   # Hierarchical clustering
   gene_tree = stats::hclust(as.dist(network), method = "average")
   # Tree cut
-  dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(dendro = gene_tree, distM = network,
-                                              deepSplit = 2, pamRespectsDendro = pam_respects_dendro,
-                                              minClusterSize = min_module_size))
+  dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(
+    dendro = gene_tree, distM = network, cutHeight = clustering_th,
+    deepSplit = 2, pamRespectsDendro = pam_respects_dendro,
+    minClusterSize = min_module_size))
+  # TODO manage to divide ellipsis (...) to allow users to add args
+  # for cutreeDynamic
 
   # Re-assign gene names
   dynamicMods <- setNames(dynamicMods, colnames(data_expr))
 
-  # TODO manage to divide ellipsis (...) to allow users to add args for cutreeDynamic
-
-  if (length(table(dynamicMods)) == 1) stop("No modules detected")
-  if (length(table(dynamicMods)) == 2) warning("Only one module found, plus 'non-classified genes' module")
+  if (length(table(dynamicMods)) == 1)
+    stop("No modules detected")
+  if (length(table(dynamicMods)) == 2)
+    warning("Only one module found, plus 'non-classified genes' module")
 
   # Merging closest modules
   if (merge_close_modules) {
-    if (length(table(dynamicMods)) == 1) stop("All genes were classified in the same module")
-    merge <- quiet(WGCNA::mergeCloseModules(data_expr, colors = dynamicMods, cutHeight = merge_cut_height, relabel = TRUE, ...))
+    if (length(table(dynamicMods)) == 1)
+      stop("All genes were classified in the same module")
+    merge <- quiet(WGCNA::mergeCloseModules(
+      data_expr, colors = dynamicMods, cutHeight = 1 - merge_threshold,
+      relabel = TRUE, ...))
   } else {
     merge <- list(
       colors = dynamicMods,

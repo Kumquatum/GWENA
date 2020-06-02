@@ -8,34 +8,49 @@ detect_modules(
   data_expr,
   network,
   min_module_size = min(20, ncol(data_expr)/2),
+  clustering_th = NULL,
   merge_close_modules = TRUE,
-  merge_cut_height = 0.25,
+  merge_threshold = 0.75,
   detailled_result = TRUE,
   pam_respects_dendro = FALSE,
   ...
 )
 }
 \arguments{
-\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression
+data with genes as column and samples as row.}
 
-\item{network}{matrix or data.frame, strengh of gene co-expression (edge values).}
+\item{network}{matrix or data.frame, strengh of gene co-expression (edge
+values).}
 
-\item{min_module_size}{integer, lowest number of gene allowed in a module. If none provided, estimated.}
+\item{min_module_size}{integer, lowest number of gene allowed in a module.
+If none provided, estimated.}
 
-\item{merge_close_modules}{boolean, does closest modules (based on eigengene) should be merged together.}
+\item{clustering_th}{float, threshold to be used by the clustering method.
+For now \code{\link[dynamicTreeCut]{cutreeDynamic}}.}
 
-\item{merge_cut_height}{float, value by which height of hclust will be thresholded to merge close modules. Must be in ]0;1[.}
+\item{merge_close_modules}{boolean, does closest modules (based on
+eigengene) should be merged together.}
 
-\item{detailled_result}{boolean, does pre-merge modules (if applicable) and dendrogram included in output.}
+\item{merge_threshold}{float, eigengenes correlation value over which
+close modules will be merged. Must be in ]0;1[. See
+\code{\link[WGCNA]{mergeCloseModules}}}
 
-\item{pam_respects_dendro}{boolean, If TRUE, the Partitioning Around Medoids (PAM) stage will respect the dendrogram in the
-sense that objects and small clusters will only be assigned to clusters that belong to the same branch that the objects or
+\item{detailled_result}{boolean, does pre-merge modules (if applicable)
+and dendrogram included in output.}
+
+\item{pam_respects_dendro}{boolean, If TRUE, the Partitioning Around Medoids
+(PAM) stage will respect the dendrogram in the
+sense that objects and small clusters will only be assigned to clusters that
+ belong to the same branch that the objects or
 small clusters being assigned belong to.}
 
-\item{...}{any other parameter compatible with \code{\link[WGCNA]{mergeCloseModules}}}
+\item{...}{any other parameter compatible with
+\code{\link[WGCNA]{mergeCloseModules}}}
 }
 \value{
-list containing modules detected, modules_eigengenes, and if asked for, modules pre-merge and dendrogram
+list containing modules detected, modules_eigengenes, and if asked
+for, modules pre-merge and dendrogram
 }
 \description{
 Detect the modules by hierarchical clustering .
