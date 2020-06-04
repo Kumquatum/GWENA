@@ -137,7 +137,6 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", 
   } else .check_data_expr(data_expr)
   cor_func <- match.arg(cor_func)
   if (cor_func == "other" & (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
-  # network_type <- match.arg(network_type)
 
   # Cor selection
   if (cor_func == "other") {
@@ -204,9 +203,6 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func = c("pearson", "sp
   if (is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
-  # No need to check in theory because checked in get_fit.cor
-  # if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off)) stop("power_cut_off should be a single number.")
-  # if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a number between 0 and 1.")
   cor_func <- match.arg(cor_func)
   if (cor_func == "other" & (is.null(your_func) | !is.function(your_func))) stop("If you specify other, your_func must be a function.")
   if (!is.null(power_value)) {
@@ -478,8 +474,6 @@ plot_expression_profiles <- function(data_expr, modules) {
   } else if (!is.list(modules) & length(modules) < 2) {
     warning("modules represent a single modules and only contains one gene name")
   }
-  # if (!(is.vector(modules, "character") | (is.vector(modules, "numeric") & all(modules %% 1 == 0)))) {
-  #   stop("modules_premerge must be a vector of whole number or string") }
 
   # Tables preparation for ggplot
   if (is.list(modules)) {
@@ -487,7 +481,6 @@ plot_expression_profiles <- function(data_expr, modules) {
   } else {
     df <- data.frame(gene = modules, module = "module", stringsAsFactors = FALSE) %>% mutate(module = as.character(module))
   }
-  # df <- data.frame(gene = names(modules), module = modules, stringsAsFactors = FALSE)
 
   eigengenes <- df %>%
     dplyr::left_join(data_expr %>% t %>% as.data.frame %>% tibble::rownames_to_column(var = "gene"), by = "gene") %>%

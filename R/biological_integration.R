@@ -53,7 +53,6 @@ join_gost <- function(gost_result) {
               warning("Different type of IDs. ", ref$meta$query_metadata$numeric_ns, " (reference) and ", addon$meta$query_metadata$numeric_ns,
                       " (list element \u00B0", x, ")")}}
         } else {
-          # if (ref$meta$query_metadata[[name]] != addon$meta$query_metadata[[name]]) stop(paste0("Item ", name, " of query_metadata isn't identical"))
           if (!identical(ref$meta$query_metadata[[name]], addon$meta$query_metadata[[name]])) warning(
             name, " from query_metadata isn't identical between reference and gost_result element n\u00B0", x, ".")
         }
@@ -355,11 +354,9 @@ plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05){
       ggplot2::theme_bw() +
       ggplot2::xlab("Module") +
       ggplot2::ylab("Phenotype")
-  )) # Warning message: Using size for a discrete variable is not advised. (vecause of using TRUE/FALSE as size)
+  ))
+  # Warning message: Using size for a discrete variable is not advised. (vecause of using TRUE/FALSE as size)
   # TODO : find why suppressWarnings + quiet doesn't make the function shut up
-  ## Dirty solution proposed by G. Devailly
-    # geom_point(size = 5) +
-    # scale_shape_manual(values = c("\u25CF", "\u2B24")) +
 
   g
 }

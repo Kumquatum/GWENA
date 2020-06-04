@@ -407,7 +407,6 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2, enrichment =
   label_legend_edge <- seq(min(edge), max(edge), length.out = nb_row_legend) %>% signif %>% as.character
   legend("topright", label_legend_edge, col='gray', title = "Weight", lwd = scale_edge_width, bty = "n",
          cex = legend_cex)
-         # cex = legend_cex, inset = c(-0.2,0))
 
 
 }

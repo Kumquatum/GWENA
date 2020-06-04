@@ -62,7 +62,6 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL, modules
   # Basic checks
   if (!is.list(data_expr_list)) stop("data_expr_list must be a list.")
   if (length(data_expr_list) < 2) stop("data_expr_list must have at least 2 elements (2 conditions) to run a comparison.")
-  # lapply(data_expr_list, .check_data_expr)
   data_expr_list <- lapply(data_expr_list, function(data_expr){
     if (is(data_expr, "SummarizedExperiment")) {
       data_expr <- t(SummarizedExperiment::assay(data_expr))

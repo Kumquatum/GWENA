@@ -129,8 +129,8 @@ contingencyTable <- function(modAssignments, mods, tiNodelist) {
       modAssignments[[2]][overlapVars]
     )
 
-    ## Add in the sizes of each module, and the number of variables present in
-    ## the other dataset
+    # Add in the sizes of each module, and the number of variables present in
+    # the other dataset
 
     # Get the module sizes irrespective of dataset overlap
     discSizes <- table(modAssignments[[1]])
@@ -173,7 +173,7 @@ contingencyTable <- function(modAssignments, mods, tiNodelist) {
     na_mat <- matrix(NA, nrow = 2, ncol = 2)
     dimnames(na_mat) <- list(c("size", "present"), c("size", "present"))
 
-    # combine
+    # Combine
     contingency <- cbind(discInfo, contingency)
     contingency <- rbind(cbind(na_mat, testInfo), contingency)
   }

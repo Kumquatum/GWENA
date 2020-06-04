@@ -47,7 +47,6 @@ test_that("data_expr should have genes as columns and samples as rows", {
 # ==== get_fit.cor ====
 
 test_that("cor_mat should be a matrix of correlations", {
-  # expect_error(get_fit.cor(cor_mat = cor(df_expr$df_microarray)), NA) # dopar warning
   # Type is matrix
   expect_error(get_fit.cor(cor_mat = 42))
   expect_error(get_fit.cor(cor_mat = "this is not a correlation matrix"))
@@ -74,10 +73,6 @@ test_that("network_type should be one of the string allowed to design the correl
     expect_error(get_fit.cor(cor_mat = cor(df_expr$df_microarray), network_type = "this is not a network available"))
   })
 })
-# FIXME: seems like in rare cases it fits...
-# test_that("random data cannot be fit by a power law (no scale-free property)", {
-#   expect_warning(get_fit.cor(cor_mat = fake_cor_mat), "No fitting power could be found")
-# })
 test_that("output format is ok", {
   # Return a list with expected elements formated correctly
   res <- get_fit.cor(cor_mat = cor(df_expr$df_microarray))
@@ -164,7 +159,6 @@ test_that("all colnames in rownames", {
   expect_error(detect_modules(data_expr = df_expr$df_microarray, net = res_net$network[-1, -10]))
 })
 test_that("output format is ok (detailled_result = TRUE)", {
-  # res_modules <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network)
   expect_true(all(names(res_detection) == c("modules", "modules_premerge", "modules_eigengenes", "dendrograms")))
   expect_true(is.list(res_detection$modules))
   expect_true(is.list(res_detection$modules_premerge))
