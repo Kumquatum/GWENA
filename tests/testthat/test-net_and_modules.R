@@ -36,9 +36,10 @@ test_that("data_expr should be either a matrix or data frame", {
   expect_error(.check_data_expr(data_expr = "this is not a data.frame nor a matrix"))
   expect_error(.check_data_expr(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))
 })
-test_that("data_expr should have values >= 0", {
-  expect_error(.check_data_expr(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
-})
+# HF_remove_limit_neg_value_build_net : removing negative value prohibition
+# test_that("data_expr should have values >= 0", {
+#   expect_error(.check_data_expr(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
+# })
 test_that("data_expr should have genes as columns and samples as rows", {
   expect_warning(.check_data_expr(data_expr = df_expr$df_microarray %>% t))
 })
@@ -95,9 +96,10 @@ test_that("good input return no error", {
   expect_error(get_fit.expr(se), NA)
 })
 
-test_that("data_expr should be a data.frame or a matrix of values >= 0", {
-  expect_error(get_fit.expr(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
-})
+# HF_remove_limit_neg_value_build_net : removing negative value prohibition
+# test_that("data_expr should be a data.frame or a matrix of values >= 0", {
+#   expect_error(get_fit.expr(data_expr = cbind(df_expr$df_rnaseq, -10:(nrow(df_expr$df_rnaseq) - 11))))
+# })
 test_that("data_expr should be either a matrix or data frame of intensities or counts", {
   expect_error(get_fit.expr(data_expr = "this is not a data.frame nor a matrix"))
   expect_error(get_fit.expr(data_expr = list("this is not a data.frame nor a matrix", "this shouldn't work")))

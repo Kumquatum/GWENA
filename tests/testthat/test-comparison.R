@@ -55,8 +55,9 @@ test_that("Checks on missing values", {
 })
 
 test_that("Checks on input format", {
-  data_list_negative_values <- list(cohort1 = discovery_data, cohort2 = test_data, cohort3 = test_data*0.9)
-  expect_error(compare_conditions(data_list_negative_values, network_list, correlation_list, mod_labels_single_cond))
+  # HF_remove_limit_neg_value_build_net : removing negative value prohibition
+  # data_list_negative_values <- list(cohort1 = discovery_data, cohort2 = test_data, cohort3 = test_data*0.9)
+  # expect_error(compare_conditions(data_list_negative_values, network_list, correlation_list, mod_labels_single_cond))
   net_list_not_sq <- network_list %>% lapply(function(x) { x[,-1] })
   expect_error(compare_conditions(data_list, net_list_not_sq, correlation_list, mod_labels_single_cond))
   cor_list_wrong_range <- correlation_list %>% lapply(function(x) { x + sample(c(-2,2), 1) })
