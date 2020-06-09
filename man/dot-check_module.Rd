@@ -7,14 +7,17 @@
 .check_module(module, is_list = FALSE)
 }
 \arguments{
-\item{module}{vector or list, object to test to be a module or list of modules}
+\item{module}{vector or list, object to test to be a module or list of
+modules}
 
-\item{is_list}{boolean, indicate if module must be tested as a single module or a list of modules}
+\item{is_list}{boolean, indicate if module must be tested as a single
+module or a list of modules}
 }
 \value{
 Throw an error if doesn't correspond
 }
 \description{
-Check content of a given object to determine if it's a module or a list of modules, meaning a single
-vector of characters which are gene names, or a named list of these vectors
+Check content of a given object to determine if it's a module or a list of
+modules, meaning a single vector of characters which are gene names, or a
+named list of these vectors
 }

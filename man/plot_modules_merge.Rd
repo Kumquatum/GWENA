@@ -7,9 +7,11 @@
 plot_modules_merge(modules_premerge, modules_merged)
 }
 \arguments{
-\item{modules_premerge}{vector, id (whole number or string) of module before merge associated to each gene.}
+\item{modules_premerge}{vector, id (whole number or string) of module before
+merge associated to each gene.}
 
-\item{modules_merged}{vector, id (whole number or string) of module after merge associated to each gene.}
+\item{modules_merged}{vector, id (whole number or string) of module after
+merge associated to each gene.}
 }
 \value{
 A bipartite graph
@@ -18,12 +20,14 @@ A bipartite graph
 Plot a bipartite graph to see in which modules all modules have been merged
 }
 \details{
-Both vectors must be in the same gene order before passing them to the function. No check is applied on this.
+Both vectors must be in the same gene order before passing them to
+the function. No check is applied on this.
 }
 \examples{
 df <- kuehne_expr[1:24, 1:350]
 net <- build_net(df, n_threads = 1)
 detection <- detect_modules(df, net$network, detailled_result = TRUE)
-plot_modules_merge(modules_premerge = detection$modules_premerge, modules_merged = detection$modules)
+plot_modules_merge(modules_premerge = detection$modules_premerge,
+                   modules_merged = detection$modules)
 
 }

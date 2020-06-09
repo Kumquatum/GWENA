@@ -7,9 +7,11 @@
 plot_expression_profiles(data_expr, modules)
 }
 \arguments{
-\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression
+data with genes as column and samples as row.}
 
-\item{modules}{vector, id (whole number or string) of modules associated to each gene.}
+\item{modules}{vector, id (whole number or string) of modules associated to
+each gene.}
 }
 \value{
 A ggplot representing expression profile and eigengene by module

@@ -2,7 +2,8 @@
 % Please edit documentation in R/net_and_modules.R
 \name{get_fit.cor}
 \alias{get_fit.cor}
-\title{Calculating best fit of a power low on correlation matrix computed on expression data}
+\title{Calculating best fit of a power low on correlation matrix computed on
+expression data}
 \usage{
 get_fit.cor(
   cor_mat,
@@ -15,26 +16,36 @@ get_fit.cor(
 \arguments{
 \item{cor_mat}{matrix or data.frame of genes correlation.}
 
-\item{fit_cut_off}{float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.}
+\item{fit_cut_off}{float, cut off by which R^2 (coefficient of
+determination) will be thresholded. Must be in ]0;1[.}
 
-\item{network_type}{string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
+\item{network_type}{string giving type of network to be used. Either
+"unsigned", "signed", "signed hybrid". See details.}
 
-\item{block_size}{integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.}
+\item{block_size}{integer giving size of blocks by which operations can be
+proceed. Helping if working with low capacity computers. If null, will be
+estimated.}
 
-\item{...}{any other parameter compatible with \code{\link{pickSoftThreshold.fromSimilarity}}}
+\item{...}{any other parameter compatible with
+\code{\link{pickSoftThreshold.fromSimilarity}}}
 }
 \value{
-A list containing power of the law for best fit, fit table, and metadata about the arguments used.
+A list containing power of the law for best fit, fit table, and
+metadata about the arguments used.
 }
 \description{
-Adjust a correlation matrix depending of the type of network, then try to parameter a power law for best fit
+Adjust a correlation matrix depending of the type of network, then try to
+parameter a power law for best fit
 }
 \details{
-network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
+network_type indicate which transformation will be applied on the
+correlation matrix to return the similarity score.
 \describe{
-  \item{signed}{will modify the range [-1;1] to [0.5;1.5] (because of log10 beeing used for scale free index computation)}
+  \item{signed}{will modify the range [-1;1] to [0.5;1.5] (because of log10
+  beeing used for scale free index computation)}
   \item{unsigned}{will return absolute value (moving from [-1;1] to [0;1])}
-  \item{signed hybrid}{will replace all negative values by 0 (moving from [-1;1] to [0;1])}
+  \item{signed hybrid}{will replace all negative values by 0 (moving from
+  [-1;1] to [0;1])}
 }
 }
 \examples{

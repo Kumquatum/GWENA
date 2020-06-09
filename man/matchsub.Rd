@@ -24,6 +24,18 @@ are supported.}
 A vector of the same length as x.
 }
 \description{
+Sources: https://github.com/sritchie73/NetRep
+CRAN page: https://cran.r-project.org/web/packages/NetRep
+Package licence: GPL-2
+}
+\details{
+Reason of the copy: the contingency function weren't exported from NetRep
+package and neither CRAN or Bioconductor allows to use un-exported function
+through the `:::` operator.
+
+Note: functions description have been modified from the original work
+Value Matching and Subsetting
+
 This set of functions provides shortcuts for value matching and subsetting,
 on top of the functionality provided by \code{\link{\%in\%}}.
 
@@ -35,14 +47,5 @@ are not in \code{table}, This is the opposite of \code{\%in\%}.
 
 \code{\%sub_nin\%} returns the elements \code{x} that are \code{\%nin\%}
 \code{table} rather than a logical vector.
-}
-\details{
-Sources: https://github.com/sritchie73/NetRep
-CRAN page: https://cran.r-project.org/web/packages/NetRep
-Package licence: GPL-2
-
-Reason of the copy: the contingency function weren't exported from NetRep package and neither CRAN or Bioconductor
-allows to use un-exported function through the `:::` operator.
-Value Matching and Subsetting
 }
 \keyword{internal}

@@ -14,13 +14,17 @@ plot_enrichment(
 )
 }
 \arguments{
-\item{enrich_output}{list, bio_enrich result which are in fact gprofiler2::gost output.}
+\item{enrich_output}{list, bio_enrich result which are in fact
+gprofiler2::gost output.}
 
-\item{modules}{string or vector of characters designing the modules to plot. "all" by default to plot every module.}
+\item{modules}{string or vector of characters designing the modules to plot.
+"all" by default to plot every module.}
 
-\item{sources}{string or vector of characters designing the sources to plot. "all" by default to plot every source.}
+\item{sources}{string or vector of characters designing the sources to plot.
+"all" by default to plot every source.}
 
-\item{colorblind}{boolean, indicates if a colorblind friendly palette should be used.}
+\item{colorblind}{boolean, indicates if a colorblind friendly palette should
+be used.}
 
 \item{custom_palette}{vector of character, colors to be used for plotting.}
 
@@ -30,18 +34,23 @@ plot_enrichment(
 A plotly object representing enrichment for specified modules
 }
 \description{
-Wrapper of the gprofiler2::gostplot function. Adding support of colorblind palet and selection of subsets if
-initial multiple query, and/or sources to plot.
+Wrapper of the gprofiler2::gostplot function. Adding support of colorblind
+palet and selection of subsets if initial multiple query, and/or sources
+to plot.
 }
 \details{
-Note: The colorblind friendly palette is limited to maximum 8 colors, therefore 8 sources of enrichment.
+Note: The colorblind friendly palette is limited to maximum 8
+colors, therefore 8 sources of enrichment.
 }
 \examples{
-custom_path <- system.file("extdata", "h.all.v6.2.symbols.gmt", package = "GWENA", mustWork = TRUE)
-multi_module <- list(mod1 = c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11", "MCL1", "IL1B", "SPTAN1",
-                              "DIABLO", "BAX", "BIK", "IL1A", "BID", "CDKN1A", "GADD45A"),
-                     mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1", "CANT1", "PDE4B",
-                              "DGCR8", "RAD51", "SURF1", "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
+custom_path <- system.file("extdata", "h.all.v6.2.symbols.gmt",
+                           package = "GWENA", mustWork = TRUE)
+multi_module <- list(mod1 = c("BIRC3", "PMAIP1", "CASP8", "JUN", "BCL2L11",
+                              "MCL1", "IL1B", "SPTAN1", "DIABLO", "BAX",
+                              "BIK", "IL1A", "BID", "CDKN1A", "GADD45A"),
+                     mod2 = c("TAF1C", "TARBP2", "POLH", "CETN2", "POLD1",
+                              "CANT1", "PDE4B", "DGCR8", "RAD51", "SURF1",
+                              "PNP", "ADA", "NME3", "GTF3C5", "NT5C"))
 multi_module_enriched <- bio_enrich(multi_module, custom_path)
 plot_enrichment(multi_module_enriched)
 

@@ -21,64 +21,88 @@ compare_conditions(
 )
 }
 \arguments{
-\item{data_expr_list}{list of matrix or data.frame or SummarizedExperiment, list of expression data by condition, with genes as column and samples as row.}
+\item{data_expr_list}{list of matrix or data.frame or SummarizedExperiment,
+list of expression data by condition, with genes as column and samples as
+row.}
 
-\item{net_list}{list of networks, list of square tables by condition, representing connectivity between
-each genes as returned by build_net.}
+\item{net_list}{list of networks, list of square tables by condition,
+representing connectivity between each genes as returned by build_net.}
 
-\item{cor_list}{list of matrices and/or data.frames, list of square tables by condition, representing correlation between
-each gene. Must be the same used to create networks in \code{\link{build_net}}. If NULL, will be re-calculated
-according to \code{cor_func}.}
+\item{cor_list}{list of matrices and/or data.frames, list of square tables
+by condition, representing correlation between each gene. Must be the same
+used to create networks in \code{\link{build_net}}. If NULL, will be
+re-calculated according to \code{cor_func}.}
 
-\item{modules_list}{list of modules or nested list of modules, list of modules in one condition (will be considered as the one
-from reference) or a condition named list with list of modules built in each one.}
+\item{modules_list}{list of modules or nested list of modules, list of
+modules in one condition (will be considered as the one from reference) or
+a condition named list with list of modules built in each one.}
 
-\item{ref}{string or vector of strings, condition(s) name to be used as reference for permutation tests, or "cross comparison"
-if you want to compare each condition with the other as reference. Default will be the name of the first element in data_expr_list.}
+\item{ref}{string or vector of strings, condition(s) name to be used as
+reference for permutation tests, or "cross comparison" if you want to
+compare each condition with the other as reference. Default will be the
+name of the first element in data_expr_list.}
 
-\item{test}{string or vector of strings, condition(s) name to be tested for permutation tests. If NULL, all conditions except
-these in ref will be taken. If ref is set to "cross comparison", any test specified will be ignored.}
+\item{test}{string or vector of strings, condition(s) name to be tested for
+permutation tests. If NULL, all conditions except these in ref will be
+taken. If ref is set to "cross comparison", any test specified will be
+ignored.}
 
-\item{cor_func}{string, name of the correlation function to be used. Must be one of "pearson", "spearman",
-"bicor", "other". If "other", your_func must be provided}
+\item{cor_func}{string, name of the correlation function to be used. Must be
+one of "pearson", "spearman", "bicor", "other". If "other", your_func must
+be provided}
 
-\item{your_func}{function returning correlation values. Final values must be in [-1;1]}
+\item{your_func}{function returning correlation values. Final values must be
+in [-1;1]}
 
-\item{n_perm}{integer, number of permutation, meaning number of random gene name re-assignment inside network to compute all tests
-and statistics for module comparison between condition.}
+\item{n_perm}{integer, number of permutation, meaning number of random gene
+name re-assignment inside network to compute all tests and statistics for
+module comparison between condition.}
 
-\item{comparison_type}{string, either "unpreserved", "preserved" or "one or the other". Design if the comparison aim to detect
-preserved modules between condition, unpreserved ones, or modules that are one or the other without specification of which.}
+\item{comparison_type}{string, either "unpreserved", "preserved" or "one or
+the other". Design if the comparison aim to detect preserved modules between
+condition, unpreserved ones, or modules that are one or the other without
+specification of which.}
 
-\item{pvalue_th}{decimal, threshold of pvalue below which comparison_type is considered significant. If "one or the other", then
-pvalue_th is splitted in two for each side (preserved/not preserved).}
+\item{pvalue_th}{decimal, threshold of pvalue below which comparison_type is
+considered significant. If "one or the other", then pvalue_th is splitted in
+two for each side (preserved/not preserved).}
 
-\item{n_threads}{integer, number of threads that can be used to paralellise the computing}
+\item{n_threads}{integer, number of threads that can be used to paralellise
+the computing}
 
-\item{...}{any other parameter compatible with \code{\link[NetRep]{modulePreservation}}}
+\item{...}{any other parameter compatible with
+\code{\link[NetRep]{modulePreservation}}}
 }
 \value{
-A nested list where first element is each ref provided, second level each condition to test, and then elements containing
-information on the comparison. See NetRep::modulePreservation() for more detail.
+A nested list where first element is each ref provided, second
+level each condition to test, and then elements containing information
+on the comparison. See NetRep::modulePreservation() for more detail.
 }
 \description{
-Take modules built from multiples conditions and search for preservation, non-preservation or one of them, against one or mutliple
-conditions of reference. Use 7 topological features to perform the differents test, and use permutation to validate results.
+Take modules built from multiples conditions and search for preservation,
+non-preservation or one of them, against one or mutliple conditions of
+reference. Use 7 topological features to perform the differents test, and
+use permutation to validate results.
 }
 \details{
 \describe{
-  \item{}{Conditions will be based on names of data_expr_list. Please do not use numbers for conditions names as modules are
-  often named this way}
-  \item{}{To avoid recalculation, correlations matrices can be obtain by setting \code{keep_cor_mat} in \code{\link[GWENA]{build_net}} to TRUE.}
-  \item{}{Description of the 7 topological features used for preservation testing is available in \code{\link[NetRep]{modulePreservation}}.}
+  \item{}{Conditions will be based on names of data_expr_list. Please do not
+  use numbers for conditions names as modules are often named this way}
+  \item{}{To avoid recalculation, correlations matrices can be obtain by
+  setting \code{keep_cor_mat} in \code{\link[GWENA]{build_net}} to TRUE.}
+  \item{}{Description of the 7 topological features used for preservation
+  testing is available in \code{\link[NetRep]{modulePreservation}}.}
 }
 }
 \examples{
 expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
                      cond2 = kuehne_expr[25:48, 1:350])
-net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = 1, keep_cor_mat = TRUE)
-mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"),
-                      MoreArgs = list(detailled_result = TRUE), SIMPLIFY = FALSE)
+net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
+                      n_threads = 1, keep_cor_mat = TRUE)
+mod_by_cond <- mapply(detect_modules, expr_by_cond,
+                      lapply(net_by_cond, `[[`, "network"),
+                      MoreArgs = list(detailled_result = TRUE),
+                      SIMPLIFY = FALSE)
 comparison <- compare_conditions(expr_by_cond,
                                  lapply(net_by_cond, `[[`, "network"),
                                  lapply(net_by_cond, `[[`, "cor_mat"),

@@ -13,18 +13,23 @@ plot_comparison_stats(
 )
 }
 \arguments{
-\item{comparison_pvalues}{matrix or data.frame, table containing the p values for the statistics on each module}
+\item{comparison_pvalues}{matrix or data.frame, table containing the p
+values for the statistics on each module}
 
-\item{pvalue_th}{decimal, threshold of pvalue below which statistics are considered as significant}
+\item{pvalue_th}{decimal, threshold of pvalue below which statistics are
+considered as significant}
 
-\item{low_color, pvalue_th_color, unsignificant_color}{string, color to use as lower, middle, and higher end of the legend. Can
-either be the color name or hexadecimal code (e.g.: “red” or “#FF1234” )}
+\item{low_color, pvalue_th_color, unsignificant_color}{string, color to use
+as lower, middle, and higher end of the legend. Can either be the color name
+or hexadecimal code (e.g.: “red” or “#FF1234” )}
 }
 \value{
-A ggplot object representing a heatmap of the comparison statistics for each module
+A ggplot object representing a heatmap of the comparison statistics
+for each module
 }
 \description{
-Plot heatmap of p values for the module comparison statistics evaluated through the permutation test.
+Plot heatmap of p values for the module comparison statistics evaluated
+through the permutation test.
 }
 \examples{
 df <- data.frame(avg.weight = abs(rnorm(4, 0.1, 0.1)),

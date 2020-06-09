@@ -7,11 +7,13 @@
 .check_data_expr(data_expr)
 }
 \arguments{
-\item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame, expression data with genes as
+column and samples as row.}
 }
 \value{
 Throw an error if doesn't correspond
 }
 \description{
-Check an object to be a data.frame or a matrix compatible of genes and samples.
+Check an object to be a data.frame or a matrix compatible of genes and
+samples.
 }

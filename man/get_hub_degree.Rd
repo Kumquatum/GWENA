@@ -7,24 +7,29 @@
 get_hub_degree(network, modules = NULL, weight_th = 0.2)
 }
 \arguments{
-\item{network}{matrix or data.frame, square table representing connectivity between each genes as returned by
-build_net. Can be whole network or a single module.}
+\item{network}{matrix or data.frame, square table representing connectivity
+between each genes as returned by build_net. Can be whole network or a
+single module.}
 
-\item{modules}{list, modules defined as list of gene vectors. If null, network is supposed to be the whole network
-or an already split module}
+\item{modules}{list, modules defined as list of gene vectors. If null,
+network is supposed to be the whole network or an already split module}
 
-\item{weight_th}{decimal, weight threshold under or equal to which edges will be removed}
+\item{weight_th}{decimal, weight threshold under or equal to which edges
+will be removed}
 }
 \value{
 A list of vectors, or single vector of gene names
 }
 \description{
-Remove edges from the graph which value is under weight_th then compute degree of each node (gene).
-Hub gene are genes whose degree value is above average degree value of the thresholded network.
+Remove edges from the graph which value is under weight_th then compute
+degree of each node (gene). Hub gene are genes whose degree value is above
+average degree value of the thresholded network.
 }
 \details{
-GWENA natively build networks using WGCNA. These networks are complete in a graph theory sens, meaning all nodes
-are connected to each other. Therefore a threshold need to be applied so degree of all nodes isn't the same.
+GWENA natively build networks using WGCNA. These networks are
+complete in a graph theory sens, meaning all nodes are connected to each
+other. Therefore a threshold need to be applied so degree of all nodes
+isn't the same.
 }
 \examples{
 mat <- matrix(runif(40*40), 40)

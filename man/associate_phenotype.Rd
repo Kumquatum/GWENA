@@ -7,12 +7,15 @@
 associate_phenotype(eigengenes, phenotypes)
 }
 \arguments{
-\item{eigengenes}{matrix or data.frame, eigengenes of the modules. Provided by the output of modules_detection.}
+\item{eigengenes}{matrix or data.frame, eigengenes of the modules.
+Provided by the output of modules_detection.}
 
-\item{phenotypes}{matrix or data.frame, phenotypes for each sample to associate.}
+\item{phenotypes}{matrix or data.frame, phenotypes for each sample to
+associate.}
 }
 \value{
-A list of two data.frames : associations modules/phenotype and p.values associated to this associations
+A list of two data.frames : associations modules/phenotype and
+p.values associated to this associations
 }
 \description{
 Compute the correlation between all modules and the phenotypic variables
@@ -20,7 +23,8 @@ Compute the correlation between all modules and the phenotypic variables
 \examples{
 eigengene_mat <- data.frame(mod1 = rnorm(20, 0.1, 0.2),
 mod2 = rnorm(20, 0.2, 0.2))
-phenotype_mat <- data.frame(phenA = sample(c("X", "Y", "Z"), 20, replace = TRUE),
+phenotype_mat <- data.frame(phenA = sample(c("X", "Y", "Z"), 20,
+                            replace = TRUE),
                             phenB = sample(c("U", "V"), 20, replace = TRUE),
                             stringsAsFactors = FALSE)
 association <- associate_phenotype(eigengene_mat, phenotype_mat)

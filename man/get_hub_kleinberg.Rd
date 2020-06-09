@@ -7,27 +7,31 @@
 get_hub_kleinberg(network, modules = NULL, top_n = 5, k_th = NULL)
 }
 \arguments{
-\item{network}{matrix or data.frame, square table representing connectivity between each genes as returned by
-build_net. Can be whole network or a single module.}
+\item{network}{matrix or data.frame, square table representing connectivity
+between each genes as returned by build_net. Can be whole network or a
+single module.}
 
-\item{modules}{list, modules defined as list of gene vectors. If null, network is supposed to be the whole network
-or an already split module}
+\item{modules}{list, modules defined as list of gene vectors. If null,
+network is supposed to be the whole network or an already split module}
 
 \item{top_n}{integer, number genes to be considered as hub genes}
 
-\item{k_th}{decimal, Kleinberg's score threshold above or equal to which genes are considered as hubs}
+\item{k_th}{decimal, Kleinberg's score threshold above or equal to which
+genes are considered as hubs}
 }
 \value{
 A list of vectors, or single vector of gene names
 }
 \description{
-Compute Kleinberg's score (defined as the principal eigenvector of A*t(A), where A is the similarity matrix of the graph)
-of each gene by module if provided or for whole network if not, and return the top_n highest ones.
+Compute Kleinberg's score (defined as the principal eigenvector of A*t(A),
+where A is the similarity matrix of the graph) of each gene by module if
+provided or for whole network if not, and return the top_n highest ones.
 }
 \details{
-If you provide a top_n value, you can't provide a k_th value and vice versa. If none of them is provided
-top_n = 5.
-For more information on Kleinberg's score, look at \code{\link[igraph]{hub_score}} from igraph.
+If you provide a top_n value, you can't provide a k_th value and
+vice versa. If none of them is provided, top_n = 5.
+For more information on Kleinberg's score, look at
+\code{\link[igraph]{hub_score}} from igraph.
 }
 \examples{
 mat <- matrix(runif(40*40), 40)

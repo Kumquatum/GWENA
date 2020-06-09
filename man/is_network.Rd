@@ -10,12 +10,12 @@ is_network(network)
 \item{network}{matrix or data.frame, object to test to be a network}
 }
 \value{
-list, a boolean as first element and in second element NULL or the reason why boolean is
-set to FALSE
+list, a boolean as first element and in second element NULL or the
+reason why boolean is set to FALSE
 }
 \description{
-Check content of a given object to determine if it's a network, meaning a squared matrix of similarity
-score between genes.
+Check content of a given object to determine if it's a network, meaning a
+squared matrix of similarity score between genes.
 }
 \examples{
 net <- matrix(runif(40*40), 40)

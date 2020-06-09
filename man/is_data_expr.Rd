@@ -7,14 +7,16 @@
 is_data_expr(data_expr)
 }
 \arguments{
-\item{data_expr}{matrix or data.frame, expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame, expression data with genes as column
+and samples as row.}
 }
 \value{
-list, a boolean as first element and in second element NULL or the reason why boolean is
-set to FALSE
+list, a boolean as first element and in second element NULL or the
+reason why boolean is set to FALSE
 }
 \description{
-Check an object to be a data.frame or a matrix compatible of genes and samples.
+Check an object to be a data.frame or a matrix compatible of genes and
+samples.
 }
 \examples{
 expr <- matrix(runif(15*40), 15)

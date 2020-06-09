@@ -13,6 +13,7 @@
 Throw an error if doesn't correspond
 }
 \description{
-Check content of a given object to determine if it's a network, meaning a squared matrix of similarity
+Check content of a given object to determine if it's a network, meaning a
+squared matrix of similarity
 score between genes.
 }

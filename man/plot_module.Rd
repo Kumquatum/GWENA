@@ -29,51 +29,61 @@ plot_module(
 \arguments{
 \item{graph_module}{igraph object, module to plot.}
 
-\item{hubs}{character vector or numeric vector with names, optionnal, vector of gene names or vector of numeric
-values named with gene names}
+\item{hubs}{character vector or numeric vector with names, optionnal,
+vector of gene names or vector of numeric values named with gene names}
 
-\item{weight_th}{decimal, weight threshold under or equal to which edges will be removed}
+\item{weight_th}{decimal, weight threshold under or equal to which edges
+will be removed}
 
 \item{enrichment}{list, representing a gost object}
 
 \item{title}{string, main title that will be displayed on the plot}
 
-\item{degree_node_scaling}{boolean, indicate if node size should represent the degree of this node}
+\item{degree_node_scaling}{boolean, indicate if node size should represent
+the degree of this node}
 
-\item{node_scaling_max}{integer, if degree_node_scaling is TRUE, it is the max size of the node, else it is the exact
-size of all node}
+\item{node_scaling_max}{integer, if degree_node_scaling is TRUE, it is the
+max size of the node, else it is the exact size of all node}
 
-\item{edge_scaling_max}{integer, scaling factor by whihch the edge width will be scalled}
+\item{edge_scaling_max}{integer, scaling factor by whihch the edge width
+will be scalled}
 
 \item{nb_row_legend}{integer, number of levels in the legend.}
 
-\item{layout}{numeric matrix or function or string, numeric matrix for nodes coordinates, or function for layout,
-or name of a layout function available in \code{igraph}. Default "auto" will choose the best layout depending on
+\item{layout}{numeric matrix or function or string, numeric matrix for nodes
+coordinates, or function for layout, or name of a layout function available
+in \code{igraph}. Default "auto" will choose the best layout depending on
 the graph. For more information, see \code{\link{igraph.plotting}}}
 
-\item{vertex.label.cex, legend_cex}{float, font size for vertex labels. It is interpreted as a multiplication factor of some
-device-dependent base font size. If 0, no labels displayed.}
+\item{vertex.label.cex, legend_cex}{float, font size for vertex labels. It is
+interpreted as a multiplication factor of some device-dependent base font
+size. If 0, no labels displayed.}
 
 \item{vertex.label.color, edge.color, vertex.frame.color, vertex.color}{character and/or integer vector , color of the labels.
-It may either contain integer values, named colors or RGB specified colors with three or four bytes. All strings starting
-with ‘#’ are assumed to be RGB color specifications. It is possible to mix named color and RGB colors.}
+It may either contain integer values, named colors or RGB specified colors
+with three or four bytes. All strings starting with ‘#’ are assumed to be
+RGB color specifications. It is possible to mix named color and RGB colors.}
 
-\item{vertex.label.family}{character, font family to be used for vertex labels.}
+\item{vertex.label.family}{character, font family to be used for vertex
+labels.}
 
-\item{vertex.label.dist}{integer, distance of the label from the center of the vertex. If it is 0 then the label is
-centered on the vertex. If it is 1 then the label is displayed beside the vertex.}
+\item{vertex.label.dist}{integer, distance of the label from the center of
+the vertex. If it is 0 then the label is centered on the vertex. If it is 1
+then the label is displayed beside the vertex.}
 
-\item{...}{any other parameter compatible with the \code{\link[igraph]{plot.igraph}} function}
+\item{...}{any other parameter compatible with the
+\code{\link[igraph]{plot.igraph}} function}
 }
 \value{
 NULL, invisible
 }
 \description{
-Display a graph representing the co-expression network and different informations like hubs, enrichments
+Display a graph representing the co-expression network and different
+informations like hubs, enrichments
 }
 \details{
-Take care of you intend to compare modules' graphs, the same size of node will not correspond to the
-same values because of the scaling.
+Take care of you intend to compare modules' graphs, the same size
+of node will not correspond to the same values because of the scaling.
 }
 \examples{
 mat <- matrix(runif(40*40), 40)

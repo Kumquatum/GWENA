@@ -15,33 +15,46 @@ get_fit.expr(
 )
 }
 \arguments{
-\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression data with genes as column and samples as row.}
+\item{data_expr}{matrix or data.frame or SummarizedExperiment, expression
+data with genes as column and samples as row.}
 
-\item{fit_cut_off}{float, cut off by which R^2 (coefficient of determination) will be thresholded. Must be in ]0;1[.}
+\item{fit_cut_off}{float, cut off by which R^2 (coefficient of
+determination) will be thresholded. Must be in ]0;1[.}
 
-\item{cor_func}{string specifying correlation function to be used. Must be one of "pearson", "spearman", "bicor", "other". If "other", your_func must be provided}
+\item{cor_func}{string specifying correlation function to be used. Must be
+one of "pearson", "spearman", "bicor", "other". If "other", your_func must
+be provided}
 
-\item{your_func}{function returning correlation values. Final values must be in [-1;1]}
+\item{your_func}{function returning correlation values. Final values must be
+in [-1;1]}
 
-\item{network_type}{string giving type of network to be used. Either "unsigned", "signed", "signed hybrid". See details.}
+\item{network_type}{string giving type of network to be used. Either
+"unsigned", "signed", "signed hybrid". See details.}
 
-\item{block_size}{integer giving size of blocks by which operations can be proceed. Helping if working with low capacity computers. If null, will be estimated.}
+\item{block_size}{integer giving size of blocks by which operations can be
+proceed. Helping if working with low capacity computers. If null, will be
+estimated.}
 
-\item{...}{any other parameter compatible with \code{\link{pickSoftThreshold.fromSimilarity}}}
+\item{...}{any other parameter compatible with
+\code{\link{pickSoftThreshold.fromSimilarity}}}
 }
 \value{
-A list containing power of the law for best fit, fit table, and metadata about the arguments used.
+A list containing power of the law for best fit, fit table, and
+metadata about the arguments used.
 }
 \description{
-Computes correlation matrix of the gene expression data, adjust it depending of the type of network, then try to
-parameter a power law for best fit
+Computes correlation matrix of the gene expression data, adjust it depending
+of the type of network, then try to parameter a power law for best fit
 }
 \details{
-network_type indicate which transformation will be applied on the correlation matrix to return the similarity score.
+network_type indicate which transformation will be applied on the
+correlation matrix to return the similarity score.
 \describe{
-  \item{signed}{will modify the range [-1;1] to [0.5;1.5] (because of log10 beeing used for scale free index computation)}
+  \item{signed}{will modify the range [-1;1] to [0.5;1.5] (because of log10
+  beeing used for scale free index computation)}
   \item{unsigned}{will return absolute value (moving from [-1;1] to [0;1])}
-  \item{signed hybrid}{will replace all negative values by 0 (moving from [-1;1] to [0;1])}
+  \item{signed hybrid}{will replace all negative values by 0 (moving from
+  [-1;1] to [0;1])}
 }
 }
 \examples{
