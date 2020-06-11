@@ -3,26 +3,28 @@
 \docType{data}
 \name{kuehne_traits}
 \alias{kuehne_traits}
-\title{Traits data linked to samples in transcriptomic data from the Kuehne et al. publication}
+\title{Traits data linked to samples in transcriptomic data from the Kuehne et al.
+publication}
 \format{
 A data frame with 48 rows (samples) and 5 columns :
 \describe{
   \item{Slide}{Reference number of the microarray's slide.}
   \item{Array}{Array number, 8 by slide usually}
   \item{Exp}{Experiment number}
-  \item{Condition}{Either old (between 55 and 66 years old) or young (between 20 to 25
-  years old)}
+  \item{Condition}{Either old (between 55 and 66 years old) or young
+  (between 20 to 25 years old)}
   \item{Age}{Real age of the donor}
 }
 }
 \source{
-\url{https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-017-3547-3}
+\url{https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-
+017-3547-3}
 }
 \usage{
 kuehne_traits
 }
 \description{
-A dataset containing the phenotype of the donors and technical information about the
-experiment
+A dataset containing the phenotype of the donors and technical information
+about the experiment
 }
 \keyword{datasets}

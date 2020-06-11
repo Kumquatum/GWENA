@@ -14,6 +14,7 @@ A data frame with 50 rows (samples) and 15000 columns (genes)
 gtex_expr
 }
 \description{
-A subset of GTEx RNA-seq dataset containing read counts collapsed to gene level.
+A subset of GTEx RNA-seq dataset containing read counts collapsed to gene
+level.
 }
 \keyword{datasets}

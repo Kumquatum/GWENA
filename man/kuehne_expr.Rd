@@ -15,7 +15,7 @@ A data frame with 48 rows (samples) and 15801 columns (genes).
 kuehne_expr
 }
 \description{
-DAAAAAAA dataset containing the expression levels collapsed to the gene level.
+A dataset containing the expression levels collapsed to the gene level.
 Obtained from script provided in additional data n°10 runned on GSE85358 and
 reduced from probe to gene by WGCNA::collapseRows with median as fucntion.
 }
