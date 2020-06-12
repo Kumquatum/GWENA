@@ -9,12 +9,12 @@ build_net(
   fit_cut_off = 0.9,
   cor_func = c("pearson", "spearman", "bicor", "other"),
   your_func = NULL,
-  keep_cor_mat = FALSE,
   power_value = NULL,
   block_size = NULL,
   stop_if_no_fit = FALSE,
   network_type = c("unsigned", "signed", "signed hybrid"),
   tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"),
+  keep_matrices = c("none", "cor", "adja", "both"),
   n_threads = NULL,
   ...
 )
@@ -32,9 +32,6 @@ be provided}
 
 \item{your_func}{function returning correlation values. Final values must be
 in [-1;1]}
-
-\item{keep_cor_mat}{boolean, does the correlation matrix needs to be saved.
-Will be usefull to keep it if later comparing multiple conditions.}
 
 \item{power_value}{integer, power to be applied to the adjacency matrix. If
 NULL, will be estimated by trying different power law fitting.}
@@ -54,6 +51,10 @@ power.}
 computed. Either "none", "unsigned", "signed", "signed Nowick",
 "unsigned 2", "signed 2" and "signed Nowick 2". See detail at
 \code{\link[WGCNA]{TOMsimilarityFromExpr}}.}
+
+\item{keep_matrices}{string, matrices to keep in final object. Can be one of
+"none", "cor", "adja", "both". It is usefull to keep both if you plant to use
+\code{\link{compare_conditions}}.}
 
 \item{n_threads}{integer, number of threads that can be used to paralellise
 the computing}

@@ -227,8 +227,9 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
 #' be provided
 #' @param your_func function returning correlation values. Final values must be
 #' in [-1;1]
-#' @param keep_cor_mat boolean, does the correlation matrix needs to be saved.
-#' Will be usefull to keep it if later comparing multiple conditions.
+#' @param keep_matrices string, matrices to keep in final object. Can be one of
+#' "none", "cor", "adja", "both". It is usefull to keep both if you plant to use
+#' \code{\link{compare_conditions}}.
 #' @param power_value integer, power to be applied to the adjacency matrix. If
 #' NULL, will be estimated by trying different power law fitting.
 #' @param block_size integer, size of blocks by which operations can be
@@ -262,12 +263,12 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
 
 build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
                         c("pearson", "spearman", "bicor", "other"),
-                      your_func = NULL, keep_cor_mat = FALSE,
-                         power_value = NULL, block_size = NULL,
+                      your_func = NULL, power_value = NULL, block_size = NULL,
                       stop_if_no_fit = FALSE,
                       network_type = c("unsigned", "signed", "signed hybrid"),
                       tom_type = c("unsigned", "signed", "signed Nowick",
                                    "unsigned 2", "signed 2", "none"),
+                      keep_matrices = c("none", "cor", "adja", "both"),
                       n_threads = NULL, ...)
                       # TODO program the mclapply version
 {
@@ -281,8 +282,11 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
   if (!is.null(power_value)) {
     if (power_value < 1 | power_value %% 1 != 0)
       stop("If not NULL, power_value must be a whole number >= 1.")}
+  if (!is.logical(stop_if_no_fit))
+    stop("stop_if_no_fit must be a boolean.")
   network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
+  keep_matrices <- match.arg(keep_matrices)
   if (!is.null(n_threads)) {
     if (!is.numeric(n_threads) | n_threads < 1 | n_threads %% 1 != 0)
       stop("n_threads must be a whole number >= 1")}
@@ -291,7 +295,6 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
   if (n_threads == 1) {
     quiet(WGCNA::disableWGCNAThreads())
   } else quiet(WGCNA::enableWGCNAThreads(n_threads))
-
   # TODO : change this function for an internal one because WGCNA's function
   # isn't prefixed, causing warnings
 
@@ -338,9 +341,15 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
       tom_type = tom_type,
       power = fit$power_value,
       fit_power_table = fit$fit_table
-    ),
-    cor_mat = if (keep_cor_mat) {cor_mat} else {NULL}
+    )#,
+    # cor_mat = if (keep_cor_mat) {cor_mat} else {NULL}
   )
+
+  # Adding matrices to keep to the list
+  if (keep_matrices %in% c("cor", "both"))
+    net$cor_mat <- cor_mat
+  if (keep_matrices %in% c("adja", "both"))
+    net$adja_mat <- adj
 
   return(net)
 }

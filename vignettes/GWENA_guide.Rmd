@@ -345,13 +345,13 @@ se_expr_by_cond <- sapply(unique(se_kuehne$Condition), function(cond){
 })
 
 # Network building and modules detection by condition
-net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = threads_to_use, keep_cor_mat = TRUE)
+net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = threads_to_use, keep_matrices = "both")
 mod_by_cond <- mapply(detect_modules, expr_by_cond, lapply(net_by_cond, `[[`, "network"), 
                       MoreArgs = list(detailled_result = TRUE), SIMPLIFY = FALSE)
 
 
 comparison <- compare_conditions(expr_by_cond, 
-                                 lapply(net_by_cond, `[[`, "network"), 
+                                 lapply(net_by_cond, `[[`, "adja_mat"), 
                                  lapply(net_by_cond, `[[`, "cor_mat"),  
                                  lapply(mod_by_cond, `[[`, "modules"),
                                  comparison_type = "preserved", 
