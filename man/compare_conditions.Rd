@@ -6,7 +6,7 @@
 \usage{
 compare_conditions(
   data_expr_list,
-  net_list,
+  adja_list,
   cor_list = NULL,
   modules_list,
   ref = names(data_expr_list)[1],
@@ -25,7 +25,7 @@ compare_conditions(
 list of expression data by condition, with genes as column and samples as
 row.}
 
-\item{net_list}{list of networks, list of square tables by condition,
+\item{adja_list}{list of adjacency matrices, list of square tables by condition,
 representing connectivity between each genes as returned by build_net.}
 
 \item{cor_list}{list of matrices and/or data.frames, list of square tables
@@ -98,13 +98,13 @@ use permutation to validate results.
 expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
                      cond2 = kuehne_expr[25:48, 1:350])
 net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
-                      n_threads = 1, keep_cor_mat = TRUE)
+                      n_threads = 1, keep_matrices = "both")
 mod_by_cond <- mapply(detect_modules, expr_by_cond,
                       lapply(net_by_cond, `[[`, "network"),
                       MoreArgs = list(detailled_result = TRUE),
                       SIMPLIFY = FALSE)
 comparison <- compare_conditions(expr_by_cond,
-                                 lapply(net_by_cond, `[[`, "network"),
+                                 lapply(net_by_cond, `[[`, "adja_mat"),
                                  lapply(net_by_cond, `[[`, "cor_mat"),
                                  lapply(mod_by_cond, `[[`, "modules"))
 
