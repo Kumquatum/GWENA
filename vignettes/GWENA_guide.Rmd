@@ -331,13 +331,13 @@ To perform the comparison, all previous steps leading to modules detection need 
 
 ```{r condition_comparison}
 # Expression by condition with data.frame/matrix
-samples_by_cond <- sapply(kuehne_traits$Condition %>% unique, function(cond){
+samples_by_cond <- lapply(kuehne_traits$Condition %>% unique, function(cond){
   apply(kuehne_traits[which(kuehne_traits$Condition == cond), c("Slide", "Exp")], 1, paste, collapse = "_")
-}, simplify = FALSE)
+}) %>% setNames(kuehne_traits$Condition %>% unique)
   
-expr_by_cond <- sapply(samples_by_cond %>% names, function(cond){
+expr_by_cond <- lapply(samples_by_cond %>% names, function(cond){
   kuehne_expr_filtered[which(rownames(kuehne_expr_filtered) %in% samples_by_cond[[cond]]),]
-}, simplify = FALSE)
+}) %>% setNames(samples_by_cond %>% names)
 
 # Expression by condition with SummarizedExperiment
 se_expr_by_cond <- sapply(unique(se_kuehne$Condition), function(cond){
