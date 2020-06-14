@@ -25,8 +25,8 @@ variation specified.
 }
 \examples{
 df <- matrix(abs(rnorm(15*45)), 15)
-colnames(df) <- paste0("gene_", 1:ncol(df))
-rownames(df) <- paste0("sample_", 1:nrow(df))
+colnames(df) <- paste0("gene_", seq_len(ncol(df)))
+rownames(df) <- paste0("sample_", seq_len(nrow(df)))
 df_filtered <- filter_low_var(df)
 
 }
