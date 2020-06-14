@@ -95,7 +95,9 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
               " genes in this case.")
       top_n <- ncol(net)
     } else {
-      hubs_name <- rowSums(net) %>% sort(decreasing = TRUE) %>% .[seq_len(top_n)]
+      hubs_name <- rowSums(net) %>%
+        sort(decreasing = TRUE) %>%
+        .[seq_len(top_n)]
     }
   })
   return(hubs)

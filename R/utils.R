@@ -52,7 +52,7 @@ is_network <- function(network) {
                 reason = "network must be a squared matrix"))
   if ((any(network > 1) | any(network < -1)) & !any(is.na(network)))
     return(list(bool = FALSE,
-                reason = paste("network should be filled with value in the [-1,1]",
+                reason = paste("network values should be between [-1,1]",
                 "range")))
 
   return(list(bool = TRUE, reason = NULL))
