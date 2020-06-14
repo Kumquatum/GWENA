@@ -19,8 +19,8 @@ squared matrix of similarity score between genes.
 }
 \examples{
 net <- matrix(runif(40*40), 40)
-colnames(net) <- paste0("gene_", 1:ncol(net))
-rownames(net) <- paste0("gene_", 1:nrow(net))
+colnames(net) <- paste0("gene_", seq_len(ncol(net)))
+rownames(net) <- paste0("gene_", seq_len(nrow(net)))
 is_network(net)
 
 }

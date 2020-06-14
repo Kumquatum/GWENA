@@ -20,8 +20,8 @@ samples.
 }
 \examples{
 expr <- matrix(runif(15*40), 15)
-colnames(expr) <- paste0("gene_", 1:ncol(expr))
-rownames(expr) <- paste0("gene_", 1:nrow(expr))
+colnames(expr) <- paste0("gene_", seq_len(ncol(expr)))
+rownames(expr) <- paste0("gene_", seq_len(nrow(expr)))
 is_data_expr(expr)
 
 }

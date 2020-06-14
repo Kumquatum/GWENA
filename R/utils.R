@@ -31,8 +31,8 @@ quiet <- function(func) {
 #'
 #' @examples
 #' net <- matrix(runif(40*40), 40)
-#' colnames(net) <- paste0("gene_", 1:ncol(net))
-#' rownames(net) <- paste0("gene_", 1:nrow(net))
+#' colnames(net) <- paste0("gene_", seq_len(ncol(net)))
+#' rownames(net) <- paste0("gene_", seq_len(nrow(net)))
 #' is_network(net)
 #'
 #' @export
@@ -230,8 +230,8 @@ is_gost <- function(gost_result) {
 #'
 #' @examples
 #' expr <- matrix(runif(15*40), 15)
-#' colnames(expr) <- paste0("gene_", 1:ncol(expr))
-#' rownames(expr) <- paste0("gene_", 1:nrow(expr))
+#' colnames(expr) <- paste0("gene_", seq_len(ncol(expr)))
+#' rownames(expr) <- paste0("gene_", seq_len(nrow(expr)))
 #' is_data_expr(expr)
 #'
 #' @export
