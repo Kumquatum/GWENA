@@ -209,7 +209,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL,
 
   # If no cor_list provided, calculating one
   if (is.null(cor_list)) {
-    cor_list <- sapply(data_expr_list, function(data_expr){
+    cor_list <- lapply(data_expr_list, function(data_expr){
       if (cor_func == "other") {
         cor_to_use <- your_func
       } else {
@@ -219,17 +219,17 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL,
       if (min(cor_mat < -1) | max(cor_mat) > 1)
         stop("Provided correlation function returned values outside [-1,1].")
       return(cor_mat)
-    }, simplify = FALSE)
+    })
   } else { cor_func <- "unknown"}
 
   # Adapting modules format
   if (is_multi_cond_modules_list) {
     # list by condition of gene named vector of modules values
-    modules_reformated <- sapply(modules_list, function(cond){
+    modules_reformated <- lapply(modules_list, function(cond){
       lapply(names(cond), function(x){
         setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>%
         unlist
-    }, simplify = FALSE)
+    })
   } else {
     # Single gene named vector of modules values
     modules_reformated <- lapply(names(modules_list), function(x){
@@ -276,12 +276,12 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL,
   # people to pass moduleAssignement for all cond tested even if they're not
   # in discovery, so adding the functionnality
   if (all(ref != "cross comparison") & exists("additional_modules_list")) {
-    additional_modules_reformated <- sapply(additional_modules_list,
+    additional_modules_reformated <- lapply(additional_modules_list,
                                             function(cond){
       lapply(names(cond), function(x){
         setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>%
                                                 unlist
-    }, simplify = FALSE)
+    })
     for (ref_i in ref_set) {
       for (additional_j in names(additional_modules_list)) {
         tmp_module_labels <- list(
