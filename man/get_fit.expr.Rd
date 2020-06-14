@@ -58,6 +58,6 @@ correlation matrix to return the similarity score.
 }
 }
 \examples{
-get_fit.expr(kuehne_expr[, 1:100])
+get_fit.expr(kuehne_expr[, seq_len(100)])
 
 }

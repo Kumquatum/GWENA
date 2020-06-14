@@ -70,6 +70,6 @@ Compute the adjacency matrix, then the TOM to build the network. Than detect
 the modules by hierarchical clustering and thresholding
 }
 \examples{
-net <- build_net(kuehne_expr[, 1:350], n_threads = 1)
+net <- build_net(kuehne_expr[, seq_len(350)], n_threads = 1)
 
 }

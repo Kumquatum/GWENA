@@ -58,7 +58,7 @@
 #' @return A list containing power of the law for best fit, fit table, and
 #' metadata about the arguments used.
 #' @examples
-#' get_fit.cor(cor_mat = cor(kuehne_expr[, 1:100]))
+#' get_fit.cor(cor_mat = cor(kuehne_expr[, seq_len(100)]))
 #'
 #' @importFrom WGCNA pickSoftThreshold.fromSimilarity
 #' @importFrom magrittr %>%
@@ -166,7 +166,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type =
 #' @importFrom magrittr %>%
 #'
 #' @examples
-#' get_fit.expr(kuehne_expr[, 1:100])
+#' get_fit.expr(kuehne_expr[, seq_len(100)])
 #'
 #' @export
 
@@ -256,7 +256,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
 #' @importFrom SummarizedExperiment assay
 #'
 #' @examples
-#' net <- build_net(kuehne_expr[, 1:350], n_threads = 1)
+#' net <- build_net(kuehne_expr[, seq_len(350)], n_threads = 1)
 #'
 #' @export
 

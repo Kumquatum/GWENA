@@ -49,6 +49,6 @@ correlation matrix to return the similarity score.
 }
 }
 \examples{
-get_fit.cor(cor_mat = cor(kuehne_expr[, 1:100]))
+get_fit.cor(cor_mat = cor(kuehne_expr[, seq_len(100)]))
 
 }
