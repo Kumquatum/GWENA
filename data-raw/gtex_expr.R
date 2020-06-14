@@ -21,7 +21,7 @@ gtex_expr <- data.table::fread("gtex_RNAseq_trunc.gct") %>%
   dplyr::filter(sample %in% gtex_muscle_sample$SAMPID) %>% # keeping only muscle data
   tibble::remove_rownames() %>%
   tibble::column_to_rownames("sample") %>%
-  .[1:50, ] # keeping only 50 samples
+  .[seq_len(50), ] # keeping only 50 samples
 
 
 usethis::use_data(gtex_expr, overwrite = TRUE)
