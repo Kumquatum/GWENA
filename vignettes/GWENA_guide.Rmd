@@ -340,9 +340,9 @@ expr_by_cond <- lapply(samples_by_cond %>% names, function(cond){
 }) %>% setNames(samples_by_cond %>% names)
 
 # Expression by condition with SummarizedExperiment
-se_expr_by_cond <- sapply(unique(se_kuehne$Condition), function(cond){
+se_expr_by_cond <- lapply(unique(se_kuehne$Condition), function(cond){
      se_kuehne[, se_kuehne$Condition == cond]
-})
+}) %>% setNames(unique(se_kuehne$Condition))
 
 # Network building and modules detection by condition
 net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman", n_threads = threads_to_use, keep_cor_mat = TRUE)
