@@ -430,10 +430,10 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
   if (degree_node_scaling) {
     deg <- degree(graph_to_plot)
     node_scaling_min <- 1
-    vertex_size <- sapply(deg, function(x) {
+    vertex_size <- lapply(deg, function(x) {
       (x - min(deg)) / (max(deg) - min(deg)) *
       (node_scaling_max - node_scaling_min) +
-      node_scaling_min })
+      node_scaling_min }) %>% unlist
   } else {
     if (exists("vertex.size")) {
       vertex_size <- vertex.size
@@ -447,10 +447,10 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
   } else {
     edge_scaling_min <- 0.2
     edge <- E(graph_to_plot)$weight
-    edge_width <- sapply(edge, function(x) {
+    edge_width <- lapply(edge, function(x) {
       (x - min(edge)) / (max(edge) - min(edge)) *
       (edge_scaling_max - edge_scaling_min) +
-      edge_scaling_min})
+      edge_scaling_min}) %>% unlist
   }
 
   # FIXME: hotfix to manage no label
