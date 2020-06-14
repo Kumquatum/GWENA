@@ -35,8 +35,8 @@ For more information on Kleinberg's score, look at
 }
 \examples{
 mat <- matrix(runif(40*40), 40)
-colnames(mat) <- paste0("gene_", 1:ncol(mat))
-rownames(mat) <- paste0("gene_", 1:nrow(mat))
+colnames(mat) <- paste0("gene_", seq_len(ncol(mat)))
+rownames(mat) <- paste0("gene_", seq_len(nrow(mat)))
 get_hub_degree(mat)
 get_hub_kleinberg(mat, top_n = NULL, k_th = 0.9)
 

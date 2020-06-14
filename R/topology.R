@@ -64,8 +64,8 @@ build_graph_from_sq_mat <- function(sq_mat) {
 #'
 #' @examples
 #' mat <- matrix(runif(40*40), 40)
-#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
-#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' colnames(mat) <- paste0("gene_", seq_len(ncol(mat)))
+#' rownames(mat) <- paste0("gene_", seq_len(nrow(mat)))
 #' get_hub_high_co(mat)
 #'
 #' @export
@@ -95,7 +95,7 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
               " genes in this case.")
       top_n <- ncol(net)
     } else {
-      hubs_name <- rowSums(net) %>% sort(decreasing = TRUE) %>% .[1:top_n]
+      hubs_name <- rowSums(net) %>% sort(decreasing = TRUE) %>% .[seq_len(top_n)]
     }
   })
   return(hubs)
@@ -126,8 +126,8 @@ get_hub_high_co <- function(network, modules = NULL, top_n = 5) {
 #'
 #' @examples
 #' mat <- matrix(runif(40*40), 40)
-#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
-#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' colnames(mat) <- paste0("gene_", seq_len(ncol(mat)))
+#' rownames(mat) <- paste0("gene_", seq_len(nrow(mat)))
 #' get_hub_degree(mat)
 #'
 #' @export
@@ -193,8 +193,8 @@ get_hub_degree <- function(network, modules = NULL, weight_th = 0.2) {
 #'
 #' @examples
 #' mat <- matrix(runif(40*40), 40)
-#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
-#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' colnames(mat) <- paste0("gene_", seq_len(ncol(mat)))
+#' rownames(mat) <- paste0("gene_", seq_len(nrow(mat)))
 #' get_hub_degree(mat)
 #' get_hub_kleinberg(mat, top_n = NULL, k_th = 0.9)
 #'
@@ -235,7 +235,7 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = 5,
 
     # With top_n
     if (!is.null(top_n)) {
-      x_hubs <- net_hub_score %>% sort(decreasing = TRUE) %>% .[1:top_n]
+      x_hubs <- net_hub_score %>% sort(decreasing = TRUE) %>% .[seq_len(top_n)]
     } else { # With k_th
       x_hubs <- net_hub_score[which(net_hub_score >= k_th)]
     }
@@ -276,8 +276,8 @@ get_hub_kleinberg <- function(network, modules = NULL, top_n = 5,
 #'
 #' @examples
 #' mat <- matrix(runif(40*40), 40)
-#' colnames(mat) <- paste0("gene_", 1:ncol(mat))
-#' rownames(mat) <- paste0("gene_", 1:nrow(mat))
+#' colnames(mat) <- paste0("gene_", seq_len(ncol(mat)))
+#' rownames(mat) <- paste0("gene_", seq_len(nrow(mat)))
 #' get_hub_genes(mat)
 #'
 #' @export
