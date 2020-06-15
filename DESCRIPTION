@@ -21,7 +21,8 @@ Suggests:
     rmarkdown (>= 1.16),
     prettydoc (>= 0.3.0),
     httr (>= 1.4.1),
-    S4Vectors (>= 0.22.1)
+    S4Vectors (>= 0.22.1),
+    BiocStyle (>= 2.15.8)
 Imports: 
     WGCNA (>= 1.67),
     dplyr (>= 0.8.3),
