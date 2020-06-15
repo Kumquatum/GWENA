@@ -8,7 +8,7 @@
 #' @param data_expr_list list of matrix or data.frame or SummarizedExperiment,
 #' list of expression data by condition, with genes as column and samples as
 #' row.
-#' @param net_list list of networks, list of square tables by condition,
+#' @param adja_list list of adjacency matrices, list of square tables by condition,
 #' representing connectivity between each genes as returned by build_net.
 #' @param cor_list list of matrices and/or data.frames, list of square tables
 #' by condition, representing correlation between each gene. Must be the same
@@ -63,13 +63,13 @@
 #' expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
 #'                      cond2 = kuehne_expr[25:48, 1:350])
 #' net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
-#'                       n_threads = 1, keep_cor_mat = TRUE)
+#'                       n_threads = 1, keep_matrices = "both")
 #' mod_by_cond <- mapply(detect_modules, expr_by_cond,
 #'                       lapply(net_by_cond, `[[`, "network"),
 #'                       MoreArgs = list(detailled_result = TRUE),
 #'                       SIMPLIFY = FALSE)
 #' comparison <- compare_conditions(expr_by_cond,
-#'                                  lapply(net_by_cond, `[[`, "network"),
+#'                                  lapply(net_by_cond, `[[`, "adja_mat"),
 #'                                  lapply(net_by_cond, `[[`, "cor_mat"),
 #'                                  lapply(mod_by_cond, `[[`, "modules"))
 #'
@@ -80,7 +80,7 @@
 #' @export
 #'
 
-compare_conditions = function(data_expr_list, net_list, cor_list = NULL,
+compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
                               modules_list, ref = names(data_expr_list)[1],
                               test = NULL, cor_func = c("pearson", "spearman",
                                                         "bicor", "other"),
@@ -102,10 +102,10 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL,
     return(data_expr)
   })
   conditions <- names(data_expr_list)
-  if (!is.list(net_list)) stop("net_list must be a list.")
-  if (!all(conditions %in% names(net_list)))
-    stop("Names in net_list don't match with conditions.")
-  lapply(net_list, .check_network)
+  if (!is.list(adja_list)) stop("adja_list must be a list.")
+  if (!all(conditions %in% names(adja_list)))
+    stop("Names in adja_list don't match with conditions.")
+  lapply(adja_list, .check_network)
   if (!is.list(cor_list) & !is.null(cor_list))
     stop("cor_list must be a list or NULL")
   if (!is.null(cor_list)) {
@@ -253,7 +253,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL,
   }
 
   # Ensuring tables are matrices
-  for (table in c("data_expr_list", "cor_list", "net_list")) {
+  for (table in c("data_expr_list", "cor_list", "adja_list")) {
     assign(table, lapply(get(table), function(cond) {
       if (!is.matrix(cond)) { cond <- as.matrix(cond)
       } else { cond } }))
@@ -263,7 +263,7 @@ compare_conditions = function(data_expr_list, net_list, cor_list = NULL,
 
   # Preservation
   preservation <- quiet(NetRep::modulePreservation(
-    network = net_list, data = data_expr_list, correlation = cor_list,
+    network = adja_list, data = data_expr_list, correlation = cor_list,
     moduleAssignments = modules_reformated, discovery = ref_set,
     test = test_set, alternative = test_tail_side, nPerm = n_perm,
     nThreads = n_threads, simplify = FALSE, ...))
