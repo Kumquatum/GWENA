@@ -229,8 +229,10 @@ net <- build_net(kuehne_expr_filtered, cor_func = "spearman",
 
 # Power selected :
 net$metadata$power
+
 # Fit of the power law to data ($R^2$) :
-net$metadata$fit_power_table[net$metadata$fit_power_table$Power == net$metadata$power, "SFT.R.sq"]
+fit_power_table <- net$metadata$fit_power_table
+fit_power_table[fit_power_table$Power == net$metadata$power, "SFT.R.sq"]
 ```
 
 
