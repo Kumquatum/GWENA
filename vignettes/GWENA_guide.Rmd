@@ -245,7 +245,8 @@ Such modules can be detected using unsupervised learning or modeling. GWENA use 
 ```{r modules_detection}
 detection <- detect_modules(kuehne_expr_filtered, 
                             net$network, 
-                            detailled_result = TRUE)
+                            detailled_result = TRUE,
+                            merge_threshold = 0.25)
 ```
 
 **Important**: Module 0 contains all genes that did not fit into any modules.
@@ -288,7 +289,7 @@ In oppositions, databases references like [TRANSFAC](https://doi.org/10.1093%2Fb
 
 Using the [over-representation analysis (ORA)](http://doi.org/10.1371/journal.pcbi.1002375) tool [GOSt](https://biit.cs.ut.ee/gprofiler/gost) from g:Profiler, we can retrieve the biological association for each module and plot it as follows.
 
-```{r modules_enrichment}
+```{r modules_enrichment, fig.height=12}
 enrichment <- bio_enrich(detection$modules)
 plot_enrichment(enrichment)
 ```
@@ -327,9 +328,9 @@ Information can be retrieved from the network topology itself. For example, hub 
 Manipulation of graph objects can be quite demanding in memory and CPU usage. Caution is advised when choosing to plot networks larger than 100 genes. 
 Since co-expression networks are complete graphs, readability is hard because all genes are connected with each other. In order to clarity visualization, edges with a similarity score below a threshold are removed.
 
-```{r graph, fig.width=12, fig.height=8}
-module_2 <- detection$modules$`2`
-graph <- build_graph_from_sq_mat(net$network[module_2, module_2])
+```{r graph, fig.width=12, fig.height=12}
+module_example <- detection$modules$`2`
+graph <- build_graph_from_sq_mat(net$network[module_example, module_example])
 
 plot_module(graph, weight_th = 0.999995, 
             vertex.label.cex = 0, 
