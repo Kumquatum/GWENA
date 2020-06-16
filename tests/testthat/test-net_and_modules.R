@@ -137,7 +137,7 @@ test_that("genes interactions strength is in [0;1]", {
 })
 test_that("output format is ok", {
   expect_true(is.list(res_net))
-  expect_true(all(names(res_net) == c("network", "metadata", "cor_mat")))
+  expect_true(all(names(res_net) == c("network", "metadata")))
   expect_true(all(names(res_net$metadata) == c("cor_func", "network_type", "tom_type", "power", "fit_power_table")))
 })
 
