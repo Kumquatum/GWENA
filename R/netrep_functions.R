@@ -181,8 +181,8 @@ contingencyTable <- function(modAssignments, mods, tiNodelist) {
   }
 
   return(list(
-    contingency = contingency, propVarsPres = propVarsPres, overlapVars = overlapVars,
-    varsPres = varsPres, overlapModules = overlapModules,
-    overlapAssignments = overlapAssignments
+    contingency = contingency, propVarsPres = propVarsPres,
+    overlapVars = overlapVars, varsPres = varsPres,
+    overlapModules = overlapModules, overlapAssignments = overlapAssignments
   ))
 }

@@ -341,8 +341,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
       tom_type = tom_type,
       power = fit$power_value,
       fit_power_table = fit$fit_table
-    )#,
-    # cor_mat = if (keep_cor_mat) {cor_mat} else {NULL}
+    )
   )
 
   # Adding matrices to keep to the list

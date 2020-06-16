@@ -25,8 +25,9 @@ compare_conditions(
 list of expression data by condition, with genes as column and samples as
 row.}
 
-\item{adja_list}{list of adjacency matrices, list of square tables by condition,
-representing connectivity between each genes as returned by build_net.}
+\item{adja_list}{list of adjacency matrices, list of square tables by
+condition, representing connectivity between each genes as returned by
+build_net.}
 
 \item{cor_list}{list of matrices and/or data.frames, list of square tables
 by condition, representing correlation between each gene. Must be the same

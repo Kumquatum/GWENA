@@ -8,8 +8,9 @@
 #' @param data_expr_list list of matrix or data.frame or SummarizedExperiment,
 #' list of expression data by condition, with genes as column and samples as
 #' row.
-#' @param adja_list list of adjacency matrices, list of square tables by condition,
-#' representing connectivity between each genes as returned by build_net.
+#' @param adja_list list of adjacency matrices, list of square tables by
+#' condition, representing connectivity between each genes as returned by
+#' build_net.
 #' @param cor_list list of matrices and/or data.frames, list of square tables
 #' by condition, representing correlation between each gene. Must be the same
 #' used to create networks in \code{\link{build_net}}. If NULL, will be
