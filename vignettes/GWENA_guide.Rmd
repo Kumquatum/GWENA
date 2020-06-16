@@ -275,7 +275,7 @@ ggplot2::ggplot(data.frame(detection$modules %>% stack),
 Each of the modules presents a distinct profile, which can be plotted in two figures to separate the positive (+ facet) and negative (- facet) correlations profile. As a summary of this profile, the eigengene (red line) is displayed to act as a signature. 
 
 ```{r plot_module_profile}
-plot_expression_profiles(kuehne_expr_filtered, detection$modules)
+# plot_expression_profiles(kuehne_expr_filtered, detection$modules)
 ```
 
 
