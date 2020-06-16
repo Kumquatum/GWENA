@@ -599,12 +599,12 @@ plot_expression_profiles <- function(data_expr, modules) {
     df <- modules %>%
       stack %>%
       setNames(c("gene", "module")) %>%
-      mutate(module = as.character(module))
+      dplyr::mutate(module = as.character(module))
   } else {
     df <- data.frame(gene = modules,
                      module = "module",
                      stringsAsFactors = FALSE) %>%
-      mutate(module = as.character(module))
+      dplyr::mutate(module = as.character(module))
   }
 
   eigengenes <- df %>%
