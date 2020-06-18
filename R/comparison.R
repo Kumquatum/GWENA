@@ -289,7 +289,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
           ref_i = modules_reformated[[ref_i]],
           additional_j = additional_modules_reformated[[additional_j]])
         preservation[[ref_i]][[additional_j]][["contingency"]] <-
-          contingencyTable(tmp_module_labels,
+          .contingencyTable(tmp_module_labels,
                            tmp_module_labels$ref_i %>% table %>% names,
                            tmp_module_labels$additional_j %>%
                              names)[["contingency"]]
