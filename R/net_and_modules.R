@@ -625,9 +625,7 @@ plot_expression_profiles <- function(data_expr, modules) {
     dplyr::mutate(gene = "eigengene") %>%
     tidyr::pivot_longer(c(-gene, -sample),
                         names_to = "module",
-                        values_to = "expression",
-                        names_ptypes = list(module = numeric())) %>%
-    dplyr::mutate(module = as.character(module))
+                        values_to = "expression")
 
   plot_table <- df %>%
     dplyr::left_join(data_expr %>%
