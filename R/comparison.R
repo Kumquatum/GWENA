@@ -61,6 +61,7 @@
 #' @importFrom purrr compact
 #'
 #' @examples
+#' \dontrun{
 #' expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
 #'                      cond2 = kuehne_expr[25:48, 1:350])
 #' net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
@@ -73,6 +74,7 @@
 #'                                  lapply(net_by_cond, `[[`, "adja_mat"),
 #'                                  lapply(net_by_cond, `[[`, "cor_mat"),
 #'                                  lapply(mod_by_cond, `[[`, "modules"))
+#'}
 #'
 #' @return A nested list where first element is each ref provided, second
 #' level each condition to test, and then elements containing information
@@ -289,7 +291,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
           ref_i = modules_reformated[[ref_i]],
           additional_j = additional_modules_reformated[[additional_j]])
         preservation[[ref_i]][[additional_j]][["contingency"]] <-
-          contingencyTable(tmp_module_labels,
+          .contingencyTable(tmp_module_labels,
                            tmp_module_labels$ref_i %>% table %>% names,
                            tmp_module_labels$additional_j %>%
                              names)[["contingency"]]

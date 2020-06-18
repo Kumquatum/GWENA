@@ -82,10 +82,8 @@ orderAsNumeric <- function(vec) {
 #'  of modules that are both requested and have nodes present in the test
 #'  dataset, and the \code{modAssignments} vector containing only nodes present
 #'  in the test dataset.
-#'
-#' @export
 
-contingencyTable <- function(modAssignments, mods, tiNodelist) {
+.contingencyTable <- function(modAssignments, mods, tiNodelist) {
   # To simplify later function calls, we need to get a vector of module
   # assignments only for (a) modules of interest and (b) the variables
   # present in both datasets for those modules.
