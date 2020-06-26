@@ -202,6 +202,10 @@ bio_enrich <- function(module, custom_gmt = NULL, ...) {
   return(enriched_modules)
 }
 
+
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("query"))
+
 #' Plot module from bio_enrich
 #'
 #' Wrapper of the gprofiler2::gostplot function. Adding support of colorblind
@@ -366,6 +370,8 @@ associate_phenotype <- function(eigengenes, phenotypes) {
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("eigengene", "pval", "phenotype"))
 
 #' Heatmap of modules phenotpic association
 #'

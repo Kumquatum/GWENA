@@ -27,6 +27,10 @@
   }
 }
 
+
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("Power", "SFT.R.sq"))
+
 #' Calculating best fit of a power low on correlation matrix computed on
 #' expression data
 #'
@@ -164,6 +168,7 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type =
 #' metadata about the arguments used.
 #'
 #' @importFrom magrittr %>%
+#' @importFrom methods is
 #'
 #' @examples
 #' get_fit.expr(kuehne_expr[, seq_len(100)])
@@ -176,7 +181,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
                            c("unsigned", "signed", "signed hybrid"),
                          block_size = NULL, ...){
   # Checking args
-  if (is(data_expr, "SummarizedExperiment")) {
+  if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
   cor_func <- match.arg(cor_func)
@@ -255,6 +260,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
 #' @importFrom WGCNA adjacency.fromSimilarity TOMsimilarity
 #' @importFrom magrittr %>% set_colnames set_rownames
 #' @importFrom SummarizedExperiment assay
+#' @importFrom methods is
 #'
 #' @examples
 #' net <- build_net(kuehne_expr[, seq_len(350)], n_threads = 1)
@@ -273,7 +279,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
                       # TODO program the mclapply version
 {
   # Checking
-  if (is(data_expr, "SummarizedExperiment")) {
+  if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
   cor_func <- match.arg(cor_func)
@@ -354,6 +360,8 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("", ""))
 
 #' Modules detection in a network
 #'
@@ -387,6 +395,8 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
 #'
 #' @importFrom WGCNA mergeCloseModules
 #' @importFrom dynamicTreeCut cutreeDynamic
+#' @importFrom stats setNames as.dist hclust
+#' @importFrom methods is
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
@@ -401,7 +411,7 @@ detect_modules <- function(data_expr, network, min_module_size =
                            merge_threshold = 0.75, detailled_result = TRUE,
                            pam_respects_dendro = FALSE, ...) {
   # Checks
-  if (is(data_expr, "SummarizedExperiment")) {
+  if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
   if (!(is.data.frame(network) | is.matrix(network)))
@@ -417,7 +427,7 @@ detect_modules <- function(data_expr, network, min_module_size =
   network <- network[colnames(data_expr), colnames(data_expr)]
 
   # Hierarchical clustering
-  gene_tree = stats::hclust(as.dist(network), method = "average")
+  gene_tree = stats::hclust(stats::as.dist(network), method = "average")
   # Tree cut
   dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(
     dendro = gene_tree, distM = network, cutHeight = clustering_th,
@@ -427,7 +437,7 @@ detect_modules <- function(data_expr, network, min_module_size =
   # for cutreeDynamic
 
   # Re-assign gene names
-  dynamicMods <- setNames(dynamicMods, colnames(data_expr))
+  dynamicMods <- stats::setNames(dynamicMods, colnames(data_expr))
 
   if (length(table(dynamicMods)) == 1)
     stop("No modules detected")
@@ -448,9 +458,9 @@ detect_modules <- function(data_expr, network, min_module_size =
   }
 
   # Re-formating
-  modules_list <- setNames(merge$colors,
+  modules_list <- stats::setNames(merge$colors,
                            colnames(data_expr)) %>% split(names(.), .)
-  modules_list_premerge <- setNames(dynamicMods,
+  modules_list_premerge <- stats::setNames(dynamicMods,
                                     colnames(data_expr)) %>% split(names(.), .)
 
   # Return
@@ -459,7 +469,7 @@ detect_modules <- function(data_expr, network, min_module_size =
       modules = modules_list,
       modules_premerge = modules_list_premerge,
       modules_eigengenes = merge$newMEs,
-      dendrograms = stats::hclust(as.dist(1 - cor(merge$newMEs)),
+      dendrograms = stats::hclust(stats::as.dist(1 - cor(merge$newMEs)),
                                   method = "average")
     )
   } else {
@@ -473,6 +483,8 @@ detect_modules <- function(data_expr, network, min_module_size =
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("before"))
 
 #' Modules merge plot
 #'
@@ -491,6 +503,7 @@ detect_modules <- function(data_expr, network, min_module_size =
 #' @importFrom igraph graph_from_data_frame V add_layout_ as_bipartite
 #' @importFrom magrittr %>% set_colnames
 #' @importFrom dplyr left_join mutate_if distinct arrange
+#' @importFrom utils stack
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
@@ -523,8 +536,8 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
     stop("module_merged values for each module must be a vector of gene names")
 
   # data.frame indicating which module got merge into another
-  g <- dplyr::left_join(stack(modules_premerge),
-                        stack(modules_merged), by = "values") %>%
+  g <- dplyr::left_join(utils::stack(modules_premerge),
+                        utils::stack(modules_merged), by = "values") %>%
     tibble::column_to_rownames("values") %>%
     magrittr::set_colnames(c("before", "after")) %>%
     dplyr::mutate_if(is.factor, as.character) %>%
@@ -550,6 +563,10 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
+                         "expression_eigengene", "cor_sign"))
+
 #' Modules expression profiles
 #'
 #' Plot expression profiles for all modules with eigengene highlighted
@@ -566,6 +583,9 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 #' @importFrom tidyr pivot_longer
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate left_join group_by rename select
+#' @importFrom stats setNames prcomp
+#' @importFrom utils stack
+#' @importFrom methods is
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
@@ -577,7 +597,7 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
 
 plot_expression_profiles <- function(data_expr, modules) {
   # Check
-  if (is(data_expr, "SummarizedExperiment")) {
+  if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
   if (is.list(modules)) {
@@ -597,8 +617,8 @@ plot_expression_profiles <- function(data_expr, modules) {
   # Tables preparation for ggplot
   if (is.list(modules)) {
     df <- modules %>%
-      stack %>%
-      setNames(c("gene", "module")) %>%
+      utils::stack() %>%
+      stats::setNames(c("gene", "module")) %>%
       dplyr::mutate(module = as.character(module))
   } else {
     df <- data.frame(gene = modules,
@@ -616,7 +636,7 @@ plot_expression_profiles <- function(data_expr, modules) {
     split.data.frame(.$module) %>%
     lapply(function(y) y[,c(-1,-2)] %>%
              t %>%
-             prcomp(center = TRUE, scale.=TRUE) %>%
+             stats::prcomp(center = TRUE, scale.=TRUE) %>%
              .$x %>%
              .[, "PC1"] %>%
              scale) %>%

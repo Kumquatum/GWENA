@@ -59,9 +59,11 @@
 #' @importFrom NetRep modulePreservation
 #' @importFrom magrittr %>%
 #' @importFrom purrr compact
+#' @importFrom stats setNames
+#' @importFrom methods is
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
 #'                      cond2 = kuehne_expr[25:48, 1:350])
 #' net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
@@ -97,7 +99,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
     stop("data_expr_list must have at least 2 elements (2 conditions) to run",
          " a comparison.")
   data_expr_list <- lapply(data_expr_list, function(data_expr){
-    if (is(data_expr, "SummarizedExperiment")) {
+    if (methods::is(data_expr, "SummarizedExperiment")) {
       data_expr <- t(SummarizedExperiment::assay(data_expr))
     } else {
       .check_data_expr(data_expr)
@@ -230,13 +232,13 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
     # list by condition of gene named vector of modules values
     modules_reformated <- lapply(modules_list, function(cond){
       lapply(names(cond), function(x){
-        setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>%
+        stats::setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>%
         unlist
     })
   } else {
     # Single gene named vector of modules values
     modules_reformated <- lapply(names(modules_list), function(x){
-      setNames(rep(as.numeric(x),
+      stats::setNames(rep(as.numeric(x),
                    length(modules_list[[x]])), modules_list[[x]]) }) %>%
       unlist
   }
@@ -282,7 +284,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
     additional_modules_reformated <- lapply(additional_modules_list,
                                             function(cond){
       lapply(names(cond), function(x){
-        setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>%
+        stats::setNames(rep(as.numeric(x), length(cond[[x]])), cond[[x]]) }) %>%
                                                 unlist
     })
     for (ref_i in ref_set) {
@@ -335,6 +337,8 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("module", "statistics", "pvalue"))
 
 #' Heatmap of comparison statistics
 #'
