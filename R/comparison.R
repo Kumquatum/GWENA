@@ -335,6 +335,8 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("module", "statistics", "pvalue"))
 
 #' Heatmap of comparison statistics
 #'

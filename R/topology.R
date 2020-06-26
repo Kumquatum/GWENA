@@ -1,3 +1,9 @@
+# Removing errors about magrittr's placeholder `.` not declared
+utils::globalVariables(c("."))
+
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("gene_from", "gene_to"))
+
 #' Return graph from squared matrix network
 #'
 #' Takes a squared matrix containing the pairwise similarity scores for each
@@ -301,6 +307,9 @@ get_hub_genes <- function(network, modules = NULL, method =
   return(hubs)
 }
 
+
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("vertex.size", "edge.width"))
 
 #' Plot co-expression network
 #'

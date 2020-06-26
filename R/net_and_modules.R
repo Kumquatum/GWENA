@@ -27,6 +27,10 @@
   }
 }
 
+
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("Power", "SFT.R.sq"))
+
 #' Calculating best fit of a power low on correlation matrix computed on
 #' expression data
 #'
@@ -354,6 +358,8 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("", ""))
 
 #' Modules detection in a network
 #'
@@ -473,6 +479,8 @@ detect_modules <- function(data_expr, network, min_module_size =
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("before"))
 
 #' Modules merge plot
 #'
@@ -549,6 +557,10 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
          vertex.frame.color = "white")
 }
 
+
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
+                         "expression_eigengene", "cor_sign"))
 
 #' Modules expression profiles
 #'
