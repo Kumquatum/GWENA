@@ -7,9 +7,12 @@ Authors@R:
            role = c("aut", "cre"),
            email = "lemoine.gwenaelle@gmail.com",
            comment = c(ORCID = "0000-0003-4747-1937"))
-Description: Analyse transcriptomics data (either microarray or RNA-seq) through co-expression network analysis
-             pipeline. Include filtration of the transcriptomic data, network build, gene clustering (modules), 
-             biological integration (gene enrichment, phenotypic association), topological analysis, and modules comparison.
+Description: GWENA (Gene Whole co-Expression Network Analysis) is an R package 
+             designed to perform gene co-expression network analysis and results
+             exploration in a single pipeline. The pipeline includes functional 
+             enrichment of modules of co-expressed genes, phenotypcal 
+             association, topological analysis and comparisons of networks 
+             between conditions.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
