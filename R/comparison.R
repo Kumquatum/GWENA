@@ -61,7 +61,7 @@
 #' @importFrom purrr compact
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
 #'                      cond2 = kuehne_expr[25:48, 1:350])
 #' net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
