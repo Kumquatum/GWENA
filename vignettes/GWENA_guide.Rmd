@@ -94,7 +94,7 @@ library(magrittr) # Not mandatory, but in this tutorial we use the pipe `%>%` to
 
 threads_to_use <- 1
 ```
-```{r load_other_os, message=FALSE, warning=FALSE, eval=!is_windows, echo=!is_windows}
+```{r load_other_os, message=FALSE, warning=FALSE, eval=isFALSE(is_windows), echo=isFALSE(is_windows)}
 library(GWENA)
 library(magrittr) # Not mandatory, we use the pipe `%>%` to ease readability.
 
