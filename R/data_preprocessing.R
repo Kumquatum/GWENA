@@ -10,10 +10,10 @@
 #' @param type string, function name used for filtration. Should be either
 #' "mean", "median", or "mad"
 #'
-#' @importFrom dplyr select
+#' @importFrom dplyr select top_frac select
 #' @importFrom magrittr %>%
-#' @importFrom dplyr top_frac select
 #' @importFrom SummarizedExperiment assay
+#' @importFrom methods is
 #'
 #' @return A data.frame of filtered genes
 #'
@@ -28,7 +28,7 @@
 filter_low_var <- function(data_expr, pct = 0.8,
                            type = c("mean", "median", "mad")){
   # Checking args
-  if (is(data_expr, "SummarizedExperiment")) {
+  if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
   if (!is.numeric(pct) | length(pct) != 1)
@@ -74,6 +74,7 @@ filter_low_var <- function(data_expr, pct = 0.8,
 #' @importFrom tidyr one_of
 #' @importFrom matrixStats colMaxs colMeans2 colMins
 #' @importFrom SummarizedExperiment assay
+#' @importFrom methods is
 #'
 #' @return A data.frame of filtered genes
 #'
@@ -88,7 +89,7 @@ filter_low_var <- function(data_expr, pct = 0.8,
 filter_RNA_seq <- function(data_expr, min_count = 5,
                            method = c("at least one", "mean", "all")){
   # Checking args
-  if (is(data_expr, "SummarizedExperiment")) {
+  if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
   } else .check_data_expr(data_expr)
   if (!is.numeric(min_count) | length(min_count) != 1)

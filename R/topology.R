@@ -355,6 +355,8 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #'
 #' @import igraph
 #' @importFrom magrittr %>%
+#' @importFrom graphics legend symbols
+#' @importFrom utils lsf.str
 #'
 #' @return NULL, invisible
 #'
@@ -423,7 +425,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
     if (is.character(layout)) {
       # Checking if layout function name exists
       igraph_layouts <- grep("layout_[\\w|_]+",
-                             lsf.str("package:igraph"),
+                             utils::lsf.str("package:igraph"),
                              value = TRUE)
       if (!any(layout %in% igraph_layouts))
         stop("layout name provided not found in igraph layout functions")
@@ -493,13 +495,14 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
       as.character
   } else { label_legend_node <- as.character(scale_vertex_size) }
 
-  a <- legend("bottomright", label_legend_node, pt.cex = scale_vertex_size/200,
-              col = 'white', pch = 21, title = "Degree", bty = "n",
-              y.intersp = 0.7, cex = legend_cex)
+  a <- graphics::legend("bottomright", label_legend_node,
+                        pt.cex = scale_vertex_size/200, col = 'white', pch = 21,
+                        title = "Degree", bty = "n", y.intersp = 0.7,
+                        cex = legend_cex)
   x <- (a$text$x + a$rect$left) / 2
   y <- a$text$y
-  symbols(x, y, circles = scale_vertex_size/200, inches = FALSE, add = TRUE,
-          bg = 'gray', fg = 'white')
+  graphics::symbols(x, y, circles = scale_vertex_size/200, inches = FALSE,
+                    add = TRUE, bg = 'gray', fg = 'white')
 
   # Legend vertex
   scale_edge_width <- seq(edge_scaling_min, edge_scaling_max,
@@ -508,6 +511,6 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
   label_legend_edge <- seq(min(edge), max(edge),
                            length.out = nb_row_legend) %>%
     signif %>% as.character
-  legend("topright", label_legend_edge, col='gray', title = "Weight",
+  graphics::legend("topright", label_legend_edge, col='gray', title = "Weight",
          lwd = scale_edge_width, bty = "n", cex = legend_cex)
 }
