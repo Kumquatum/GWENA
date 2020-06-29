@@ -44,17 +44,8 @@ This document gives a brief tutorial using a subset of a microarray data set to 
 
 .
 
-> ![Figure 1. Analysis pipeline of GWENA, from expression data to characterization of the modules and comparison of conditions.](figure_pipeline_schema.png)
+![Figure 1. Analysis pipeline of GWENA, from expression data to characterization of the modules and comparison of conditions.](figure_pipeline_schema.png)
 
-<!-- It can be performed using the function wrapping all steps `TODO nom fonction full analysis`, or using each function for each step. -->
-
-
-<!-- ## Quick start  -->
-<!-- `# TODO: script function full analysis when implemented` -->
-
-<!-- ```{r wrapper, eval = FALSE} -->
-<!-- # TODO: add example with wrapper -->
-<!-- ``` -->
 
 # Main steps of the pipeline
 
