@@ -63,7 +63,6 @@
 #' @importFrom methods is
 #'
 #' @examples
-#' \donttest{
 #' expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
 #'                      cond2 = kuehne_expr[25:48, 1:350])
 #' net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
@@ -76,7 +75,7 @@
 #'                                  lapply(net_by_cond, `[[`, "adja_mat"),
 #'                                  lapply(net_by_cond, `[[`, "cor_mat"),
 #'                                  lapply(mod_by_cond, `[[`, "modules"))
-#'}
+#'
 #'
 #' @return A nested list where first element is each ref provided, second
 #' level each condition to test, and then elements containing information
