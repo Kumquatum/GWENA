@@ -424,7 +424,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
   if (layout != "auto") {
     if (is.character(layout)) {
       # Checking if layout function name exists
-      igraph_layouts <- grep("layout_[\\w|_]+",
+      igraph_layouts <- grep("^layout_\\w[\\w|_]*",
                              utils::lsf.str("package:igraph"),
                              value = TRUE)
       if (!any(layout %in% igraph_layouts))
