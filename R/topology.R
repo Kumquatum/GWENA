@@ -419,7 +419,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
 
   # Removing edges whose weight < weight_th
   graph_to_plot <- graph_module %>%
-    delete.edges(which(E(.)$weight < weight_th))
+    igraph::delete.edges(which(E(.)$weight < weight_th))
 
   if (layout != "auto") {
     if (is.character(layout)) {
@@ -441,7 +441,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
 
   # Should node be scaled with the degree information
   if (degree_node_scaling) {
-    deg <- degree(graph_to_plot)
+    deg <- igraph::degree(graph_to_plot)
     node_scaling_min <- 1
     vertex_size <- lapply(deg, function(x) {
       (x - min(deg)) / (max(deg) - min(deg)) *
@@ -459,7 +459,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
     edge_width <- edge.width
   } else {
     edge_scaling_min <- 0.2
-    edge <- E(graph_to_plot)$weight
+    edge <- igraph::E(graph_to_plot)$weight
     edge_width <- lapply(edge, function(x) {
       (x - min(edge)) / (max(edge) - min(edge)) *
       (edge_scaling_max - edge_scaling_min) +
