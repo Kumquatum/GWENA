@@ -91,7 +91,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
                               your_func = NULL, n_perm = 10000,
                               comparison_type = c("unpreserved", "preserved",
                                                   "one or the other"),
-                              pvalue_th = 0.05, n_threads = NULL, ...){
+                              pvalue_th = 0.01, n_threads = NULL, ...){
   # Basic checks
   if (!is.list(data_expr_list)) stop("data_expr_list must be a list.")
   if (length(data_expr_list) < 2)
@@ -314,9 +314,23 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
     for (test_j in names(preservation[[ref_i]])) {
       comparison <- preservation[[ref_i]][[test_j]][["p.values"]] %>%
         apply(1, function(mod_stats){
-          if (all(mod_stats < pvalue_th/2)) { "unpreserved"
-          } else if (all(mod_stats > (1 - pvalue_th/2))) { "preserved"
-          } else { "not significant" }
+          if(comparison_type == "unpreserved") {
+            if (all(mod_stats > 1 - pvalue_th)) { "unpreserved"
+            } else "not significant"
+          } else if (comparison_type == "preserved") {
+            if (all(mod_stats < pvalue_th)) { "preserved"
+            } else "not significant"
+          } else if (comparison_type == "one or the other") {
+            if (all(mod_stats > 1 - pvalue_th / 2)) { "unpreserved"
+            } else if (all(mod_stats < pvalue_th)) { "preserved"
+            } else "not significant"
+          } else {
+            stop("Should not be triggered") }
+
+          # if (all(mod_stats < pvalue_th/2)) { "unpreserved"
+          # } else if (all(mod_stats > (1 - pvalue_th/2))) { "preserved"
+          # } else { "not significant" }
+
         }) %>% data.frame(module = names(.), comparison = .,
                           stringsAsFactors = FALSE)
 
