@@ -15,7 +15,7 @@ compare_conditions(
   your_func = NULL,
   n_perm = 10000,
   comparison_type = c("unpreserved", "preserved", "one or the other"),
-  pvalue_th = 0.05,
+  pvalue_th = 0.01,
   n_threads = NULL,
   ...
 )

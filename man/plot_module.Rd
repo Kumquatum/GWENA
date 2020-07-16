@@ -15,6 +15,7 @@ plot_module(
   edge_scaling_max = 1,
   nb_row_legend = 6,
   layout = "auto",
+  layout_scaling = 1,
   vertex.label.cex = 0.7,
   vertex.label.color = "gray20",
   vertex.label.family = "Helvetica",
@@ -54,6 +55,9 @@ will be scalled}
 coordinates, or function for layout, or name of a layout function available
 in \code{igraph}. Default "auto" will choose the best layout depending on
 the graph. For more information, see \code{\link{igraph.plotting}}}
+
+\item{layout_scaling}{integer, scaling factor by which it's possible to have
+compact graph (< 1) or larger graph (> 1) display}
 
 \item{vertex.label.cex, legend_cex}{float, font size for vertex labels. It is
 interpreted as a multiplication factor of some device-dependent base font
