@@ -1,21 +1,66 @@
 library(magrittr)
 library(NetRep)
 
+# Datasets
 data("NetRep")
-data_list <- list(cohort1 = discovery_data, cohort2 = test_data, cohort3 = test_data*0.9) %>% lapply(abs)
+data_list <- list(cohort1 = discovery_data,
+                  cohort2 = test_data,
+                  cohort3 = test_data*0.9) %>% lapply(abs)
 data_list_se <- lapply(data_list, function(data_expr) {
   SummarizedExperiment::SummarizedExperiment(
     assays = list(expr = t(data_expr)),
     colData = S4Vectors::DataFrame(kuehne_traits[1:30,])
   )
 })
-correlation_list <- list(cohort1 = discovery_correlation, cohort2 = test_correlation, cohort3 = test_correlation*0.95)
-adja_list <- list(cohort1 = discovery_network, cohort2 = test_network, cohort3 = test_network*0.97)
-module_labels_switched1 <- module_labels %>% replace(c(which(. == 4), which(. == 3)), .[c(which(. == 3), which(. == 4))])
-module_labels_switched2 <- module_labels %>% replace(c(which(. == 2), which(. == 3)), .[c(which(. == 3), which(. == 2))])
-mod_labels_single_cond <- module_labels %>% split(module_labels) %>% lapply(names)
-mod_labels_multi_cond <- list(cohort1 = module_labels, cohort2 = module_labels_switched1, cohort3 = module_labels_switched2) %>%
+correlation_list <- list(cohort1 = discovery_correlation,
+                         cohort2 = test_correlation,
+                         cohort3 = test_correlation*0.95)
+adja_list <- list(cohort1 = discovery_network,
+                  cohort2 = test_network,
+                  cohort3 = test_network*0.97)
+
+# Different modules conformations
+module_labels_switched1 <- module_labels %>%
+  replace(c(which(. == 4), which(. == 3)), .[c(which(. == 3), which(. == 4))])
+module_labels_switched2 <- module_labels %>%
+  replace(c(which(. == 2), which(. == 3)), .[c(which(. == 3), which(. == 2))])
+mod_labels_single_cond <- module_labels %>%
+  split(module_labels) %>%
+  lapply(names)
+mod_labels_multi_cond <- list(cohort1 = module_labels,
+                              cohort2 = module_labels_switched1,
+                              cohort3 = module_labels_switched2) %>%
   lapply(function(cond){cond %>% split(cond) %>% lapply(names)})
+
+
+
+# ==== z_summary ====
+mini_comp <- compare_conditions(data_list, adja_list, correlation_list,
+                               mod_labels_single_cond, ref = "cohort1",
+                               n_perm = 100)
+test_that("Valid input doesn't thow errors", {
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed,
+                         mini_comp$result$cohort1$cohort2$nulls),
+               NA)
+})
+test_that("Check on input format", {
+  expect_error(z_summary(NULL, mini_comp$result$cohort1$cohort2$nulls))
+  expect_error(z_summary("a", mini_comp$result$cohort1$cohort2$nulls))
+  expect_error(z_summary(1, mini_comp$result$cohort1$cohort2$nulls))
+  expect_error(z_summary(letters[1:5], mini_comp$result$cohort1$cohort2$nulls))
+  expect_error(z_summary(1:5, mini_comp$result$cohort1$cohort2$nulls))
+  expect_error(z_summary(matrix(letters[1:9], 3),
+                         mini_comp$result$cohort1$cohort2$nulls))
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed, NULL))
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed, "a"))
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed, 1))
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed, letters[1:5]))
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed, 1:5))
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed,
+                         matrix(1:9, 3)))
+  expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed,
+                         array(letters[1:3], c(1:3))))
+})
 
 # ==== compare_conditions ====
 test_that("Valid input doesn't thow errors", {
