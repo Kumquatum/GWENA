@@ -74,7 +74,8 @@
 #' comparison <- compare_conditions(expr_by_cond,
 #'                                  lapply(net_by_cond, `[[`, "adja_mat"),
 #'                                  lapply(net_by_cond, `[[`, "cor_mat"),
-#'                                  lapply(mod_by_cond, `[[`, "modules"))
+#'                                  lapply(mod_by_cond, `[[`, "modules"),
+#'                                  n_perm = 100)
 #'
 #'
 #' @return A nested list where first element is each ref provided, second
@@ -82,7 +83,6 @@
 #' on the comparison. See NetRep::modulePreservation() for more detail.
 #'
 #' @export
-#'
 
 compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
                               modules_list, ref = names(data_expr_list)[1],
