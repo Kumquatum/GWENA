@@ -3,6 +3,14 @@ library(magrittr)
 
 query <- res_detection$modules[[5]]
 query_entrez <- gprofiler2::gconvert(query, target = "ENTREZGENE_ACC")$target
+diff_size <- length(query_entrez) - length(query)
+# Since g:Profiler often update its databases, gconvert-ed query varies in
+# length, so handling it.
+if (diff_size < 0) {
+  query_entrez <- c(query_entrez, sample(100:50000, abs(diff_size)))
+} else if (diff_size > 0) {
+  query_entrez <- query_entrez[1:(length(query) - diff_size)]
+}
 classic_gost <- gprofiler2::gost(query)
 gmt_entrez_path <- system.file("extdata", "h.all.v6.2.entrez.gmt", package = "GWENA", mustWork = TRUE)
 gmt_entrez_id <- gprofiler2::upload_GMT_file(gmt_entrez_path)
@@ -46,8 +54,8 @@ test_that("input is a gost result", {
 })
 
 test_that("gost objects in list are compatible", {
-  expect_error(join_gost(list(classic_gost, custom_gost_entrez))) # not same length
-  expect_warning(join_gost(list(classic_gost, gprofiler2::gost(query_entrez[12:124], organism = gmt_entrez_id)))) # not same id type (27:140 arbitrairy to get gost result)
+  expect_error(join_gost(list(classic_gost, gprofiler2::gost(query[1:50])))) # not same length
+  expect_warning(join_gost(list(classic_gost, gprofiler2::gost(query_entrez, organism = gmt_entrez_id)))) # not same id type
   mock_custom_gost <- custom_gost_symbols
   mock_custom_gost$meta$query_metadata$ordered <- TRUE
   expect_warning(join_gost(list(classic_gost, mock_custom_gost))) # element different
