@@ -15,7 +15,7 @@ compare_conditions(
   your_func = NULL,
   n_perm = 10000,
   comparison_type = c("unpreserved", "preserved", "one or the other"),
-  pvalue_th = 0.05,
+  pvalue_th = 0.01,
   n_threads = NULL,
   ...
 )
@@ -107,7 +107,8 @@ mod_by_cond <- mapply(detect_modules, expr_by_cond,
 comparison <- compare_conditions(expr_by_cond,
                                  lapply(net_by_cond, `[[`, "adja_mat"),
                                  lapply(net_by_cond, `[[`, "cor_mat"),
-                                 lapply(mod_by_cond, `[[`, "modules"))
+                                 lapply(mod_by_cond, `[[`, "modules"),
+                                 n_perm = 100)
 
 
 }

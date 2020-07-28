@@ -18,7 +18,7 @@ Description: The development of high-throughput sequencing led to increased use
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Depends: R (>= 4.0.0)
 Suggests: 
     testthat (>= 2.1.0),

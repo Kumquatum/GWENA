@@ -334,6 +334,8 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #' coordinates, or function for layout, or name of a layout function available
 #' in \code{igraph}. Default "auto" will choose the best layout depending on
 #' the graph. For more information, see \code{\link{igraph.plotting}}
+#' @param layout_scaling integer, scaling factor by which it's possible to have
+#' compact graph (< 1) or larger graph (> 1) display
 #' @param vertex.label.cex,legend_cex float, font size for vertex labels. It is
 #' interpreted as a multiplication factor of some device-dependent base font
 #' size. If 0, no labels displayed.
@@ -371,7 +373,8 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
                         enrichment = NULL, title = "Module",
                         degree_node_scaling = TRUE, node_scaling_max = 6,
                         edge_scaling_max = 1, nb_row_legend = 6,
-                        layout = "auto", vertex.label.cex = 0.7,
+                        layout = "auto", layout_scaling = 1,
+                        vertex.label.cex = 0.7,
                         vertex.label.color = "gray20",
                         vertex.label.family = "Helvetica",
                         edge.color = "gray70",
@@ -403,6 +406,8 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
   if (!is.character(layout) & !is.matrix(layout) & !is.function(layout)) {
     stop("layout must be a layout function, its name as a string, or a matrix",
     " giving position of each node ") }
+  if (!is.numeric(layout_scaling))
+    stop("layout_scaling must be a numeric value superior to 0.")
   if (!is.logical(degree_node_scaling))
     stop("degree_node_scaling must be a boolean value")
   if (isTRUE(degree_node_scaling) & exists("vertex.size"))
@@ -419,32 +424,41 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
 
   # Removing edges whose weight < weight_th
   graph_to_plot <- graph_module %>%
-    delete.edges(which(E(.)$weight < weight_th))
+    igraph::delete.edges(which(E(.)$weight < weight_th))
 
-  if (layout != "auto") {
-    if (is.character(layout)) {
+
+  if (is.character(layout)) {
+    if (layout != "auto") {
       # Checking if layout function name exists
-      igraph_layouts <- grep("layout_[\\w|_]+",
+      igraph_layouts <- grep("^layout_\\w[\\w|_]*",
                              utils::lsf.str("package:igraph"),
                              value = TRUE)
       if (!any(layout %in% igraph_layouts))
         stop("layout name provided not found in igraph layout functions")
-      l = igraph::layout_(graph_to_plot, get(layout))
-    } else if (is.function(layout)) {
-      l = igraph::layout_(graph_to_plot, layout)
-    # Meaning it's a matrix
+      l <- igraph::layout_(graph_to_plot, get(layout))
     } else {
-      l = layout
-    }
-  } else {
-    l = igraph::layout_nicely(graph_to_plot)}
+      l <- igraph::layout_nicely(graph_to_plot)}
+  } else if (is.function(layout)) {
+    l <- layout(graph_to_plot)
+  } else if (is.matrix(layout)){
+    l <- layout
+  } else stop("Should never be triggered.")
+
+  if (layout_scaling != 1) l <- l * layout_scaling
 
   # Should node be scaled with the degree information
   if (degree_node_scaling) {
-    deg <- degree(graph_to_plot)
+    deg <- igraph::degree(graph_to_plot)
+    # Checking deg is the same for all (meaning graph is fully connected)
+    delta_deg <- max(deg) - min(deg)
+    if (delta_deg == 0) {
+      warning("max and min degree of the nodes are equal. ",
+      "Consider increasing the weight_th value.")
+      delta_deg <- 1
+    }
     node_scaling_min <- 1
     vertex_size <- lapply(deg, function(x) {
-      (x - min(deg)) / (max(deg) - min(deg)) *
+      (x - min(deg)) / delta_deg *
       (node_scaling_max - node_scaling_min) +
       node_scaling_min }) %>% unlist
   } else {
@@ -459,7 +473,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
     edge_width <- edge.width
   } else {
     edge_scaling_min <- 0.2
-    edge <- E(graph_to_plot)$weight
+    edge <- igraph::E(graph_to_plot)$weight
     edge_width <- lapply(edge, function(x) {
       (x - min(edge)) / (max(edge) - min(edge)) *
       (edge_scaling_max - edge_scaling_min) +
@@ -481,6 +495,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
                       vertex.size = vertex_size,
                       edge.width = edge_width,
                       layout = l,
+                      rescale = ifelse(layout_scaling != 1, FALSE, TRUE),
                       main = title,
                       ...)
 

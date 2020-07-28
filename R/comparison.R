@@ -1,3 +1,101 @@
+utils::globalVariables(c("coherence", "avg.contrib", "avg.cor", "avg.weight",
+                         "cor.contrib", "cor.cor", "cor.degree"))
+#' Calculating Z summary
+#'
+#' Use the topological metrics and permutations from output of
+#' \code{\link[NetRep]{modulePreservation}} to compute a Z summary (a composite
+#' preservation statistic) as defined by
+#' \href{Langfelder et al. (2011)}{https://doi.org/10.1371/journal.pcbi.1001057}
+#'
+#' @param observed_stat matrix, bidimensional matrix containing the topological
+#' matrix computed for each module by \code{\link[NetRep]{modulePreservation}}
+#' (the element \code{observed}). Modules are in row, metrics are in column.
+#' @param permutations_array matrix, tridimensional matrix containing the
+#' topological matrix computed for each module by
+#' \code{\link[NetRep]{modulePreservation}} (the element \code{observed}).
+#' Modules are in dim 1, metrics are in dim 2, permutations are in dim 3.
+#'
+#' @details The original Zsummary composite preservation statistic was defined
+#' by Langfelder et al. (2011). However this method use the metric from
+#' \code{\link[NetRep]{modulePreservation}} since they it handle better large
+#' and multiple testing correction.
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select
+#' @importFrom stats sd median
+#'
+#' @examples
+#' expr_by_cond <- list(cond1 = kuehne_expr[1:24, 1:350],
+#'                      cond2 = kuehne_expr[25:48, 1:350])
+#' net_by_cond <- lapply(expr_by_cond, build_net, cor_func = "spearman",
+#'                       n_threads = 1, keep_matrices = "both")
+#'
+#' mods_labels <- setNames(
+#'   sample(1:6, 350, replace = TRUE,
+#'          prob = c(0.05, 0.4, 0.25, 0.15, 0.1, 0.05)),
+#'   colnames(expr_by_cond$cond1))
+#'
+#' netrep_res <- NetRep::modulePreservation(
+#'   network = lapply(net_by_cond, `[[`, "adja_mat"),
+#'   data = lapply(expr_by_cond, as.matrix),
+#'   correlation = lapply(net_by_cond, `[[`, "cor_mat"),
+#'   moduleAssignments = mods_labels,  nPerm = 100)
+#'
+#' z_summary(netrep_res$observed, netrep_res$nulls)
+#'
+#' mod_by_cond <- mapply(detect_modules, expr_by_cond,
+#'                       lapply(net_by_cond, `[[`, "network"),
+#'                       MoreArgs = list(detailled_result = TRUE),
+#'                       SIMPLIFY = FALSE)
+#'
+#' comparison <- compare_conditions(expr_by_cond,
+#'                                  lapply(net_by_cond, `[[`, "adja_mat"),
+#'                                  lapply(net_by_cond, `[[`, "cor_mat"),
+#'                                  lapply(mod_by_cond, `[[`, "modules"),
+#'                                  n_perm = 100)
+#'
+#' z_summary(comparison$result$cond1$cond2$observed,
+#'           comparison$result$cond1$cond2$nulls)
+#'
+#' @return A named vector of the z summary statistic with the module id as name.
+#'
+#' @export
+
+z_summary <- function(observed_stat, permutations_array) {
+  # Checks
+  if (!is.matrix(observed_stat))
+    stop("observed_stat must be a matrix")
+  if (!is.numeric(observed_stat))
+    stop("observed_stat must only contain numeric values")
+  if (!is.array(permutations_array))
+    stop("permutations_array must be an array")
+  if (length(dim(permutations_array)) != 3)
+    stop("permutations_array must be a tridimensional array")
+  if (!is.numeric(permutations_array))
+    stop("permutations_array must only contain numeric values")
+
+  # Calculating the Z score for each stat
+  mean_perm <- apply(permutations_array, c(1,2), mean)
+  sd_perm <- apply(permutations_array, c(1,2), stats::sd)
+  z_stats <- (observed_stat - mean_perm) / sd_perm
+
+  # Density Z score
+  z_density <- z_stats %>%
+    as.data.frame %>%
+    dplyr::select(coherence, avg.contrib, avg.cor, avg.weight) %>%
+    apply(1, stats::median)
+
+  # Connectivity Z score
+  z_connectivity <- z_stats %>%
+    as.data.frame %>%
+    dplyr::select(cor.contrib, cor.cor, cor.degree) %>%
+    apply(1, stats::median)
+
+  # Summary Z score
+  return(mapply(mean, z_density, z_connectivity))
+}
+
+
 #' Compare modules topology between conditions
 #'
 #' Take modules built from multiples conditions and search for preservation,
@@ -74,7 +172,8 @@
 #' comparison <- compare_conditions(expr_by_cond,
 #'                                  lapply(net_by_cond, `[[`, "adja_mat"),
 #'                                  lapply(net_by_cond, `[[`, "cor_mat"),
-#'                                  lapply(mod_by_cond, `[[`, "modules"))
+#'                                  lapply(mod_by_cond, `[[`, "modules"),
+#'                                  n_perm = 100)
 #'
 #'
 #' @return A nested list where first element is each ref provided, second
@@ -82,7 +181,6 @@
 #' on the comparison. See NetRep::modulePreservation() for more detail.
 #'
 #' @export
-#'
 
 compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
                               modules_list, ref = names(data_expr_list)[1],
@@ -91,7 +189,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
                               your_func = NULL, n_perm = 10000,
                               comparison_type = c("unpreserved", "preserved",
                                                   "one or the other"),
-                              pvalue_th = 0.05, n_threads = NULL, ...){
+                              pvalue_th = 0.01, n_threads = NULL, ...){
   # Basic checks
   if (!is.list(data_expr_list)) stop("data_expr_list must be a list.")
   if (length(data_expr_list) < 2)
@@ -314,9 +412,23 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
     for (test_j in names(preservation[[ref_i]])) {
       comparison <- preservation[[ref_i]][[test_j]][["p.values"]] %>%
         apply(1, function(mod_stats){
-          if (all(mod_stats < pvalue_th/2)) { "unpreserved"
-          } else if (all(mod_stats > (1 - pvalue_th/2))) { "preserved"
-          } else { "not significant" }
+          if(comparison_type == "unpreserved") {
+            if (all(mod_stats > 1 - pvalue_th)) { "unpreserved"
+            } else "not significant"
+          } else if (comparison_type == "preserved") {
+            if (all(mod_stats < pvalue_th)) { "preserved"
+            } else "not significant"
+          } else if (comparison_type == "one or the other") {
+            if (all(mod_stats > 1 - pvalue_th / 2)) { "unpreserved"
+            } else if (all(mod_stats < pvalue_th)) { "preserved"
+            } else "not significant"
+          } else {
+            stop("Should not be triggered") }
+
+          # if (all(mod_stats < pvalue_th/2)) { "unpreserved"
+          # } else if (all(mod_stats > (1 - pvalue_th/2))) { "preserved"
+          # } else { "not significant" }
+
         }) %>% data.frame(module = names(.), comparison = .,
                           stringsAsFactors = FALSE)
 
