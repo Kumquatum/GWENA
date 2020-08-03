@@ -397,7 +397,7 @@ utils::globalVariables(c("", ""))
 #' @importFrom dynamicTreeCut cutreeDynamic
 #' @importFrom stats setNames as.dist hclust
 #' @importFrom methods is
-#' @importFrom stringr srt_sort
+#' @importFrom stringr str_sort
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
