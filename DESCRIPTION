@@ -44,6 +44,7 @@ Imports:
     rlist (>= 0.4.6.1),
     matrixStats (>= 0.55.0),
     SummarizedExperiment (>= 1.14.1),
+    stringr (>= 1.4.0),
     methods,
     graphics,
     stats,

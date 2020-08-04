@@ -397,6 +397,7 @@ utils::globalVariables(c("", ""))
 #' @importFrom dynamicTreeCut cutreeDynamic
 #' @importFrom stats setNames as.dist hclust
 #' @importFrom methods is
+#' @importFrom stringr str_sort
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
@@ -451,6 +452,13 @@ detect_modules <- function(data_expr, network, min_module_size =
     merge <- quiet(WGCNA::mergeCloseModules(
       data_expr, colors = dynamicMods, cutHeight = 1 - merge_threshold,
       relabel = TRUE, ...))
+
+    # Reordering module eigengenes
+    merge$newMEs <- merge$newMEs[, stringr::str_sort(colnames(merge$newMEs),
+                                                     numeric = TRUE)]
+    merge$newMEs <- merge$newMEs[, stringr::str_sort(colnames(merge$newMEs),
+                                                     numeric = TRUE)]
+
   } else {
     merge <- list(
       colors = dynamicMods,

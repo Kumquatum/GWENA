@@ -338,6 +338,29 @@ associate_phenotype <- function(eigengenes, phenotypes) {
     stop("Number of row should be the same between eigengene and phenotypes ",
          "(samples)")
 
+  # Looking for common id column. If not checking rownames match
+  matching_id_col <- colnames(eigengenes) %in% colnames(phenotypes)
+  nb_matching <- length(matching_id_col[matching_id_col == TRUE])
+  if (nb_matching > 1) {
+    stop("More than one common column name between eigengenes and phenotypes.",
+         "Therefore cannot match rows.")
+  } else if (nb_matching == 0) {
+    # Looking for matching rownames to use instead
+    matching_rownames <- rownames(eigengenes) %in% rownames(phenotypes)
+    if (all(matching_rownames)) {
+      phenotypes <- phenotypes[match(rownames(eigengenes),
+                                     rownames(phenotypes)), ]
+    } else {
+      warning("No common name found to be used as id, neither matching",
+              " rownames. Using both dataframes as is for row matching.")
+    }
+  } else if (nb_matching == 1) {
+    # Ordering rows using the id column and removing it after
+    id_col <- colnames(eigengenes)[matching_id_col]
+    phenotypes <- phenotypes[match(eigengenes[, id_col], phenotypes$sample), ]
+    rownames(phenotypes) <- NULL
+  }
+
   # Design matrix (dummy variable formation for qualitative variables)
   dummies_var <- lapply(colnames(phenotypes), function(dummy_name) {
     df <- phenotypes %>% dplyr::select(dummy_name)

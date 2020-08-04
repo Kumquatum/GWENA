@@ -14,7 +14,7 @@ compare_conditions(
   cor_func = c("pearson", "spearman", "bicor", "other"),
   your_func = NULL,
   n_perm = 10000,
-  comparison_type = c("unpreserved", "preserved", "one or the other"),
+  test_alternative_hyp = c("greater", "less", "two.sided"),
   pvalue_th = 0.01,
   n_threads = NULL,
   ...
@@ -59,14 +59,14 @@ in [-1;1]}
 name re-assignment inside network to compute all tests and statistics for
 module comparison between condition.}
 
-\item{comparison_type}{string, either "unpreserved", "preserved" or "one or
-the other". Design if the comparison aim to detect preserved modules between
-condition, unpreserved ones, or modules that are one or the other without
-specification of which.}
+\item{test_alternative_hyp}{string, either "greater", "less" or "two.sided".
+Alternative hypothesis (H1) used for the permutation test. Determine if the
+metrics computed on permuted values are expected to be greater, less or both
+than the observed ones. More details:\code{\link[NetRep]{modulePreservation}}}
 
-\item{pvalue_th}{decimal, threshold of pvalue below which comparison_type is
-considered significant. If "one or the other", then pvalue_th is splitted in
-two for each side (preserved/not preserved).}
+\item{pvalue_th}{decimal, threshold of pvalue below which
+test_alternative_hyp is considered significant. If "two.sided", then
+pvalue_th is splitted in two for each side (preserved/not preserved).}
 
 \item{n_threads}{integer, number of threads that can be used to paralellise
 the computing}
