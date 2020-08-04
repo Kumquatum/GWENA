@@ -37,7 +37,7 @@ mod_labels_multi_cond <- list(cohort1 = module_labels,
 # ==== z_summary ====
 mini_comp <- compare_conditions(data_list, adja_list, correlation_list,
                                mod_labels_single_cond, ref = "cohort1",
-                               n_perm = 100)
+                               n_perm = 10)
 test_that("Valid input doesn't thow errors", {
   expect_error(z_summary(mini_comp$result$cohort1$cohort2$observed,
                          mini_comp$result$cohort1$cohort2$nulls),

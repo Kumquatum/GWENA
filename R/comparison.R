@@ -132,13 +132,13 @@ z_summary <- function(observed_stat, permutations_array) {
 #' @param n_perm integer, number of permutation, meaning number of random gene
 #' name re-assignment inside network to compute all tests and statistics for
 #' module comparison between condition.
-#' @param comparison_type string, either "unpreserved", "preserved" or "one or
-#' the other". Design if the comparison aim to detect preserved modules between
-#' condition, unpreserved ones, or modules that are one or the other without
-#' specification of which.
-#' @param pvalue_th decimal, threshold of pvalue below which comparison_type is
-#' considered significant. If "one or the other", then pvalue_th is splitted in
-#' two for each side (preserved/not preserved).
+#' @param test_alternative_hyp string, either "greater", "less" or "two.sided".
+#' Alternative hypothesis (H1) used for the permutation test. Determine if the
+#' metrics computed on permuted values are expected to be greater, less or both
+#' than the observed ones. More details:\code{\link[NetRep]{modulePreservation}}
+#' @param pvalue_th decimal, threshold of pvalue below which
+#' test_alternative_hyp is considered significant. If "two.sided", then
+#' pvalue_th is splitted in two for each side (preserved/not preserved).
 #' @param n_threads integer, number of threads that can be used to paralellise
 #' the computing
 #' @param ... any other parameter compatible with
@@ -187,8 +187,8 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
                               test = NULL, cor_func = c("pearson", "spearman",
                                                         "bicor", "other"),
                               your_func = NULL, n_perm = 10000,
-                              comparison_type = c("unpreserved", "preserved",
-                                                  "one or the other"),
+                              test_alternative_hyp = c("greater", "less",
+                                                       "two.sided"),
                               pvalue_th = 0.01, n_threads = NULL, ...){
   # Basic checks
   if (!is.list(data_expr_list)) stop("data_expr_list must be a list.")
@@ -246,7 +246,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
     stop("If you specify other, your_func must be a function.")
   if (!is.numeric(n_perm)) stop("n_perm must be a numeric value")
   if (n_perm %% 1 != 0) stop("n_perm must be a whole number")
-  comparison_type <- match.arg(comparison_type)
+  test_alternative_hyp <- match.arg(test_alternative_hyp)
   if (!is.null(n_threads)) {
     if (!is.numeric(n_threads)) stop("n_threads must be a numeric value")
     if (n_threads %% 1 != 0) stop("n_threads must be a whole number")
@@ -340,12 +340,6 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
       unlist
   }
 
-  # Setting tests depending on input params
-  test_tail_side <- switch(comparison_type,
-                           "unpreserved" = "less",
-                           "preserved" = "greater",
-                           "one or the other" = "two.sided"
-                           )
   if (all(ref == "cross comparison")) {
     test_set <- conditions
     ref_set <- conditions
@@ -364,10 +358,10 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
 
 
   # Preservation
-  preservation <- quiet(NetRep::modulePreservation(
+  net_rep_preservation <- quiet(NetRep::modulePreservation(
     network = adja_list, data = data_expr_list, correlation = cor_list,
     moduleAssignments = modules_reformated, discovery = ref_set,
-    test = test_set, alternative = test_tail_side, nPerm = n_perm,
+    test = test_set, alternative = test_alternative_hyp, nPerm = n_perm,
     nThreads = n_threads, simplify = FALSE, ...))
 
 
@@ -389,7 +383,7 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
         tmp_module_labels <- list(
           ref_i = modules_reformated[[ref_i]],
           additional_j = additional_modules_reformated[[additional_j]])
-        preservation[[ref_i]][[additional_j]][["contingency"]] <-
+        net_rep_preservation[[ref_i]][[additional_j]][["contingency"]] <-
           .contingencyTable(tmp_module_labels,
                            tmp_module_labels$ref_i %>% table %>% names,
                            tmp_module_labels$additional_j %>%
@@ -405,43 +399,79 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
     x <- lapply(x, function(y) if (is.list(y)) prune_list(y) else y)
     purrr::compact(x)
   }
-  preservation <- prune_list(preservation)
+  net_rep_preservation <- prune_list(net_rep_preservation)
 
-  # Adding summarising table about module's preservation
-  for (ref_i in names(preservation)) {
-    for (test_j in names(preservation[[ref_i]])) {
-      comparison <- preservation[[ref_i]][[test_j]][["p.values"]] %>%
-        apply(1, function(mod_stats){
-          if(comparison_type == "unpreserved") {
-            if (all(mod_stats > 1 - pvalue_th)) { "unpreserved"
-            } else "not significant"
-          } else if (comparison_type == "preserved") {
-            if (all(mod_stats < pvalue_th)) { "preserved"
-            } else "not significant"
-          } else if (comparison_type == "one or the other") {
-            if (all(mod_stats > 1 - pvalue_th / 2)) { "unpreserved"
-            } else if (all(mod_stats < pvalue_th)) { "preserved"
-            } else "not significant"
-          } else {
-            stop("Should not be triggered") }
+  # Computing Z summary stat and adding summarising table about module's
+  # preservation
+  # for (ref_i in names(net_rep_preservation)) {
+  #   for (test_j in names(net_rep_preservation[[ref_i]])) {
+  preservation_both <- lapply(names(net_rep_preservation), function(ref_i){
+    lapply(names(net_rep_preservation[[ref_i]]), function(test_j){
 
-          # if (all(mod_stats < pvalue_th/2)) { "unpreserved"
-          # } else if (all(mod_stats > (1 - pvalue_th/2))) { "preserved"
-          # } else { "not significant" }
+      ij_comparison <- net_rep_preservation[[ref_i]][[test_j]]
+      p_values <- ij_comparison$p.values
+      z_summary <- z_summary(ij_comparison$observed, ij_comparison$nulls)
 
-        }) %>% data.frame(module = names(.), comparison = .,
-                          stringsAsFactors = FALSE)
+      joined_comparison <- lapply(seq_len(nrow(p_values)),
+                                  function(module_index){
+        module_p_values <- p_values[module_index, ]
+        module_z_summary <- z_summary[module_index]
 
-      preservation[[ref_i]][[test_j]][["comparison"]] <- comparison
-    }
-  }
+        # Getting comparison output according to NetRep
+        get_net_rep_output <- function(bool) {
+          if(bool) "preserved" else "not significant"}
+        net_rep_res <- switch(
+          test_alternative_hyp,
+          "greater"  = get_net_rep_output(max(module_p_values) < pvalue_th),
+          "less" = get_net_rep_output(min(module_p_values) > 1 - pvalue_th),
+          "two.sided" = get_net_rep_output(
+            max(module_p_values) < (pvalue_th / 2) |
+            min(module_p_values) > 1 - (pvalue_th / 2)),
+          stop("Should not be triggered"))
+
+        # Getting comparison output according to Z summary stat
+        if (module_z_summary < 2) {
+          z_summary_res <- "unpreserved"
+        } else if (module_z_summary >= 2 & module_z_summary <= 10) {
+          z_summary_res <- "moderately preserved"
+        } else if (module_z_summary > 10) {
+          z_summary_res <- "preserved"
+        } else stop("Should not be triggered")
+
+        # Joining both metrics into a final output
+        comparison_single_module <- switch(
+          net_rep_res,
+         "preserved" = {
+           switch(z_summary_res,
+                  "preserved" = { "preserved" },
+                  "moderately preserved" = { "moderately preserved" },
+                  "unpreserved" = { "unconclusive" },
+                  stop("Should not be triggered"))},
+         "not significant" = {
+           switch(z_summary_res,
+                  "preserved" = { "unconclusive" },
+                  "moderately preserved" = { "moderately preserved" },
+                  "unpreserved" = { "unpreserved" },
+                  stop("Should not be triggered"))},
+         stop("Should not be triggered"))})
+
+      joined_comparison <- joined_comparison %>%
+        unlist() %>%
+        data.frame(comparison = ., stringsAsFactors = FALSE)
+
+      ij_comparison$z_summary <- z_summary
+      ij_comparison$comparison <- joined_comparison
+
+      return(ij_comparison)
+    }) %>% setNames(names(net_rep_preservation[[ref_i]]))
+  }) %>% setNames(names(net_rep_preservation))
 
   # Adding metadata about the comparison
-  preservation <- list(result = preservation,
+  preservation <- list(result = preservation_both,
                        metadata = list(
                          pvalue_th = pvalue_th,
                          cor_func = cor_func,
-                         comparison_type = comparison_type
+                         test_alternative_hyp = test_alternative_hyp
                        ))
 
   return(preservation)
