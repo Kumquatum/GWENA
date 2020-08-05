@@ -372,12 +372,13 @@ mod_by_cond <- mapply(detect_modules, expr_by_cond,
 comparison <- compare_conditions(expr_by_cond, 
                                  lapply(net_by_cond, `[[`, "adja_mat"), 
                                  lapply(net_by_cond, `[[`, "cor_mat"),  
-                                 lapply(mod_by_cond, `[[`, "modules"),
-                                 comparison_type = "preserved", 
+                                 lapply(mod_by_cond, `[[`, "modules"), 
                                  pvalue_th = 0.05)
 ```
 
-The final object contains a table summarizing the comparison of the modules, directly available with the `comparison$result$young$old$comparison` command.
+The final object contains a table summarizing the comparison of the modules, 
+directly available with the `comparison$result$young$old$comparison` command. 
+The comparison take into account the permutation test result and the z summary.
 
 `r knitr::kable(comparison$result$young$old$comparison, caption =  "Modules preservation with young as reference")`
 

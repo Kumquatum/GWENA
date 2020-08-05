@@ -148,6 +148,11 @@ z_summary <- function(observed_stat, permutations_array) {
 #' \describe{
 #'   \item{}{Conditions will be based on names of data_expr_list. Please do not
 #'   use numbers for conditions names as modules are often named this way}
+#'   \item{}{The final comparison output is a combination of the permutation
+#'   test and the Z summary statistic. Comparison value is set to "preserved"
+#'   when both return "preserved", "moderately preserved" when Z summary return
+#'   it, "unpreserved" when permutation test is not significant and Z summary
+#'   return "unpreserved", and "inconclusive" when the two values are opposite}
 #'   \item{}{To avoid recalculation, correlations matrices can be obtain by
 #'   setting \code{keep_cor_mat} in \code{\link[GWENA]{build_net}} to TRUE.}
 #'   \item{}{Description of the 7 topological features used for preservation
@@ -445,11 +450,11 @@ compare_conditions = function(data_expr_list, adja_list, cor_list = NULL,
            switch(z_summary_res,
                   "preserved" = { "preserved" },
                   "moderately preserved" = { "moderately preserved" },
-                  "unpreserved" = { "unconclusive" },
+                  "unpreserved" = { "inconclusive" },
                   stop("Should not be triggered"))},
          "not significant" = {
            switch(z_summary_res,
-                  "preserved" = { "unconclusive" },
+                  "preserved" = { "inconclusive" },
                   "moderately preserved" = { "moderately preserved" },
                   "unpreserved" = { "unpreserved" },
                   stop("Should not be triggered"))},
