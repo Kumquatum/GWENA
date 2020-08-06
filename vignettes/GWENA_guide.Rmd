@@ -323,7 +323,7 @@ Since co-expression networks are complete graphs, readability is hard because al
 module_example <- detection$modules$`2`
 graph <- build_graph_from_sq_mat(net$network[module_example, module_example])
 
-plot_module(graph, weight_th = 0.999995, 
+plot_module(graph, upper_weight_th = 0.999995, 
             vertex.label.cex = 0, 
             node_scaling_max = 7, 
             legend_cex = 1)

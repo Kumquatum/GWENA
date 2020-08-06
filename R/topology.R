@@ -318,24 +318,24 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #'
 #' @param graph_module igraph object, module to plot.
 #' @param hubs character vector or numeric vector with names, optionnal,
-#' vector of gene names or vector of numeric values named with gene names
-#' @param weight_th  decimal, weight threshold under or equal to which edges
-#' will be removed
-#' @param enrichment list, representing a gost object
-#' @param title string, main title that will be displayed on the plot
+#' vector of gene names or vector of numeric values named with gene names.
+#' @param lower_weight_th,upper_weight_th decimal, weight threshold below or
+#' above which edges will be removed.
+#' @param enrichment list, representing a gost object.
+#' @param title string, main title that will be displayed on the plot.
 #' @param degree_node_scaling boolean, indicate if node size should represent
-#' the degree of this node
+#' the degree of this node.
 #' @param node_scaling_max integer, if degree_node_scaling is TRUE, it is the
-#' max size of the node, else it is the exact size of all node
+#' max size of the node, else it is the exact size of all node.
 #' @param edge_scaling_max integer, scaling factor by whihch the edge width
-#' will be scalled
+#' will be scalled.
 #' @param nb_row_legend integer, number of levels in the legend.
 #' @param layout numeric matrix or function or string, numeric matrix for nodes
 #' coordinates, or function for layout, or name of a layout function available
 #' in \code{igraph}. Default "auto" will choose the best layout depending on
-#' the graph. For more information, see \code{\link{igraph.plotting}}
+#' the graph. For more information, see \code{\link{igraph.plotting}}.
 #' @param layout_scaling integer, scaling factor by which it's possible to have
-#' compact graph (< 1) or larger graph (> 1) display
+#' compact graph (< 1) or larger graph (> 1) display.
 #' @param vertex.label.cex,legend_cex float, font size for vertex labels. It is
 #' interpreted as a multiplication factor of some device-dependent base font
 #' size. If 0, no labels displayed.
@@ -350,7 +350,7 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #' the vertex. If it is 0 then the label is centered on the vertex. If it is 1
 #' then the label is displayed beside the vertex.
 #' @param ... any other parameter compatible with the
-#' \code{\link[igraph]{plot.igraph}} function
+#' \code{\link[igraph]{plot.igraph}} function.
 #'
 #' @details Take care of you intend to compare modules' graphs, the same size
 #' of node will not correspond to the same values because of the scaling.
@@ -369,11 +369,11 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #'
 #' @export
 
-plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
-                        enrichment = NULL, title = "Module",
-                        degree_node_scaling = TRUE, node_scaling_max = 6,
-                        edge_scaling_max = 1, nb_row_legend = 6,
-                        layout = "auto", layout_scaling = 1,
+plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
+                        upper_weight_th = NULL, enrichment = NULL,
+                        title = "Module", degree_node_scaling = TRUE,
+                        node_scaling_max = 6, edge_scaling_max = 1,
+                        nb_row_legend = 6, layout = "auto", layout_scaling = 1,
                         vertex.label.cex = 0.7,
                         vertex.label.color = "gray20",
                         vertex.label.family = "Helvetica",
@@ -399,9 +399,16 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
       stop("hubs must be a named vector of numeric values, or a vector of",
       " characters")
   }
-  if (length(weight_th) > 1) stop("weight_th must be a single numeric value")
-  if (!is.numeric(weight_th)) stop("weight_th must be a numeric value")
-  if (weight_th < 0 | weight_th >= 1) stop("weight_th must be a in [0;1[")
+  lapply(c(lower_weight_th, upper_weight_th), function(weight_th){
+    if (!is.null(weight_th)) {
+      if (length(weight_th) > 1)
+        stop("Weight threshold must be a single numeric value")
+      if (!is.numeric(weight_th))
+        stop("Weight threshold must be a numeric value")
+      # if (weight_th <= -1 | weight_th >= 1)
+      #   stop("Weight thresholds must be a in ]-1;1[")
+    }
+  })
   if (!is.null(enrichment)) .check_gost(enrichment)
   if (!is.character(layout) & !is.matrix(layout) & !is.function(layout)) {
     stop("layout must be a layout function, its name as a string, or a matrix",
@@ -422,9 +429,15 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
   if (!(all(hubs %in% igraph::V(graph_module)$names)))
     stop("Not all hubs are in graph_module")
 
-  # Removing edges whose weight < weight_th
-  graph_to_plot <- graph_module %>%
-    igraph::delete.edges(which(E(.)$weight < weight_th))
+  # Removing edges whose weight is below or above thresholds given
+  if (!is.null(lower_weight_th)) {
+    graph_to_plot <- graph_module %>%
+      igraph::delete.edges(which(E(.)$weight < lower_weight_th))
+  } else if (!is.null(upper_weight_th)) {
+    graph_to_plot <- graph_module %>%
+      igraph::delete.edges(which(E(.)$weight > upper_weight_th))
+  } else graph_to_plot <- graph_module
+
 
 
   if (is.character(layout)) {
@@ -453,7 +466,7 @@ plot_module <- function(graph_module, hubs = NULL, weight_th = 0.2,
     delta_deg <- max(deg) - min(deg)
     if (delta_deg == 0) {
       warning("max and min degree of the nodes are equal. ",
-      "Consider increasing the weight_th value.")
+      "Consider changing the weight thresholds value.")
       delta_deg <- 1
     }
     node_scaling_min <- 1

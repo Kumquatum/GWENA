@@ -7,7 +7,8 @@
 plot_module(
   graph_module,
   hubs = NULL,
-  weight_th = 0.2,
+  lower_weight_th = NULL,
+  upper_weight_th = NULL,
   enrichment = NULL,
   title = "Module",
   degree_node_scaling = TRUE,
@@ -31,33 +32,33 @@ plot_module(
 \item{graph_module}{igraph object, module to plot.}
 
 \item{hubs}{character vector or numeric vector with names, optionnal,
-vector of gene names or vector of numeric values named with gene names}
+vector of gene names or vector of numeric values named with gene names.}
 
-\item{weight_th}{decimal, weight threshold under or equal to which edges
-will be removed}
+\item{lower_weight_th, upper_weight_th}{decimal, weight threshold below or
+above which edges will be removed.}
 
-\item{enrichment}{list, representing a gost object}
+\item{enrichment}{list, representing a gost object.}
 
-\item{title}{string, main title that will be displayed on the plot}
+\item{title}{string, main title that will be displayed on the plot.}
 
 \item{degree_node_scaling}{boolean, indicate if node size should represent
-the degree of this node}
+the degree of this node.}
 
 \item{node_scaling_max}{integer, if degree_node_scaling is TRUE, it is the
-max size of the node, else it is the exact size of all node}
+max size of the node, else it is the exact size of all node.}
 
 \item{edge_scaling_max}{integer, scaling factor by whihch the edge width
-will be scalled}
+will be scalled.}
 
 \item{nb_row_legend}{integer, number of levels in the legend.}
 
 \item{layout}{numeric matrix or function or string, numeric matrix for nodes
 coordinates, or function for layout, or name of a layout function available
 in \code{igraph}. Default "auto" will choose the best layout depending on
-the graph. For more information, see \code{\link{igraph.plotting}}}
+the graph. For more information, see \code{\link{igraph.plotting}}.}
 
 \item{layout_scaling}{integer, scaling factor by which it's possible to have
-compact graph (< 1) or larger graph (> 1) display}
+compact graph (< 1) or larger graph (> 1) display.}
 
 \item{vertex.label.cex, legend_cex}{float, font size for vertex labels. It is
 interpreted as a multiplication factor of some device-dependent base font
@@ -76,7 +77,7 @@ the vertex. If it is 0 then the label is centered on the vertex. If it is 1
 then the label is displayed beside the vertex.}
 
 \item{...}{any other parameter compatible with the
-\code{\link[igraph]{plot.igraph}} function}
+\code{\link[igraph]{plot.igraph}} function.}
 }
 \value{
 NULL, invisible
