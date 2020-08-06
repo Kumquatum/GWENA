@@ -331,6 +331,8 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
   adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat,
                                         type = network_type,
                                         power = fit$power_value)
+  # Outputed matrix class is AsIs. Changing it to avoid later side effects
+  class(adj) <- c("matrix", "array")
 
   # Topological overlap matrix
   if (tom_type != "none") {
