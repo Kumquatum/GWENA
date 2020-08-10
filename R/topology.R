@@ -430,12 +430,16 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
     stop("Not all hubs are in graph_module")
 
   # Removing edges whose weight is below or above thresholds given
-  if (!is.null(lower_weight_th)) {
+  if (!is.null(lower_weight_th) & !is.null(upper_weight_th)) {
     graph_to_plot <- graph_module %>%
-      igraph::delete.edges(which(E(.)$weight < lower_weight_th))
+      igraph::delete.edges(which(E(.)$weight > lower_weight_th &
+                                 E(.)$weight < upper_weight_th))
+  } else if (!is.null(lower_weight_th)) {
+    graph_to_plot <- graph_module %>%
+      igraph::delete.edges(which(E(.)$weight > lower_weight_th))
   } else if (!is.null(upper_weight_th)) {
     graph_to_plot <- graph_module %>%
-      igraph::delete.edges(which(E(.)$weight > upper_weight_th))
+      igraph::delete.edges(which(E(.)$weight < upper_weight_th))
   } else graph_to_plot <- graph_module
 
 
