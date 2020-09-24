@@ -80,7 +80,7 @@ then the label is displayed beside the vertex.}
 \code{\link[igraph]{plot.igraph}} function.}
 }
 \value{
-NULL, invisible
+matrix, layout of the graph as a two column matrix (x, y)
 }
 \description{
 Display a graph representing the co-expression network and different

@@ -360,7 +360,7 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #' @importFrom graphics legend symbols
 #' @importFrom utils lsf.str
 #'
-#' @return NULL, invisible
+#' @return matrix, layout of the graph as a two column matrix (x, y)
 #'
 #' @examples
 #' mat <- matrix(runif(40*40), 40)
@@ -545,4 +545,6 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
     signif %>% as.character
   graphics::legend("topright", label_legend_edge, col='gray', title = "Weight",
          lwd = scale_edge_width, bty = "n", cex = legend_cex)
+
+  return(l)
 }
