@@ -393,7 +393,7 @@ utils::globalVariables(c("", ""))
 #' \code{\link[WGCNA]{mergeCloseModules}}
 #'
 #' @return list containing modules detected, modules_eigengenes, and if asked
-#' for, modules pre-merge and dendrogram
+#' for, modules pre-merge and dendrograms of genes and merged modules
 #'
 #' @importFrom WGCNA mergeCloseModules
 #' @importFrom dynamicTreeCut cutreeDynamic
@@ -479,8 +479,10 @@ detect_modules <- function(data_expr, network, min_module_size =
       modules = modules_list,
       modules_premerge = modules_list_premerge,
       modules_eigengenes = merge$newMEs,
-      dendrograms = stats::hclust(stats::as.dist(1 - cor(merge$newMEs)),
-                                  method = "average")
+      dendrogram_genes = gene_tree,
+      dendrogram_merged_modules = stats::hclust(
+        stats::as.dist(1 - cor(merge$newMEs)),
+        method = "average")
     )
   } else {
     detection <- list(
