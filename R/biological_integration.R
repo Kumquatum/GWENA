@@ -301,6 +301,8 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 #' Provided by the output of modules_detection.
 #' @param phenotypes matrix or data.frame, phenotypes for each sample to
 #' associate.
+#' @param id_col string or vector of string, optional name of the columns
+#' containing the common id between eigengenes and phenotypes.
 #' @importFrom WGCNA corPvalueStudent
 #' @importFrom dplyr select
 #'
@@ -318,7 +320,7 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 #'
 #' @export
 
-associate_phenotype <- function(eigengenes, phenotypes) {
+associate_phenotype <- function(eigengenes, phenotypes, id_col = NULL) {
   # Checks
   if (!(is.data.frame(eigengenes) | is.matrix(eigengenes)))
     stop("eigengenes should be a data.frame or matrix")
@@ -337,33 +339,78 @@ associate_phenotype <- function(eigengenes, phenotypes) {
   if (nrow(eigengenes) != nrow(phenotypes))
     stop("Number of row should be the same between eigengene and phenotypes ",
          "(samples)")
-
-  # Looking for common id column. If not checking rownames match
-  matching_id_col <- colnames(eigengenes) %in% colnames(phenotypes)
-  nb_matching <- length(matching_id_col[matching_id_col == TRUE])
-  if (nb_matching > 1) {
-    stop("More than one common column name between eigengenes and phenotypes.",
-         "Therefore cannot match rows.")
-  } else if (nb_matching == 0) {
-    # Looking for matching rownames to use instead
-    matching_rownames <- rownames(eigengenes) %in% rownames(phenotypes)
-    if (all(matching_rownames)) {
-      phenotypes <- phenotypes[match(rownames(eigengenes),
-                                     rownames(phenotypes)), ]
-    } else {
-      warning("No common name found to be used as id, neither matching",
-              " rownames. Using both dataframes as is for row matching.")
+  if (!is.null(id_col)) {
+    if (!is.character(id_col))
+      stop("id_col should be a character or a character vector")
+    if (!any(id_col %in% c(colnames(eigengenes), colnames(phenotypes))))
+      stop("Specified id_col wasn't found in colnames")
+    if (length(id_col) > 2)
+      stop("More than 2 id_col specified")
+    if (length(id_col) == 1 & !all(c(id_col %in% colnames(eigengenes),
+                                     id_col %in% colnames(phenotypes))))
+      stop("Specified id_col wasn't found in both datasets")
+    if (length(id_col) == 2 & id_col[1] == id_col[2]) {
+      warning("You specified twice the same id_col")
+      id_col <- id_col[1]
     }
-  } else if (nb_matching == 1) {
-    # Ordering rows using the id column and removing it after
-    id_col <- colnames(eigengenes)[matching_id_col]
-    phenotypes <- phenotypes[match(eigengenes[, id_col], phenotypes$sample), ]
-    rownames(phenotypes) <- NULL
   }
+
+  # Ensuring format
+  if(is.matrix(eigengenes)) eigengenes <- as.data.frame(eigengenes)
+  if(is.matrix(phenotypes)) phenotypes <- as.data.frame(phenotypes)
+
+  # Looking for common id column if none specified (if none found, testing
+  # rownames)
+  if (is.null(id_col)) {
+    matching_id_col <- colnames(eigengenes) %in% colnames(phenotypes)
+    nb_matching <- length(matching_id_col[matching_id_col == TRUE])
+    if (nb_matching > 1) {
+      stop("More than one common column name between eigengenes and phenotypes.",
+           "Therefore cannot match rows.")
+    } else if (nb_matching == 0) {
+      # Looking for matching rownames to use instead
+      matching_rownames <- rownames(eigengenes) %in% rownames(phenotypes)
+      if (all(matching_rownames)) {
+        phenotypes <- phenotypes[match(rownames(eigengenes),
+                                       rownames(phenotypes)), ]
+      } else {
+        warning("No common name found to be used as id, neither matching",
+                " rownames. Using both dataframes as is for row matching.")
+      }
+    } else if (nb_matching == 1) {
+      # Ordering rows using the id column and removing it after
+      id_col <- colnames(eigengenes)[matching_id_col]
+      phenotypes <- phenotypes[match(eigengenes[, id_col], phenotypes$sample), ]
+      rownames(phenotypes) <- NULL
+    }
+  } else {
+    if (length(id_col) == 2) {
+      # Ordering rows using the id columns and removing them after
+      if (id_col[1] %in% colnames(eigengenes)) {
+        eigengenes <- eigengenes[order(eigengenes[, id_col[1]]), ]
+        phenotypes <- phenotypes[order(phenotypes[, id_col[2]]), ]
+        eigengenes[, id_col[1]] <- NULL
+        phenotypes[, id_col[2]] <- NULL
+      } else {
+        eigengenes <- eigengenes[order(eigengenes[id_col[2]]), ]
+        phenotypes <- phenotypes[order(phenotypes[id_col[1]]), ]
+        eigengenes[, id_col[2]] <- NULL
+        phenotypes[, id_col[1]] <- NULL
+      }
+    } else {
+      # Ordering rows using the id column and removing it after
+      id_col_sorted <- sort(eigengenes[, id_col])
+      eigengenes[order(id_col_sorted),]
+      phenotypes[order(id_col_sorted),]
+      eigengenes[, id_col] <- NULL
+      phenotypes[, id_col] <- NULL
+    }
+  }
+
 
   # Design matrix (dummy variable formation for qualitative variables)
   dummies_var <- lapply(colnames(phenotypes), function(dummy_name) {
-    df <- phenotypes %>% dplyr::select(dummy_name)
+    df <- phenotypes %>% dplyr::select(!!dummy_name)
     if (!is.numeric(df[1,])) {
       model_mat <- stats::model.matrix(
         stats::formula(paste("~ ", dummy_name, "+ 0")),

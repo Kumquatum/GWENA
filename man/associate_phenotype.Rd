@@ -4,7 +4,7 @@
 \alias{associate_phenotype}
 \title{Modules phenotpic association}
 \usage{
-associate_phenotype(eigengenes, phenotypes)
+associate_phenotype(eigengenes, phenotypes, id_col = NULL)
 }
 \arguments{
 \item{eigengenes}{matrix or data.frame, eigengenes of the modules.
@@ -12,6 +12,9 @@ Provided by the output of modules_detection.}
 
 \item{phenotypes}{matrix or data.frame, phenotypes for each sample to
 associate.}
+
+\item{id_col}{string or vector of string, optional name of the columns
+containing the common id between eigengenes and phenotypes.}
 }
 \value{
 A list of two data.frames : associations modules/phenotype and
