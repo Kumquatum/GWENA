@@ -4,7 +4,7 @@
 \alias{plot_modules_phenotype}
 \title{Heatmap of modules phenotpic association}
 \usage{
-plot_modules_phenotype(modules_phenotype, pvalue_th = 0.05)
+plot_modules_phenotype(modules_phenotype, pvalue_th = 0.05, ...)
 }
 \arguments{
 \item{modules_phenotype}{list, data.frames of correlation and pvalue
@@ -12,6 +12,8 @@ associated}
 
 \item{pvalue_th}{float, threshold in ]0;1[ under which module will be
 considered as significantly associated}
+
+\item{...}{any other parameter you can provide to ggplot2::theme}
 }
 \value{
 A ggplot object representing a heatmap with phenotype association

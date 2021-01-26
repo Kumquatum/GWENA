@@ -496,7 +496,7 @@ detect_modules <- function(data_expr, network, min_module_size =
 
 
 # Removing errors about dplyr data-variables
-utils::globalVariables(c("before"))
+utils::globalVariables(c("before", "after"))
 
 #' Modules merge plot
 #'
@@ -506,16 +506,29 @@ utils::globalVariables(c("before"))
 #' merge associated to each gene.
 #' @param modules_merged vector, id (whole number or string) of module after
 #' merge associated to each gene.
+#' @param zoom decimal, value to which the display will be increased/decreased.
+#' @param vertex_label_color,vertex_color,vertex_frame_color string, name of the
+#'  color or hexadecimal code.
+#' @param vertex_label_family string, font family name.
+#' @param vertex_label_cex decimal, value for font size.
+#' @param window_x_min decimal, value for the bottom limit of the window.
+#' @param window_x_min decimal, value for the top limit of the window.
+#' @param window_y_min decimal, value for the left limit of the window.
+#' @param window_y_min decimal, value for the right limit of the window.
+#' @param ... additional arguments to be passed to igraph::plot.igraph().
 #'
 #' @details Both vectors must be in the same gene order before passing them to
 #' the function. No check is applied on this.
 #'
-#' @return A bipartite graph
+#' @return The layout of the plot
 #'
 #' @importFrom igraph graph_from_data_frame V add_layout_ as_bipartite
+#' norm_coords
 #' @importFrom magrittr %>% set_colnames
-#' @importFrom dplyr left_join mutate_if distinct arrange
+#' @importFrom dplyr left_join mutate mutate_if distinct arrange
 #' @importFrom utils stack
+#' @importFrom stringr str_c str_extract
+#' @importFrom tibble column_to_rownames
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
@@ -526,7 +539,15 @@ utils::globalVariables(c("before"))
 #'
 #' @export
 
-plot_modules_merge <- function(modules_premerge, modules_merged) {
+plot_modules_merge <- function(modules_premerge, modules_merged,
+                               zoom = 1, vertex_size = 6,
+                               vertex_label_color = "gray20",
+                               vertex_label_family = "Helvetica",
+                               vertex_label_cex = 0.8,
+                               vertex_color = "lightskyblue",
+                               vertex_frame_color = "white",
+                               window_x_min = -1, window_x_max = 1,
+                               window_y_min = -1, window_y_max = 1, ...) {
   # Checks
   if (!is.list(modules_premerge))
     stop("modules_premerge must be a named list with modules id as names, and",
@@ -548,30 +569,40 @@ plot_modules_merge <- function(modules_premerge, modules_merged) {
     stop("module_merged values for each module must be a vector of gene names")
 
   # data.frame indicating which module got merge into another
-  g <- dplyr::left_join(utils::stack(modules_premerge),
+  g_df <- dplyr::left_join(utils::stack(modules_premerge),
                         utils::stack(modules_merged), by = "values") %>%
-    tibble::column_to_rownames("values") %>%
-    magrittr::set_colnames(c("before", "after")) %>%
-    dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::mutate_if(is.character, as.numeric) %>%
-    dplyr::distinct() %>%
-    dplyr::arrange(before) %>%
-    igraph::graph_from_data_frame()
+      tibble::column_to_rownames("values") %>%
+      magrittr::set_colnames(c("before", "after")) %>%
+      dplyr::mutate_if(is.factor, as.character) %>%
+      dplyr::mutate_if(is.character, as.numeric) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(before) %>%
+      dplyr::mutate(before = stringr::str_c("b", before, sep = "_")) %>%
+      dplyr::mutate(after = stringr::str_c("a", after, sep = "_"))
+  g <- igraph::graph_from_data_frame(g_df)
 
   # Adding property used by bipartite plot
-  igraph::V(g)$type <- lapply(igraph::V(g) %>% names %>% as.numeric,
-                              function(x) ifelse(x %in% (modules_merged %>%
-                                                           names %>%
-                                                           unique),
-                                                 TRUE, FALSE)) %>% unlist
+  igraph::V(g)$type <- lapply(
+      igraph::V(g) %>% names, # modules premerge
+      function(x) ifelse(x %in% (g_df$after %>% unique), # in modules merged
+                         TRUE, FALSE)) %>% unlist
 
   # Bipartite plot
-  g %>% igraph::add_layout_(igraph::as_bipartite()) %>%
-    plot(vertex.label.color = "gray20",
-         vertex.label.family = "Helvetica",
-         vertex.label.cex = 0.9,
-         vertex.color = "lightskyblue",
-         vertex.frame.color = "white")
+  l <- igraph::layout_as_bipartite(g) %>%
+      igraph::norm_coords(l, xmin = window_x_min, xmax = window_x_max,
+                          ymin = window_y_min, ymax = window_y_max)
+
+  igraph::plot.igraph(g, layout = l*zoom,
+       rescale = ifelse(zoom == 1, TRUE, FALSE),
+       vertex.label = igraph::V(g) %>% names() %>% stringr::str_extract("\\d+"),
+       vertex.label.color = vertex_label_color,
+       vertex.label.family = vertex_label_family,
+       vertex.size = vertex_size,
+       vertex.label.cex = vertex_label_cex,
+       vertex.color = vertex_color,
+       vertex.frame.color = vertex_frame_color, ...)
+
+  return(l)
 }
 
 
@@ -587,6 +618,7 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #' data with genes as column and samples as row.
 #' @param modules vector, id (whole number or string) of modules associated to
 #' each gene.
+#' @param ... additional parameters to pass to ggplot2::theme
 #'
 #' @return A ggplot representing expression profile and eigengene by module
 #'
@@ -607,7 +639,7 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #'
 #' @export
 
-plot_expression_profiles <- function(data_expr, modules) {
+plot_expression_profiles <- function(data_expr, modules, ...) {
   # Check
   if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
@@ -687,9 +719,10 @@ plot_expression_profiles <- function(data_expr, modules) {
                   ggplot2::aes(x=sample, y=expression, group=gene)) +
     ggplot2::geom_line(alpha = 0.3) +
     ggplot2::facet_grid(cor_sign ~ module) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
-                                                       vjust = 0.5)) +
-    ggplot2::theme(legend.position = "none") +
+    ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                   axis.ticks.x = ggplot2::element_blank(),
+                   legend.position = "none",
+                   ...) +
     ggplot2::geom_line(ggplot2::aes(x = sample, y = expression_eigengene),
                        color = "red")
 }

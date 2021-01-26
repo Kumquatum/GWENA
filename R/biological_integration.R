@@ -452,13 +452,15 @@ utils::globalVariables(c("eigengene", "pval", "phenotype"))
 #' associated
 #' @param pvalue_th float, threshold in ]0;1[ under which module will be
 #' considered as significantly associated
+#' @param ... any other parameter you can provide to ggplot2::theme
 #'
 #' @importFrom ggplot2 ggplot geom_tile geom_point scale_color_gradient2
-#' theme_bw xlab ylab
+#' theme_bw xlab ylab theme
 #' @importFrom magrittr %>%
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr mutate select bind_cols
+#' @importFrom stringr str_sort
 #'
 #' @return A ggplot object representing a heatmap with phenotype association
 #' and related pvalues
@@ -476,7 +478,7 @@ utils::globalVariables(c("eigengene", "pval", "phenotype"))
 #'
 #' @export
 
-plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05){
+plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05, ...){
   # Checks
   if (!is.list(modules_phenotype)) stop("modules_phenotype must be a list")
   if (!isTRUE(all.equal(names(modules_phenotype),
@@ -507,16 +509,21 @@ plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05){
     tidyr::pivot_longer(-eigengene, names_to = "phenotype", values_to = "pval")
 
   df_total <- dplyr::bind_cols(df_cor, df_pval %>% dplyr::select(pval)) %>%
-    dplyr::mutate(signif = ifelse(pval > pvalue_th, FALSE, TRUE))
+    dplyr::mutate(signif = ifelse(pval > pvalue_th, FALSE, TRUE)) %>%
+    dplyr::mutate(eigengene = stringr::str_sort(eigengene, numeric = TRUE)) %>%
+    dplyr::mutate(eigengene = factor(eigengene, levels = unique(eigengene)))
 
   # Plotting
   suppressWarnings(quiet(
-    g <- ggplot2::ggplot(df_total, ggplot2::aes(x = factor(eigengene),
-                                                y = factor(phenotype))) +
+    # g <- ggplot2::ggplot(df_total, ggplot2::aes(x = factor(eigengene),
+    #                                             y = factor(phenotype))) +
+    g <- ggplot2::ggplot(df_total, ggplot2::aes(x = eigengene, y = phenotype)) +
       ggplot2::geom_tile(fill = "white") +
       ggplot2::geom_point(ggplot2::aes(colour = cor, size = signif)) +
       ggplot2::scale_color_gradient2() +
       ggplot2::theme_bw() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1),
+                     ...) +
       ggplot2::xlab("Module") +
       ggplot2::ylab("Phenotype")
   ))

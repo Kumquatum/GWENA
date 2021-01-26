@@ -161,7 +161,9 @@ test_that("all colnames in rownames", {
   expect_error(detect_modules(data_expr = df_expr$df_microarray, net = res_net$network[-1, -10]))
 })
 test_that("output format is ok (detailled_result = TRUE)", {
-  expect_true(all(names(res_detection) == c("modules", "modules_premerge", "modules_eigengenes", "dendrogram_genes", "dendrogram_merged_modules")))
+  expect_true(all(names(res_detection) == c(
+    "modules", "modules_premerge", "modules_eigengenes", "dendrogram_genes",
+    "dendrogram_merged_modules")))
   expect_true(is.list(res_detection$modules))
   expect_true(is.list(res_detection$modules_premerge))
   expect_true(is.vector(res_detection$modules %>% unlist, "character"))

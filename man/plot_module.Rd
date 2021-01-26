@@ -12,11 +12,13 @@ plot_module(
   enrichment = NULL,
   title = "Module",
   degree_node_scaling = TRUE,
+  node_scaling_min = 1,
+  edge_scaling_min = 0.2,
   node_scaling_max = 6,
   edge_scaling_max = 1,
   nb_row_legend = 6,
   layout = "auto",
-  layout_scaling = 1,
+  zoom = 1,
   vertex.label.cex = 0.7,
   vertex.label.color = "gray20",
   vertex.label.family = "Helvetica",
@@ -25,6 +27,11 @@ plot_module(
   vertex.color = "gray60",
   vertex.label.dist = 1,
   legend_cex = 0.8,
+  window_x_min = -1,
+  window_x_max = 1,
+  window_y_min = -1,
+  window_y_max = 1,
+  legend = TRUE,
   ...
 )
 }
@@ -57,7 +64,7 @@ coordinates, or function for layout, or name of a layout function available
 in \code{igraph}. Default "auto" will choose the best layout depending on
 the graph. For more information, see \code{\link{igraph.plotting}}.}
 
-\item{layout_scaling}{integer, scaling factor by which it's possible to have
+\item{zoom}{integer, scaling factor by which it's possible to have
 compact graph (< 1) or larger graph (> 1) display.}
 
 \item{vertex.label.cex, legend_cex}{float, font size for vertex labels. It is
@@ -75,6 +82,10 @@ labels.}
 \item{vertex.label.dist}{integer, distance of the label from the center of
 the vertex. If it is 0 then the label is centered on the vertex. If it is 1
 then the label is displayed beside the vertex.}
+
+\item{window_x_min}{decimal, value for the top limit of the window.}
+
+\item{window_y_min}{decimal, value for the right limit of the window.}
 
 \item{...}{any other parameter compatible with the
 \code{\link[igraph]{plot.igraph}} function.}

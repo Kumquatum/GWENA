@@ -2,11 +2,17 @@ Package: GWENA
 Title: Pipeline for augmented co-expression analysis
 Version: 0.99.110
 Authors@R: 
-    person(given = "Gwenaëlle",
-           family = "Lemoine",
-           role = c("aut", "cre"),
-           email = "lemoine.gwenaelle@gmail.com",
-           comment = c(ORCID = "0000-0003-4747-1937"))
+    c(person(given = "Gwenaëlle",
+             family = "Lemoine",
+             role = c("aut", "cre"),
+             email = "lemoine.gwenaelle@gmail.com",
+             comment = c(ORCID = "0000-0003-4747-1937")),
+      person(given = "Marie-Pier",
+             family = "Scott-Boyer",
+             role = "ths"),
+      person(given = "Arnaud",
+             family = "Droit",
+             role = "fnd"))
 Description: The development of high-throughput sequencing led to increased use
              of co-expression analysis to go beyong single feature (i.e. gene)
              focus. We propose GWENA (Gene Whole co-Expression Network Analysis) 

@@ -4,7 +4,7 @@
 \alias{plot_expression_profiles}
 \title{Modules expression profiles}
 \usage{
-plot_expression_profiles(data_expr, modules)
+plot_expression_profiles(data_expr, modules, ...)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame or SummarizedExperiment, expression
@@ -12,6 +12,8 @@ data with genes as column and samples as row.}
 
 \item{modules}{vector, id (whole number or string) of modules associated to
 each gene.}
+
+\item{...}{additional parameters to pass to ggplot2::theme}
 }
 \value{
 A ggplot representing expression profile and eigengene by module
