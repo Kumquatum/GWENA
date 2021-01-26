@@ -319,7 +319,7 @@ Information can be retrieved from the network topology itself. For example, hub 
 Manipulation of graph objects can be quite demanding in memory and CPU usage. Caution is advised when choosing to plot networks larger than 100 genes. 
 Since co-expression networks are complete graphs, readability is hard because all genes are connected with each other. In order to clarity visualization, edges with a similarity score below a threshold are removed.
 
-```{r graph, fig.width=12, fig.height=12}
+```{r graph, fig.width=12, fig.height=12, echo=FALSE}
 module_example <- detection$modules$`2`
 graph <- build_graph_from_sq_mat(net$network[module_example, module_example])
 
