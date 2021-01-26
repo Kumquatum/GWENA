@@ -4,7 +4,22 @@
 \alias{plot_modules_merge}
 \title{Modules merge plot}
 \usage{
-plot_modules_merge(modules_premerge, modules_merged)
+plot_modules_merge(
+  modules_premerge,
+  modules_merged,
+  zoom = 1,
+  vertex_size = 6,
+  vertex_label_color = "gray20",
+  vertex_label_family = "Helvetica",
+  vertex_label_cex = 0.8,
+  vertex_color = "lightskyblue",
+  vertex_frame_color = "white",
+  window_x_min = -1,
+  window_x_max = 1,
+  window_y_min = -1,
+  window_y_max = 1,
+  ...
+)
 }
 \arguments{
 \item{modules_premerge}{vector, id (whole number or string) of module before
@@ -12,9 +27,24 @@ merge associated to each gene.}
 
 \item{modules_merged}{vector, id (whole number or string) of module after
 merge associated to each gene.}
+
+\item{zoom}{decimal, value to which the display will be increased/decreased.}
+
+\item{vertex_label_color, vertex_color, vertex_frame_color}{string, name of the
+color or hexadecimal code.}
+
+\item{vertex_label_family}{string, font family name.}
+
+\item{vertex_label_cex}{decimal, value for font size.}
+
+\item{window_x_min}{decimal, value for the top limit of the window.}
+
+\item{window_y_min}{decimal, value for the right limit of the window.}
+
+\item{...}{additional arguments to be passed to igraph::plot.igraph().}
 }
 \value{
-A bipartite graph
+The layout of the plot
 }
 \description{
 Plot a bipartite graph to see in which modules all modules have been merged
