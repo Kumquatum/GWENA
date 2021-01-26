@@ -161,13 +161,16 @@ test_that("all colnames in rownames", {
   expect_error(detect_modules(data_expr = df_expr$df_microarray, net = res_net$network[-1, -10]))
 })
 test_that("output format is ok (detailled_result = TRUE)", {
-  expect_true(all(names(res_detection) == c("modules", "modules_premerge", "modules_eigengenes", "dendrograms")))
+  expect_true(all(names(res_detection) == c(
+    "modules", "modules_premerge", "modules_eigengenes", "dendrogram_genes",
+    "dendrogram_merged_modules")))
   expect_true(is.list(res_detection$modules))
   expect_true(is.list(res_detection$modules_premerge))
   expect_true(is.vector(res_detection$modules %>% unlist, "character"))
   expect_true(is.vector(res_detection$modules_premerge %>% unlist, "character"))
   expect_true(is.data.frame(res_detection$modules_eigengenes) & ncol(res_detection$modules_eigengenes) == length(res_detection$modules))
-  expect_true(is(res_detection$dendrograms, "hclust"))
+  expect_true(is(res_detection$dendrogram_genes, "hclust"))
+  expect_true(is(res_detection$dendrogram_merged_modules, "hclust"))
 })
 test_that("output format is ok (detailled_result = FALSE)", {
   res_detection_not_detailled <- detect_modules(data_expr = df_expr$df_microarray, net = res_net$network, detailled_result = FALSE)
