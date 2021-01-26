@@ -50,7 +50,7 @@ small clusters being assigned belong to.}
 }
 \value{
 list containing modules detected, modules_eigengenes, and if asked
-for, modules pre-merge and dendrogram
+for, modules pre-merge and dendrograms of genes and merged modules
 }
 \description{
 Detect the modules by hierarchical clustering .
