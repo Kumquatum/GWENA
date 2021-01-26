@@ -618,6 +618,7 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #' data with genes as column and samples as row.
 #' @param modules vector, id (whole number or string) of modules associated to
 #' each gene.
+#' @param ... additional parameters to pass to ggplot2::theme
 #'
 #' @return A ggplot representing expression profile and eigengene by module
 #'
@@ -638,7 +639,7 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #'
 #' @export
 
-plot_expression_profiles <- function(data_expr, modules) {
+plot_expression_profiles <- function(data_expr, modules, ...) {
   # Check
   if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
@@ -718,9 +719,10 @@ plot_expression_profiles <- function(data_expr, modules) {
                   ggplot2::aes(x=sample, y=expression, group=gene)) +
     ggplot2::geom_line(alpha = 0.3) +
     ggplot2::facet_grid(cor_sign ~ module) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
-                                                       vjust = 0.5)) +
-    ggplot2::theme(legend.position = "none") +
+    ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                   axis.ticks.x = ggplot2::element_blank(),
+                   legend.position = "none",
+                   ...) +
     ggplot2::geom_line(ggplot2::aes(x = sample, y = expression_eigengene),
                        color = "red")
 }
