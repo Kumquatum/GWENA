@@ -507,14 +507,15 @@ utils::globalVariables(c("before", "after"))
 #' @param modules_merged vector, id (whole number or string) of module after
 #' merge associated to each gene.
 #' @param zoom decimal, value to which the display will be increased/decreased.
+#' @param vertex_size integer, size of the vertices.
 #' @param vertex_label_color,vertex_color,vertex_frame_color string, name of the
 #'  color or hexadecimal code.
 #' @param vertex_label_family string, font family name.
 #' @param vertex_label_cex decimal, value for font size.
 #' @param window_x_min decimal, value for the bottom limit of the window.
-#' @param window_x_min decimal, value for the top limit of the window.
+#' @param window_x_max decimal, value for the top limit of the window.
 #' @param window_y_min decimal, value for the left limit of the window.
-#' @param window_y_min decimal, value for the right limit of the window.
+#' @param window_y_max decimal, value for the right limit of the window.
 #' @param ... additional arguments to be passed to igraph::plot.igraph().
 #'
 #' @details Both vectors must be in the same gene order before passing them to
