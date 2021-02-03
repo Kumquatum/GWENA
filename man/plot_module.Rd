@@ -48,14 +48,14 @@ above which edges will be removed.}
 
 \item{title}{string, main title that will be displayed on the plot.}
 
-\item{degree_node_scaling}{boolean, indicate if node size should represent
+\item{degree_node_scaling}{boolean, indicates if node size should represent
 the degree of this node.}
 
-\item{node_scaling_max}{integer, if degree_node_scaling is TRUE, it is the
-max size of the node, else it is the exact size of all node.}
+\item{node_scaling_min, node_scaling_max}{integer, if degree_node_scaling is
+TRUE, it is the min/max size of the node, else it is the exact size of all
+node.}
 
-\item{edge_scaling_max}{integer, scaling factor by whihch the edge width
-will be scalled.}
+\item{edge_scaling_min, edge_scaling_max}{integer, min/max width of the edge}
 
 \item{nb_row_legend}{integer, number of levels in the legend.}
 
@@ -83,9 +83,15 @@ labels.}
 the vertex. If it is 0 then the label is centered on the vertex. If it is 1
 then the label is displayed beside the vertex.}
 
-\item{window_x_min}{decimal, value for the top limit of the window.}
+\item{window_x_min}{decimal, value for the bottom limit of the window.}
 
-\item{window_y_min}{decimal, value for the right limit of the window.}
+\item{window_x_max}{decimal, value for the top limit of the window.}
+
+\item{window_y_min}{decimal, value for the left limit of the window.}
+
+\item{window_y_max}{decimal, value for the right limit of the window.}
+
+\item{legend}{boolean, indicates if the legend should be plotted.}
 
 \item{...}{any other parameter compatible with the
 \code{\link[igraph]{plot.igraph}} function.}
