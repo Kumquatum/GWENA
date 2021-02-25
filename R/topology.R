@@ -569,3 +569,88 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
 
   return(l)
 }
+
+
+# Removing errors about dplyr data-variables
+# utils::globalVariables(c("vertex.size", "edge.width"))
+
+#' Detect sub clusters
+#'
+#' Use a partitioning around medoid (PAM, or k-medoid) clustering method to
+#' detect clusters into a provided module using the strength matrix of the
+#' network
+#'
+#' @param network matrix or data.frame, strength of gene co-expression (edge
+#' values).
+#' @param module vector, module defined as vector of characters for genes id.
+#' @param seq_k vector, sequence of k number of cluster to test
+#' @param fit_plot boolean, does the plot with silhouette coefficient depending
+#' on the k tested should be plotted.
+#' @param ... any other parameter compatible with the
+#' \code{\link[cluster]{pam}} function.
+#'
+#' @importFrom magrittr %>%
+#' @importFrom cluster pam
+#' @importFrom tibble rownames_to_column
+#'
+#' @return data.frame, a two cols table with the gene id in the first one, and
+#' the cluster number assignation in the second one.
+#'
+#' @examples
+#' df <- kuehne_expr[1:24, 1:350]
+#' full_network <- build_net(df, n_threads = 1)
+#' all_modules <- detect_modules(df, network$network)
+#' get_sub_clusters(full_network$network, all_modules$modules$`1`)
+#'
+#' @export
+
+get_sub_clusters <- function(network, module, seq_k = 1:15, fit_plot = TRUE,
+                             ...) {
+  # Checking args
+  is_network(network)
+  is_module(module, is_list = FALSE)
+  if(!is.numeric(seq_k))
+    stop("seq_k must be a numeric vector")
+  if(length(seq_k) < 2)
+    stop("seq_k must at leat have two power values to test")
+  if (any(lapply(seq_k, function(x) x < 1 | x %% 1 != 0) %>% unlist))
+    stop("seq_k must contain only whole numbers >= 1")
+  if(!is.logical(fit_plot))
+    stop("fit_plot must be a boolean")
+
+  # Getting network corresponding to the module
+  net_mod <- network[module, module]
+
+  # Computing the k-medoid
+  list_k_tests <- lapply(seq_k, function(k) {
+    k_res <- cluster::pam(net_mod, k, diss = TRUE, ...)
+    return(k_res)
+  }) %>% setNames(paste0("k_", seq_k))
+
+  # Summarizing needed results for plot and returning optimal k
+  df_k_tests <- list_k_tests %>%
+    lapply(`[[`, "silinfo") %>%
+    lapply(`[[`, "avg.width") %>%
+    unlist %>%
+    data.frame(k = seq_k[-1], avg_sil_width = .)
+
+  # If asked, plotting the silhouette coefficient against k tested
+  if (fit_plot) {
+    plot(df_k_tests, type="b", pch = 19,
+         frame = FALSE, xlab="Number of clusters K",
+         ylab="Average silhouette width")
+  }
+
+  # Isolating optimal k regarding the silhouette coefficient
+  opti_k <- df_k_tests %>%
+    filter(avg_sil_width == max(avg_sil_width)) %>%
+    select(k) %>% as.numeric()
+
+  # Formatting the table to return the gene id association to cluster
+  clusters <- list_k_tests[[opti_k]]$clustering %>%
+    data.frame(cluster = .) %>%
+    tibble::rownames_to_column("gene") %>%
+    mutate(cluster = as.character(cluster))
+
+  return(clusters)
+}
