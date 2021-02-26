@@ -652,23 +652,25 @@ plot_module <- function(graph_module, hubs = NULL, groups = NULL,
 #' @importFrom magrittr %>%
 #' @importFrom cluster pam
 #' @importFrom tibble rownames_to_column
+#' @importFrom dplyr filter select
+#' @importFrom graphics plot
 #'
 #' @return data.frame, a two cols table with the gene id in the first one, and
 #' the cluster number assignation in the second one.
 #'
 #' @examples
 #' df <- kuehne_expr[1:24, 1:350]
-#' full_network <- build_net(df, n_threads = 1)
-#' all_modules <- detect_modules(df, network$network)
-#' get_sub_clusters(full_network$network, all_modules$modules$`1`)
+#' net <- build_net(df, n_threads = 1)
+#' mods <- detect_modules(df, net$network)
+#' net_mod_1 <- net$network[mods$modules$`1`, mods$modules$`1`]
+#' get_sub_clusters(net_mod_1)
 #'
 #' @export
 
-get_sub_clusters <- function(network, module, seq_k = 1:15, fit_plot = TRUE,
+get_sub_clusters <- function(network, seq_k = 1:15, fit_plot = TRUE,
                              ...) {
   # Checking args
   is_network(network)
-  is_module(module, is_list = FALSE)
   if(!is.numeric(seq_k))
     stop("seq_k must be a numeric vector")
   if(length(seq_k) < 2)
@@ -678,14 +680,11 @@ get_sub_clusters <- function(network, module, seq_k = 1:15, fit_plot = TRUE,
   if(!is.logical(fit_plot))
     stop("fit_plot must be a boolean")
 
-  # Getting network corresponding to the module
-  net_mod <- network[module, module]
-
   # Computing the k-medoid
   list_k_tests <- lapply(seq_k, function(k) {
-    k_res <- cluster::pam(net_mod, k, diss = TRUE, ...)
+    k_res <- cluster::pam(network, k, diss = TRUE, ...)
     return(k_res)
-  }) %>% setNames(paste0("k_", seq_k))
+  }) %>% stats::setNames(paste0("k_", seq_k))
 
   # Summarizing needed results for plot and returning optimal k
   df_k_tests <- list_k_tests %>%
@@ -696,21 +695,21 @@ get_sub_clusters <- function(network, module, seq_k = 1:15, fit_plot = TRUE,
 
   # If asked, plotting the silhouette coefficient against k tested
   if (fit_plot) {
-    plot(df_k_tests, type="b", pch = 19,
+    graphics::plot(df_k_tests, type="b", pch = 19,
          frame = FALSE, xlab="Number of clusters K",
          ylab="Average silhouette width")
   }
 
   # Isolating optimal k regarding the silhouette coefficient
   opti_k <- df_k_tests %>%
-    filter(avg_sil_width == max(avg_sil_width)) %>%
-    select(k) %>% as.numeric()
+    dplyr::filter(avg_sil_width == max(avg_sil_width)) %>%
+    dplyr::select(k) %>% as.numeric()
 
-  # Formatting the table to return the gene id association to cluster
+  # Formatting the table to return the gene id association to sub_module
   clusters <- list_k_tests[[opti_k]]$clustering %>%
-    data.frame(cluster = .) %>%
+    data.frame(sub_module = .) %>%
     tibble::rownames_to_column("gene") %>%
-    mutate(cluster = as.character(cluster))
+    dplyr::mutate(sub_module = as.character(sub_module))
 
   return(clusters)
 }
