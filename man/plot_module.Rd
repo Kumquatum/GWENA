@@ -7,9 +7,9 @@
 plot_module(
   graph_module,
   hubs = NULL,
+  groups = NULL,
   lower_weight_th = NULL,
   upper_weight_th = NULL,
-  enrichment = NULL,
   title = "Module",
   degree_node_scaling = TRUE,
   node_scaling_min = 1,
@@ -27,10 +27,12 @@ plot_module(
   vertex.color = "gray60",
   vertex.label.dist = 1,
   legend_cex = 0.8,
+  groups_palette = NULL,
   window_x_min = -1,
   window_x_max = 1,
   window_y_min = -1,
   window_y_max = 1,
+  dynamic_plot = TRUE,
   legend = TRUE,
   ...
 )
@@ -41,10 +43,11 @@ plot_module(
 \item{hubs}{character vector or numeric vector with names, optionnal,
 vector of gene names or vector of numeric values named with gene names.}
 
-\item{lower_weight_th, upper_weight_th}{decimal, weight threshold below or
-above which edges will be removed.}
+\item{groups}{matrix or data.frame, a two cols table with the gene id in the
+first one, and the group assignation in the second one.}
 
-\item{enrichment}{list, representing a gost object.}
+\item{lower_weight_th, upper_weight_th}{decimal, weight threshold above
+lower_weight_th or below upper_weight_th which edges will be removed.}
 
 \item{title}{string, main title that will be displayed on the plot.}
 
@@ -83,6 +86,12 @@ labels.}
 the vertex. If it is 0 then the label is centered on the vertex. If it is 1
 then the label is displayed beside the vertex.}
 
+\item{groups_palette}{character and/or integer vector, vertices group palette
+of colors for the groups specified. It may either contain integer values, 
+named colors or RGB specified colors with three or four bytes. All strings 
+starting with ‘#’ are assumed to be RGB color specifications. It is possible 
+to mix named color and RGB colors.}
+
 \item{window_x_min}{decimal, value for the bottom limit of the window.}
 
 \item{window_x_max}{decimal, value for the top limit of the window.}
@@ -95,6 +104,9 @@ then the label is displayed beside the vertex.}
 
 \item{...}{any other parameter compatible with the
 \code{\link[igraph]{plot.igraph}} function.}
+
+\item{dymamic_plot}{boolean, does the final plot should be dynamic (plotly
+plot) or static (ggplot2 plot).}
 }
 \value{
 matrix, layout of the graph as a two column matrix (x, y)
@@ -110,6 +122,6 @@ of node will not correspond to the same values because of the scaling.
 \examples{
 mat <- matrix(runif(40*40), 40)
 g <- build_graph_from_sq_mat(mat)
-plot_module(g)
+plot_module(g, lower_weight_th = -0.5, upper_weight_th = 0.5)
 
 }
