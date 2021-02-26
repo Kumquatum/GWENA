@@ -319,9 +319,11 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #' @param graph_module igraph object, module to plot.
 #' @param hubs character vector or numeric vector with names, optionnal,
 #' vector of gene names or vector of numeric values named with gene names.
-#' @param lower_weight_th,upper_weight_th decimal, weight threshold below or
-#' above which edges will be removed.
-#' @param enrichment list, representing a gost object.
+#' @param groups matrix or data.frame, a two cols table with the gene id in the
+#' first one, and the group assignation in the second one.
+#' @param lower_weight_th,upper_weight_th decimal, weight threshold above
+#' lower_weight_th or below upper_weight_th which edges will be removed.
+### @param enrichment list, representing a gost object. # Not yet implemented
 #' @param title string, main title that will be displayed on the plot.
 #' @param degree_node_scaling boolean, indicates if node size should represent
 #' the degree of this node.
