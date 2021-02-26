@@ -351,11 +351,18 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #' @param vertex.label.dist integer, distance of the label from the center of
 #' the vertex. If it is 0 then the label is centered on the vertex. If it is 1
 #' then the label is displayed beside the vertex.
+#' @param groups_palette character and/or integer vector, vertices group palette
+#' of colors for the groups specified. It may either contain integer values, 
+#' named colors or RGB specified colors with three or four bytes. All strings 
+#' starting with ‘#’ are assumed to be RGB color specifications. It is possible 
+#' to mix named color and RGB colors.
 #' @param window_x_min decimal, value for the bottom limit of the window.
 #' @param window_x_max decimal, value for the top limit of the window.
 #' @param window_y_min decimal, value for the left limit of the window.
 #' @param window_y_max decimal, value for the right limit of the window.
 #' @param legend boolean, indicates if the legend should be plotted.
+#' @param dymamic_plot boolean, does the final plot should be dynamic (plotly
+#' plot) or static (ggplot2 plot).
 #' @param ... any other parameter compatible with the
 #' \code{\link[igraph]{plot.igraph}} function.
 #'
@@ -372,12 +379,14 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #' @examples
 #' mat <- matrix(runif(40*40), 40)
 #' g <- build_graph_from_sq_mat(mat)
-#' plot_module(g)
+#' plot_module(g, lower_weight_th = -0.5, upper_weight_th = 0.5)
 #'
 #' @export
 
-plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
-                        upper_weight_th = NULL, enrichment = NULL,
+plot_module <- function(graph_module, hubs = NULL, groups = NULL,
+                        lower_weight_th = NULL, upper_weight_th = NULL,
+                        # enrichment = NULL,
+                        # dynamic_plot = TRUE,
                         title = "Module", degree_node_scaling = TRUE,
                         node_scaling_min = 1, edge_scaling_min = 0.2,
                         node_scaling_max = 6, edge_scaling_max = 1,
@@ -385,10 +394,9 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
                         vertex.label.cex = 0.7,
                         vertex.label.color = "gray20",
                         vertex.label.family = "Helvetica",
-                        edge.color = "gray70",
-                        vertex.frame.color = "white",
-                        vertex.color = "gray60",
-                        vertex.label.dist = 1, legend_cex = 0.8,
+                        edge.color = "gray70", vertex.frame.color = "white",
+                        vertex.color = "gray60", vertex.label.dist = 1, 
+                        legend_cex = 0.8, groups_palette = NULL,
                         window_x_min = -1, window_x_max = 1,
                         window_y_min = -1, window_y_max = 1,
                         legend = TRUE, ...) {
@@ -396,7 +404,7 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
   # be list of genes of interest (like one displaying gene known in aging and
   # another for inflammation)
 
-  # Checks
+  # Checking args
   if (!igraph::is.igraph(graph_module))
     stop("graph_module must be an igraph object")
   named_num_vec <- char_vec <- FALSE
@@ -410,6 +418,17 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
       stop("hubs must be a named vector of numeric values, or a vector of",
       " characters")
   }
+  if (!is.null(groups)) {
+    if (!is.data.frame(groups) & !is.matrix(groups))
+      stop("groups must be a matrix or a data.frame")
+    if (length(groups) != 2)
+      stop("groups must be a two columns matrix with genes id and group",
+           " assignation")
+  }
+  if (!is.null(groups_palette)){
+    if (is.null(groups)) 
+      stop("groups need to be provided to use groups_palette")
+  }
   lapply(c(lower_weight_th, upper_weight_th), function(weight_th){
     if (!is.null(weight_th)) {
       if (length(weight_th) > 1)
@@ -420,7 +439,8 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
       #   stop("Weight thresholds must be a in ]-1;1[")
     }
   })
-  if (!is.null(enrichment)) .check_gost(enrichment)
+  # TODO: Change when implemented
+  # if (!is.null(enrichment)) .check_gost(enrichment)
   if (!is.character(layout) & !is.matrix(layout) & !is.function(layout)) {
     stop("layout must be a layout function, its name as a string, or a matrix",
     " giving position of each node ") }
@@ -512,63 +532,101 @@ plot_module <- function(graph_module, hubs = NULL, lower_weight_th = NULL,
       (edge_scaling_max - edge_scaling_min) +
       edge_scaling_min}) %>% unlist
   }
-
+  
+  
   # FIXME: hotfix to manage no label
   if (vertex.label.cex == 0) vertex_label = NA else vertex_label = NULL
 
-  igraph::plot.igraph(graph_to_plot,
-                      vertex.label.color = vertex.label.color,
-                      vertex.label.family = vertex.label.family,
-                      vertex.label.cex = vertex.label.cex,
-                      vertex.label.dist = vertex.label.dist,
-                      edge.color = edge.color,
-                      vertex.label = vertex_label,
-                      vertex.frame.color = vertex.frame.color,
-                      vertex.color = vertex.color,
-                      vertex.size = vertex_size,
-                      edge.width = edge_width,
-                      layout = l * zoom,
-                      rescale = ifelse(zoom != 1, FALSE, TRUE),
-                      main = title,
-                      ...)
+  # Plotting static or dynamic graph
+  # TODO: implementer
+  # if (dynamic_plot) {
+  # 
+  # 
+  # } else {
+    # Vertex color if groups provided
+    if (!is.null(groups)) {
+      # No palette specified
+      if (is.null(groups_palette)) {
+        graph_to_plot$palette <- RColorBrewer::brewer.pal(
+          length(unique(groups[,2])), "Paired")
+      # Palette name specified
+      } else if (is.character(groups_palette) & length(groups_palette) == 1) {
+        graph_to_plot$palette <- RColorBrewer::brewer.pal(
+          length(unique(groups[,2])), groups_palette)
+      # Palette of custom colors specified
+      } else {
+        if (length(unique(groups[,2])) > length(groups_palette)) {
+          warning("Number of groups superior to number of colors in the",
+                  "palette. Using ggplot2 like colors instead.")
+          graph_to_plot$palette <- gg_palette(length(unique(groups[,2])))
+        } else {
+          graph_to_plot$palette <- groups_palette
+        }
+      }
+      graph_to_plot <- igraph::set_vertex_attr(graph_to_plot, "color", 
+                                               groups[,1], groups[,2])
+      vertex.color <- NULL
+    }
+    
+    igraph::plot.igraph(graph_to_plot,
+                        vertex.label.color = vertex.label.color,
+                        vertex.label.family = vertex.label.family,
+                        vertex.label.cex = vertex.label.cex,
+                        vertex.label.dist = vertex.label.dist,
+                        edge.color = edge.color,
+                        vertex.label = vertex_label,
+                        vertex.frame.color = vertex.frame.color,
+                        vertex.color = vertex.color,
+                        vertex.size = vertex_size,
+                        edge.width = edge_width,
+                        layout = l * zoom,
+                        rescale = ifelse(zoom != 1, FALSE, TRUE),
+                        main = title,
+                        ...)
 
 
-  if(legend) {
-
-    # Legend nodes
-    scale_vertex_size <- seq(node_scaling_min, node_scaling_max,
-                           length.out = nb_row_legend)
-    if (degree_node_scaling){
-      label_legend_node <- seq(
+    # Adding a legend
+    if (legend) {
+      # Legend nodes size
+      scale_vertex_size <- seq(node_scaling_min, node_scaling_max,
+                               length.out = nb_row_legend)
+      if (degree_node_scaling) {
+        label_legend_node <- seq(
           min(deg), max(deg), length.out = nb_row_legend) %>%
           round %>%
           as.character
-    } else { label_legend_node <- as.character(scale_vertex_size) }
+      } else {label_legend_node <- as.character(scale_vertex_size)}
 
-    a <- graphics::legend("bottomright", label_legend_node,
-                        pt.cex = scale_vertex_size/200, col = 'white', pch = 21,
-                        title = "Degree", bty = "n", y.intersp = 0.7,
-                        cex = legend_cex)
-    x <- (a$text$x + a$rect$left) / 2
-    y <- a$text$y
-    graphics::symbols(x, y, circles = scale_vertex_size/200, inches = FALSE,
-                    add = TRUE, bg = 'gray', fg = 'white')
+      legend_nodes_size <- graphics::legend(
+        "bottomright", label_legend_node,
+        pt.cex = scale_vertex_size/200, col = 'white', 
+        pch = 21, title = "Degree", bty = "n", 
+        y.intersp = 0.7, cex = legend_cex)
+      x_nodes_size <- (legend_nodes_size$text$x + legend_nodes_size$rect$left)/2
+      y_nodes_size <- legend_nodes_size$text$y
+      graphics::symbols(x_nodes_size, y_nodes_size, 
+                        circles = scale_vertex_size/200, inches = FALSE,
+                        add = TRUE, bg = 'gray', fg = 'white')
+      
+      # Legend nodes colors if groups provided
+      if (!is.null(groups)) {
+        graphics::legend("topleft", as.character(unique(groups[ ,2])),
+                         pt.bg = graph_to_plot$palette, title = names(groups)[2], 
+                         pt.cex = 2, pch = 21, col = "white",
+                         bty = "n", cex = legend_cex)
+      }
 
-
-    # Legend vertex
-    scale_edge_width <- seq(edge_scaling_min, edge_scaling_max,
-                          length.out = nb_row_legend) %>% signif
-
-    label_legend_edge <- seq(min(edge), max(edge),
-                           length.out = nb_row_legend) %>%
+      # Legend vertex
+      scale_edge_width <- seq(edge_scaling_min, edge_scaling_max,
+                              length.out = nb_row_legend) %>% signif
+      label_legend_edge <- seq(
+        min(edge), max(edge), length.out = nb_row_legend) %>%
         signif %>%
         as.character
-
-    graphics::legend("topright", label_legend_edge, col='gray', title = "Weight",
-                   lwd = scale_edge_width, bty = "n", cex = legend_cex)
-
-  }
-
+      graphics::legend("topright", label_legend_edge, col='gray', title = "Weight",
+                       lwd = scale_edge_width, bty = "n", cex = legend_cex)
+    }
+  # }
   return(l)
 }
 
