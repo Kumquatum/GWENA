@@ -467,18 +467,17 @@ plot_module <- function(graph_module, hubs = NULL, groups = NULL,
   # Removing edges whose weight is below or above thresholds given
   if (!is.null(lower_weight_th) & !is.null(upper_weight_th)) {
     graph_to_plot <- graph_module %>%
-      igraph::delete.edges(which(E(.)$weight > lower_weight_th &
-                                 E(.)$weight < upper_weight_th))
+      igraph::delete.edges(which(igraph::E(.)$weight > lower_weight_th &
+                                   igraph::E(.)$weight < upper_weight_th))
   } else if (!is.null(lower_weight_th)) {
     graph_to_plot <- graph_module %>%
-      igraph::delete.edges(which(E(.)$weight > lower_weight_th))
+      igraph::delete.edges(which(igraph::E(.)$weight > lower_weight_th))
   } else if (!is.null(upper_weight_th)) {
     graph_to_plot <- graph_module %>%
-      igraph::delete.edges(which(E(.)$weight < upper_weight_th))
+      igraph::delete.edges(which(igraph::E(.)$weight < upper_weight_th))
   } else graph_to_plot <- graph_module
 
-
-
+  # Détermining layout
   if (is.character(layout)) {
     if (layout != "auto") {
       # Checking if layout function name exists
@@ -501,7 +500,7 @@ plot_module <- function(graph_module, hubs = NULL, groups = NULL,
       l <- igraph::norm_coords(l, xmin = window_x_min, xmax = window_x_max,
                           ymin = window_y_min, ymax = window_y_max) }
 
-  # Should node be scaled with the degree information
+  # Node scaling on degree or provided value
   if (degree_node_scaling) {
     deg <- igraph::degree(graph_to_plot)
     # Checking deg is the same for all (meaning graph is fully connected)
@@ -523,6 +522,7 @@ plot_module <- function(graph_module, hubs = NULL, groups = NULL,
     }
   }
 
+  # Edge scaling if no edge width provided
   if (exists("edge.width")) {
     edge_width <- edge.width
   } else {
