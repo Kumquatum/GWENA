@@ -434,8 +434,7 @@ detect_modules <- function(data_expr, network, min_module_size =
   # Tree cut
   dynamicMods = quiet(dynamicTreeCut::cutreeDynamic(
     dendro = gene_tree, distM = network, cutHeight = clustering_th,
-    deepSplit = 2, pamRespectsDendro = pam_respects_dendro,
-    minClusterSize = min_module_size))
+    pamRespectsDendro = pam_respects_dendro, minClusterSize = min_module_size))
   # TODO manage to divide ellipsis (...) to allow users to add args
   # for cutreeDynamic
 
