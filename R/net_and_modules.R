@@ -84,9 +84,9 @@ get_fit.cor <- function(cor_mat, fit_cut_off = 0.90, network_type =
   if (nrow(cor_mat) != ncol(cor_mat))
     stop("cor_mat should be a squared matrix")
   if (length(fit_cut_off) != 1 | !is.numeric(fit_cut_off))
-    stop("power_cut_off should be a single number")
-  if (fit_cut_off < 0 | fit_cut_off > 1) stop("power_cut_off should be a",
-                                              " number between 0 and 1")
+    stop("alpha_expr should be a single number")
+  if (fit_cut_off < 0 | fit_cut_off > 1) 
+    stop("alpha_expr should be a number between 0 and 1")
   network_type <- match.arg(network_type)
   if (!is.null(block_size)) {
     if (block_size < 2 | block_size %% 1 != 0)
@@ -618,6 +618,8 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #' data with genes as column and samples as row.
 #' @param modules vector, id (whole number or string) of modules associated to
 #' each gene.
+#' @param alpha_expr numeric, transparency of the expression lines. Must be a
+#' value betweem 0 (transparent) and 1 (opaque)
 #' @param ... additional parameters to pass to ggplot2::theme
 #'
 #' @return A ggplot representing expression profile and eigengene by module
@@ -639,7 +641,8 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #'
 #' @export
 
-plot_expression_profiles <- function(data_expr, modules, ...) {
+plot_expression_profiles <- function(data_expr, modules, alpha_expr = 0.3, 
+                                     ...) {
   # Check
   if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
@@ -657,6 +660,10 @@ plot_expression_profiles <- function(data_expr, modules, ...) {
     warning("modules represent a single modules and only contains one",
     " gene name")
   }
+  if (length(alpha_expr) != 1 | !is.numeric(alpha_expr))
+    stop("alpha_expr should be a single number")
+  if (alpha_expr < 0 | alpha_expr > 1) 
+    stop("alpha_expr should be a number between 0 and 1")
 
   # Tables preparation for ggplot
   if (is.list(modules)) {
@@ -717,7 +724,7 @@ plot_expression_profiles <- function(data_expr, modules, ...) {
 
   ggplot2::ggplot(plot_table,
                   ggplot2::aes(x=sample, y=expression, group=gene)) +
-    ggplot2::geom_line(alpha = 0.3) +
+    ggplot2::geom_line(alpha = alpha_expr) +
     ggplot2::facet_grid(cor_sign ~ module) +
     ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                    axis.ticks.x = ggplot2::element_blank(),
