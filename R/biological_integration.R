@@ -452,6 +452,7 @@ utils::globalVariables(c("eigengene", "pval", "phenotype"))
 #' associated
 #' @param pvalue_th float, threshold in ]0;1[ under which module will be
 #' considered as significantly associated
+#' @param text_angle integer, angle in [0,360] of the x axis labels.
 #' @param ... any other parameter you can provide to ggplot2::theme
 #'
 #' @importFrom ggplot2 ggplot geom_tile geom_point scale_color_gradient2
@@ -478,7 +479,8 @@ utils::globalVariables(c("eigengene", "pval", "phenotype"))
 #'
 #' @export
 
-plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05, ...){
+plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05, 
+                                   text_angle = 90, ...){
   # Checks
   if (!is.list(modules_phenotype)) stop("modules_phenotype must be a list")
   if (!isTRUE(all.equal(names(modules_phenotype),
@@ -498,6 +500,10 @@ plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05, ...){
   if (!is.numeric(pvalue_th)) stop("pvalue_th must be a numeric value")
   if (length(pvalue_th) != 1) stop("pvalue_th must be a single value")
   if (pvalue_th <= 0 | pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
+  if (length(text_angle) != 1 | !is.numeric(text_angle))
+    stop("text_angle should be a single number")
+  if (text_angle < -360 | text_angle > 360) 
+    stop("text_angle should be a number between -360 and 360")
 
   # Data preparation
   df_cor <- modules_phenotype$association %>%
@@ -522,7 +528,8 @@ plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05, ...){
       ggplot2::geom_point(ggplot2::aes(colour = cor, size = signif)) +
       ggplot2::scale_color_gradient2() +
       ggplot2::theme_bw() +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1),
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = text_angle, 
+                                                         hjust = 1),
                      ...) +
       ggplot2::xlab("Module") +
       ggplot2::ylab("Phenotype")
