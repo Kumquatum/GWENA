@@ -498,6 +498,7 @@ utils::globalVariables(c("module", "statistics", "pvalue"))
 #' @param low_color,pvalue_th_color,unsignificant_color string, color to use
 #' as lower, middle, and higher end of the legend. Can either be the color name
 #' or hexadecimal code (e.g.: “red” or “#FF1234” )
+#' @param text_angle integer, angle in [0,360] of the x axis labels.
 #'
 #' @importFrom magrittr %>%
 #' @importFrom ggplot2 ggplot geom_tile scale_fill_gradientn coord_equal
@@ -523,7 +524,8 @@ utils::globalVariables(c("module", "statistics", "pvalue"))
 plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05,
                                   low_color = "#031643",
                                   pvalue_th_color = "#A0A3D3",
-                                  unsignificant_color = "#FFFFFF") {
+                                  unsignificant_color = "#FFFFFF",
+                                  text_angle = 90) {
   # Checks
   if (!is.data.frame(comparison_pvalues) & !is.matrix(comparison_pvalues))
     stop("comparison_pvalues should be a data.frame or a matrix.")
@@ -544,6 +546,10 @@ plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05,
       stop(color, " should be a color specified by a name or an hexadecimal",
            " code")
   })
+  if (length(text_angle) != 1 | !is.numeric(text_angle))
+    stop("text_angle should be a single number")
+  if (text_angle < -360 | text_angle > 360) 
+    stop("text_angle should be a number between -360 and 360")
 
   df <- comparison_pvalues %>%
     as.data.frame %>%
@@ -564,5 +570,6 @@ plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05,
                                   guide = "legend", breaks = breaks) +
     ggplot2::coord_equal() +
     ggplot2::theme_minimal() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = text_angle, 
+                                                       hjust = 1))
 }
