@@ -301,6 +301,11 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 #' Provided by the output of modules_detection.
 #' @param phenotypes matrix or data.frame, phenotypes for each sample to
 #' associate.
+#' @param cor_func string, name of the correlation function to be used. Must be
+#' one of "pearson", "spearman", "kendall", "other". If "other", your_func must
+#' be provided
+#' @param your_func function returning a correlation matrix. Final values must 
+#' be in [-1;1] range
 #' @param id_col string or vector of string, optional name of the columns
 #' containing the common id between eigengenes and phenotypes.
 #' @importFrom WGCNA corPvalueStudent
@@ -320,7 +325,10 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 #'
 #' @export
 
-associate_phenotype <- function(eigengenes, phenotypes, id_col = NULL) {
+associate_phenotype <- function(
+  eigengenes, phenotypes, 
+  cor_func = c("pearson", "spearman", "kendall", "other"),
+  your_func = NULL, id_col = NULL) {
   # Checks
   if (!(is.data.frame(eigengenes) | is.matrix(eigengenes)))
     stop("eigengenes should be a data.frame or matrix")
@@ -339,6 +347,9 @@ associate_phenotype <- function(eigengenes, phenotypes, id_col = NULL) {
   if (nrow(eigengenes) != nrow(phenotypes))
     stop("Number of row should be the same between eigengene and phenotypes ",
          "(samples)")
+  cor_func <- match.arg(cor_func)
+  if (cor_func == "other" & (is.null(your_func) | !is.function(your_func)))
+    stop("If you specify other, your_func must be a function.")
   if (!is.null(id_col)) {
     if (!is.character(id_col))
       stop("id_col should be a character or a character vector")
@@ -425,7 +436,13 @@ associate_phenotype <- function(eigengenes, phenotypes, id_col = NULL) {
   design_mat <- as.data.frame(dummies_var, check.names = FALSE)
 
   # Correlation + student test to assess correlation significance
-  asso_test_res <- WGCNA::corAndPvalue(eigengenes, design_mat)
+  if (cor_func == "other") {
+    asso_test_res <- list(cor = your_func(eigengenes, design_mat),
+                          p = WGCNA::corPvalueStudent(asso, nrow(phenotypes)))
+  } else {
+    asso_test_res <- WGCNA::corAndPvalue(eigengenes, design_mat)
+  }
+  
 
   # TODO Check if a correction for multiple testing shouldn't be performed
   # here...
