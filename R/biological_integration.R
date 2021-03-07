@@ -308,6 +308,7 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 #' be in [-1;1] range
 #' @param id_col string or vector of string, optional name of the columns
 #' containing the common id between eigengenes and phenotypes.
+#' @param ... any arguments compatible with \code{\link[stats]{cor}}.
 #' @importFrom WGCNA corPvalueStudent
 #' @importFrom dplyr select
 #'
@@ -328,7 +329,7 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 associate_phenotype <- function(
   eigengenes, phenotypes, 
   cor_func = c("pearson", "spearman", "kendall", "other"),
-  your_func = NULL, id_col = NULL) {
+  your_func = NULL, id_col = NULL, ...) {
   # Checks
   if (!(is.data.frame(eigengenes) | is.matrix(eigengenes)))
     stop("eigengenes should be a data.frame or matrix")
@@ -347,6 +348,9 @@ associate_phenotype <- function(
   if (nrow(eigengenes) != nrow(phenotypes))
     stop("Number of row should be the same between eigengene and phenotypes ",
          "(samples)")
+  if (any(lapply(phenotypes, function(x) any(is.na(x))) %>% unlist))
+    warning("NA detected into phenotypes. You should check the 'use' arg of ",
+            "the cor function to ensure good handling of NA.")
   cor_func <- match.arg(cor_func)
   if (cor_func == "other" & (is.null(your_func) | !is.function(your_func)))
     stop("If you specify other, your_func must be a function.")
@@ -425,8 +429,10 @@ associate_phenotype <- function(
     if (!is.numeric(df[1,])) {
       model_mat <- stats::model.matrix(
         stats::formula(paste("~ ", dummy_name, "+ 0")),
-        data = df
-      )
+        data = df) %>% 
+        .[match(rownames(df), rownames(.)),] %>%
+        set_rownames(rownames(df))
+      
       colnames(model_mat) <- gsub(dummy_name, "", colnames(model_mat))
       return(model_mat)
     } else {
@@ -437,12 +443,12 @@ associate_phenotype <- function(
 
   # Correlation + student test to assess correlation significance
   if (cor_func == "other") {
-    asso_test_res <- list(cor = your_func(eigengenes, design_mat),
+    asso <- your_func(eigengenes, design_mat)
+    asso_test_res <- list(cor = asso,
                           p = WGCNA::corPvalueStudent(asso, nrow(phenotypes)))
   } else {
-    asso_test_res <- WGCNA::corAndPvalue(eigengenes, design_mat)
+    asso_test_res <- WGCNA::corAndPvalue(eigengenes, design_mat, ...)
   }
-  
 
   # TODO Check if a correction for multiple testing shouldn't be performed
   # here...
