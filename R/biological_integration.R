@@ -424,18 +424,15 @@ associate_phenotype <- function(eigengenes, phenotypes, id_col = NULL) {
   })
   design_mat <- as.data.frame(dummies_var, check.names = FALSE)
 
-  # Correlations
-  association <- stats::cor(eigengenes, design_mat)
-
-  # P value associated
-  pval_association <- WGCNA::corPvalueStudent(association, nrow(phenotypes))
+  # Correlation + student test to assess correlation significance
+  asso_test_res <- WGCNA::corAndPvalue(eigengenes, design_mat)
 
   # TODO Check if a correction for multiple testing shouldn't be performed
   # here...
 
   return(list(
-    association = association %>% as.data.frame,
-    pval = pval_association %>% as.data.frame
+    association = asso_test_res$cor %>% as.data.frame,
+    pval = asso_test_res$p %>% as.data.frame
   ))
 }
 
