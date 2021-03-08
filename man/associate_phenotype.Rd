@@ -4,7 +4,14 @@
 \alias{associate_phenotype}
 \title{Modules phenotpic association}
 \usage{
-associate_phenotype(eigengenes, phenotypes, id_col = NULL)
+associate_phenotype(
+  eigengenes,
+  phenotypes,
+  cor_func = c("pearson", "spearman", "kendall", "other"),
+  your_func = NULL,
+  id_col = NULL,
+  ...
+)
 }
 \arguments{
 \item{eigengenes}{matrix or data.frame, eigengenes of the modules.
@@ -13,8 +20,17 @@ Provided by the output of modules_detection.}
 \item{phenotypes}{matrix or data.frame, phenotypes for each sample to
 associate.}
 
+\item{cor_func}{string, name of the correlation function to be used. Must be
+one of "pearson", "spearman", "kendall", "other". If "other", your_func must
+be provided}
+
+\item{your_func}{function returning a correlation matrix. Final values must 
+be in [-1;1] range}
+
 \item{id_col}{string or vector of string, optional name of the columns
 containing the common id between eigengenes and phenotypes.}
+
+\item{...}{any arguments compatible with \code{\link[stats]{cor}}.}
 }
 \value{
 A list of two data.frames : associations modules/phenotype and

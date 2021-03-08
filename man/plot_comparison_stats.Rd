@@ -9,7 +9,8 @@ plot_comparison_stats(
   pvalue_th = 0.05,
   low_color = "#031643",
   pvalue_th_color = "#A0A3D3",
-  unsignificant_color = "#FFFFFF"
+  unsignificant_color = "#FFFFFF",
+  text_angle = 90
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ considered as significant}
 \item{low_color, pvalue_th_color, unsignificant_color}{string, color to use
 as lower, middle, and higher end of the legend. Can either be the color name
 or hexadecimal code (e.g.: “red” or “#FF1234” )}
+
+\item{text_angle}{integer, angle in [0,360] of the x axis labels.}
 }
 \value{
 A ggplot object representing a heatmap of the comparison statistics

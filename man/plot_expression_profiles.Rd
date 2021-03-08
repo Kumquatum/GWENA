@@ -4,7 +4,7 @@
 \alias{plot_expression_profiles}
 \title{Modules expression profiles}
 \usage{
-plot_expression_profiles(data_expr, modules, ...)
+plot_expression_profiles(data_expr, modules, alpha_expr = 0.3, ...)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame or SummarizedExperiment, expression
@@ -12,6 +12,9 @@ data with genes as column and samples as row.}
 
 \item{modules}{vector, id (whole number or string) of modules associated to
 each gene.}
+
+\item{alpha_expr}{numeric, transparency of the expression lines. Must be a
+value betweem 0 (transparent) and 1 (opaque)}
 
 \item{...}{additional parameters to pass to ggplot2::theme}
 }

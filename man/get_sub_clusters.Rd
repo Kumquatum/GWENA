@@ -17,8 +17,6 @@ on the k tested should be plotted.}
 
 \item{...}{any other parameter compatible with the
 \code{\link[cluster]{pam}} function.}
-
-\item{module}{vector, module defined as vector of characters for genes id.}
 }
 \value{
 data.frame, a two cols table with the gene id in the first one, and

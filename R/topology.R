@@ -361,8 +361,8 @@ utils::globalVariables(c("vertex.size", "edge.width"))
 #' @param window_y_min decimal, value for the left limit of the window.
 #' @param window_y_max decimal, value for the right limit of the window.
 #' @param legend boolean, indicates if the legend should be plotted.
-#' @param dymamic_plot boolean, does the final plot should be dynamic (plotly
-#' plot) or static (ggplot2 plot).
+# #' @param dymamic_plot boolean, does the final plot should be dynamic (plotly
+# #' plot) or static (ggplot2 plot).
 #' @param ... any other parameter compatible with the
 #' \code{\link[igraph]{plot.igraph}} function.
 #'
@@ -632,7 +632,7 @@ plot_module <- function(graph_module, hubs = NULL, groups = NULL,
 
 
 # Removing errors about dplyr data-variables
-# utils::globalVariables(c("vertex.size", "edge.width"))
+utils::globalVariables(c("avg_sil_width", "k", "sub_module"))
 
 #' Detect sub clusters
 #'
@@ -642,7 +642,6 @@ plot_module <- function(graph_module, hubs = NULL, groups = NULL,
 #'
 #' @param network matrix or data.frame, strength of gene co-expression (edge
 #' values).
-#' @param module vector, module defined as vector of characters for genes id.
 #' @param seq_k vector, sequence of k number of cluster to test
 #' @param fit_plot boolean, does the plot with silhouette coefficient depending
 #' on the k tested should be plotted.

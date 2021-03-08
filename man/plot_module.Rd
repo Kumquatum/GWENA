@@ -32,7 +32,6 @@ plot_module(
   window_x_max = 1,
   window_y_min = -1,
   window_y_max = 1,
-  dynamic_plot = TRUE,
   legend = TRUE,
   ...
 )
@@ -104,9 +103,6 @@ to mix named color and RGB colors.}
 
 \item{...}{any other parameter compatible with the
 \code{\link[igraph]{plot.igraph}} function.}
-
-\item{dymamic_plot}{boolean, does the final plot should be dynamic (plotly
-plot) or static (ggplot2 plot).}
 }
 \value{
 matrix, layout of the graph as a two column matrix (x, y)

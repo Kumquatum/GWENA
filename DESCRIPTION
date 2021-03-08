@@ -51,6 +51,8 @@ Imports:
     matrixStats (>= 0.55.0),
     SummarizedExperiment (>= 1.14.1),
     stringr (>= 1.4.0),
+    cluster (>= 2.1.0),
+    grDevices (>= 4.0.4),
     methods,
     graphics,
     stats,
