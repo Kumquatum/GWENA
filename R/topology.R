@@ -666,7 +666,7 @@ utils::globalVariables(c("avg_sil_width", "k", "sub_module"))
 #'
 #' @export
 
-get_sub_clusters <- function(network, seq_k = 1:15, fit_plot = TRUE,
+get_sub_clusters <- function(network, seq_k = seq_len(15), fit_plot = TRUE,
                              ...) {
   # Checking args
   is_network(network)

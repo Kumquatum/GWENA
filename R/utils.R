@@ -25,7 +25,7 @@ quiet <- function(func) {
 #' @return character vector, haxadecimal colors of length n
 gg_palette <- function(n) {
   hues = seq(15, 375, length = n + 1)
-  grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
+  grDevices::hcl(h = hues, l = 65, c = 100)[seq_len(n)]
 }
 
 

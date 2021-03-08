@@ -325,7 +325,10 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
     fit <- list(
       power_value = power_value,
       fit_table = "None. Custom power_value provided")
-    }
+  }
+  
+  # Checking power
+  
 
   # Adjacency
   adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat,
