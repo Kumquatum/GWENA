@@ -336,9 +336,9 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
   # Checking power (based on question 6 from WGCNA FAQ)
   approx_power <- data.frame(n_samples_min = c(0, 20, 30, 40),
                              n_samples_max = c(20, 30, 40, +Inf),
-                             signed = c(9, 8, 7, 6),
-                             unsigned = c(18, 16, 14, 16),
-                             `signed hybrid` = c(18, 16, 14, 16), 
+                             signed = c(18, 16, 14, 16),
+                             unsigned = c(9, 8, 7, 6),
+                             `signed hybrid` = c(9, 8, 7, 6), 
                              check.names = FALSE)
   n_samples <- nrow(data_expr)
   good_line <- approx_power %>% 
