@@ -4,7 +4,7 @@
 \alias{get_sub_clusters}
 \title{Detect sub clusters}
 \usage{
-get_sub_clusters(network, seq_k = 1:15, fit_plot = TRUE, ...)
+get_sub_clusters(network, seq_k = seq_len(15), fit_plot = TRUE, ...)
 }
 \arguments{
 \item{network}{matrix or data.frame, strength of gene co-expression (edge

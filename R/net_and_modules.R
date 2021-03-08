@@ -218,6 +218,9 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
 }
 
 
+# Removing errors about dplyr data-variables
+utils::globalVariables(c("n_samples_min", "n_samples_max"))
+
 #' Network building by co-expression score computation
 #'
 #' Compute the adjacency matrix, then the TOM to build the network. Than detect
@@ -240,9 +243,12 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
 #' @param block_size integer, size of blocks by which operations can be
 #' proceed. Helping if working with low capacity computers. If null, will be
 #' estimated.
-#' @param stop_if_no_fit boolean, does not finding a fit above fit_cut_off
+#' @param stop_if_fit_pb boolean, does not finding a fit above fit_cut_off, or 
+#' having a power too low or too high (based on WGCNA FAQ recommended powers)
 #' should stop process, or just print a warning and return the highest fitting
 #' power.
+#' @param pct_power_ic float, confidence interval by which the power fitted
+#' should be evaluated for too high or too low a power.
 #' @param network_type string, type of network to be used. Either "unsigned",
 #' "signed", "signed hybrid". See details.
 #' @param tom_type string, type of the topological overlap matrix to be
@@ -270,7 +276,7 @@ get_fit.expr <- function(data_expr, fit_cut_off = 0.90,
 build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
                         c("pearson", "spearman", "bicor", "other"),
                       your_func = NULL, power_value = NULL, block_size = NULL,
-                      stop_if_no_fit = FALSE,
+                      stop_if_fit_pb = FALSE, pct_power_ic = 0.7,
                       network_type = c("unsigned", "signed", "signed hybrid"),
                       tom_type = c("unsigned", "signed", "signed Nowick",
                                    "unsigned 2", "signed 2", "none"),
@@ -288,8 +294,8 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
   if (!is.null(power_value)) {
     if (power_value < 1 | power_value %% 1 != 0)
       stop("If not NULL, power_value must be a whole number >= 1.")}
-  if (!is.logical(stop_if_no_fit))
-    stop("stop_if_no_fit must be a boolean.")
+  if (!is.logical(stop_if_fit_pb))
+    stop("stop_if_fit_pb must be a boolean.")
   network_type <- match.arg(network_type)
   tom_type <- match.arg(tom_type)
   keep_matrices <- match.arg(keep_matrices)
@@ -318,7 +324,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
   if (is.null(power_value)) {
     fit <- get_fit.cor(cor_mat = cor_mat, fit_cut_off = fit_cut_off,
                        network_type = network_type, ...)
-    if (stop_if_no_fit & fit$fit_above_cut_off == FALSE)
+    if (stop_if_fit_pb & fit$fit_above_cut_off == FALSE)
       stop("No fitting power could be found for provided fit_cut_off.",
            "You should verify your data (or lower fit_cut_off). See FAQ.")
   } else {
@@ -327,8 +333,33 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
       fit_table = "None. Custom power_value provided")
   }
   
-  # Checking power
+  # Checking power (based on question 6 from WGCNA FAQ)
+  approx_power <- data.frame(n_samples_min = c(0, 20, 30, 40),
+                             n_samples_max = c(20, 30, 40, +Inf),
+                             signed = c(9, 8, 7, 6),
+                             unsigned = c(18, 16, 14, 16),
+                             `signed hybrid` = c(18, 16, 14, 16), 
+                             check.names = FALSE)
+  n_samples <- nrow(data_expr)
+  good_line <- approx_power %>% 
+    select(n_samples_min, n_samples_max, network_type) %>%
+    filter(n_samples >= n_samples_min & n_samples < n_samples_max)
   
+  if (as.logical(fit$power_value < good_line[network_type] * pct_power_ic)) {
+    msg_fit <- paste0("The power fitted is below the reference (confidence ", 
+                      " interval included): ", good_line[network_type], ". ", 
+                      "You might want to decrease your fit threshold and/or ",
+                      "your data for confounding factors. See FAQ for more ",
+                      "details on power fit troubles.")
+  } else if (
+    as.logical(fit$power_value > good_line[network_type] / pct_power_ic)) {
+    msg_fit <- paste0("The power fitted is above the reference (confidence ", 
+                      " interval included): ", good_line[network_type], ". ", 
+                      "You might want to increase your fit threshold and/or ",
+                      "check the scale-free topology fitting through the fit ",
+                      "table. See FAQ for more details on power fit troubles.")
+  }
+  if (exists("msg_fit")) if (stop_if_fit_pb) stop(msg_fit) else warning(msg_fit)
 
   # Adjacency
   adj = WGCNA::adjacency.fromSimilarity(similarity = cor_mat,

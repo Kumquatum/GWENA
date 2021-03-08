@@ -11,7 +11,8 @@ build_net(
   your_func = NULL,
   power_value = NULL,
   block_size = NULL,
-  stop_if_no_fit = FALSE,
+  stop_if_fit_pb = FALSE,
+  pct_power_ic = 0.7,
   network_type = c("unsigned", "signed", "signed hybrid"),
   tom_type = c("unsigned", "signed", "signed Nowick", "unsigned 2", "signed 2", "none"),
   keep_matrices = c("none", "cor", "adja", "both"),
@@ -40,9 +41,13 @@ NULL, will be estimated by trying different power law fitting.}
 proceed. Helping if working with low capacity computers. If null, will be
 estimated.}
 
-\item{stop_if_no_fit}{boolean, does not finding a fit above fit_cut_off
+\item{stop_if_fit_pb}{boolean, does not finding a fit above fit_cut_off, or 
+having a power too low or too high (based on WGCNA FAQ recommended powers)
 should stop process, or just print a warning and return the highest fitting
 power.}
+
+\item{pct_power_ic}{float, confidence interval by which the power fitted
+should be evaluated for too high or too low a power.}
 
 \item{network_type}{string, type of network to be used. Either "unsigned",
 "signed", "signed hybrid". See details.}
