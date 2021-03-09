@@ -204,7 +204,7 @@ Gene co-expression networks are an ensemble of genes (nodes) linked to each othe
 The co-expression network is built according to the following sub-steps :
 
 1. A **correlation** (or distance) between each pair of genes is computed.
-2. The correlation distributions are **fitted to a power law**.
+2. A **power law** is fitted on the correlation matrix. This step can be performed by itself through the function `get_fit.expr` if needed.
 3. An **adjacency score** is computed by adjusting previous correlations by the fitted power law. 
 4. A **topological overlap score** is computed by accounting for the network's topology.
 
@@ -234,7 +234,7 @@ At this point, the network is a [complete graph](https://en.wikipedia.org/wiki/C
 Such modules can be detected using unsupervised learning or modeling. GWENA use the hierarchical clustering but other methods can be used (kmeans, Gaussian mixture models, etc.). 
 
 ```{r modules_detection}
-detection <- detect_modules(kuehne_expr_filtered, 
+modules <- detect_modules(kuehne_expr_filtered, 
                             net$network, 
                             detailled_result = TRUE,
                             merge_threshold = 0.25)
@@ -246,18 +246,19 @@ Since this operation tends to create multiple smaller modules with highly simila
 
 ```{r bipartite_graph_merge}
 # Number of modules before merging :
-length(unique(detection$modules_premerge))
+length(unique(modules$modules_premerge))
 # Number of modules after merging: 
-length(unique(detection$modules))
+length(unique(modules$modules))
 
-plot_modules_merge(modules_premerge = detection$modules_premerge, 
-                   modules_merged = detection$modules)
+layout_mod_merge <- plot_modules_merge(
+  modules_premerge = modules$modules_premerge, 
+  modules_merged = modules$modules)
 ```
 
 Resulting modules contain more genes whose repartition can be seen by a simple barplot. 
 
 ```{r plot_modules_gene_distribution, fig.height=3}
-ggplot2::ggplot(data.frame(detection$modules %>% stack), 
+ggplot2::ggplot(data.frame(modules$modules %>% stack), 
                 ggplot2::aes(x = ind)) + ggplot2::stat_count() +
   ggplot2::ylab("Number of genes") +
   ggplot2::xlab("Module")
@@ -266,7 +267,7 @@ ggplot2::ggplot(data.frame(detection$modules %>% stack),
 Each of the modules presents a distinct profile, which can be plotted in two figures to separate the positive (+ facet) and negative (- facet) correlations profile. As a summary of this profile, the eigengene (red line) is displayed to act as a signature. 
 
 ```{r plot_module_profile}
-# plot_expression_profiles(kuehne_expr_filtered, detection$modules)
+# plot_expression_profiles(kuehne_expr_filtered, modules$modules)
 ```
 
 
@@ -281,7 +282,7 @@ In oppositions, databases references like [TRANSFAC](https://doi.org/10.1093%2Fb
 Using the [over-representation analysis (ORA)](http://doi.org/10.1371/journal.pcbi.1002375) tool [GOSt](https://biit.cs.ut.ee/gprofiler/gost) from g:Profiler, we can retrieve the biological association for each module and plot it as follows.
 
 ```{r modules_enrichment, fig.height=12}
-enrichment <- bio_enrich(detection$modules)
+enrichment <- bio_enrich(modules$modules)
 plot_enrichment(enrichment)
 ```
 
@@ -293,12 +294,12 @@ If phenotypic information is available about the samples provided, an associatio
 ```{r modules_phenotype}
 # With data.frame/matrix
 phenotype_association <- associate_phenotype(
-  detection$modules_eigengenes, 
+  modules$modules_eigengenes, 
   kuehne_traits %>% dplyr::select(Condition, Age, Slide))
 
 # With SummarizedExperiment
 phenotype_association <- associate_phenotype(
-  detection$modules_eigengenes, 
+  modules$modules_eigengenes, 
   SummarizedExperiment::colData(se_kuehne) %>% 
     as.data.frame %>% 
     dplyr::select(Condition, Age, Slide))
@@ -319,15 +320,28 @@ Information can be retrieved from the network topology itself. For example, hub 
 Manipulation of graph objects can be quite demanding in memory and CPU usage. Caution is advised when choosing to plot networks larger than 100 genes. 
 Since co-expression networks are complete graphs, readability is hard because all genes are connected with each other. In order to clarity visualization, edges with a similarity score below a threshold are removed.
 
-```{r graph, fig.width=12, fig.height=12, echo=FALSE}
-module_example <- detection$modules$`2`
+```{r graph, fig.width=12, fig.height=12}
+module_example <- modules$modules$`2`
 graph <- build_graph_from_sq_mat(net$network[module_example, module_example])
 
-plot_module(graph, upper_weight_th = 0.999995, 
-            vertex.label.cex = 0, 
-            node_scaling_max = 7, 
-            legend_cex = 1)
+layout_mod_2 <- plot_module(graph, upper_weight_th = 0.999995, 
+                            vertex.label.cex = 0, 
+                            node_scaling_max = 7, 
+                            legend_cex = 1)
 ```
+
+As modules also follow a modular topology inside, it may be interesting to detect the sub clusters inside them to find genes working toward the same function through enrichment. The sub cluster can then be plotted on the graph to see their interaction.
+
+```{r sub_clusters, fig.width=12, fig.height=12}
+net_mod_2 <- net$network[modules$modules$`2`, modules$modules$`2`] 
+sub_clusters <- get_sub_clusters(net_mod_2)
+layout_mod_2_sub_clust <- plot_module(graph, upper_weight_th = 0.999995,
+                                      groups = sub_clusters,
+                                      vertex.label.cex = 0, 
+                                      node_scaling_max = 7, 
+                                      legend_cex = 1)
+```
+
 
 
 ## Networks comparison
@@ -380,7 +394,7 @@ The final object contains a table summarizing the comparison of the modules,
 directly available with the `comparison$result$young$old$comparison` command. 
 The comparison take into account the permutation test result and the z summary.
 
-`r knitr::kable(comparison$result$young$old$comparison, caption =  "Modules preservation with young as reference")`
+`r knitr::kable(comparison$result$young$old$comparison)`
 
 The detail of the pvalues can also be seen as a heatmap. Since all evaluation metrics of  `compare_conditions` need to be significant to consider a module preserved/unpreserved/one of them, it could be interesting to see which metrics prevented a module to be significant.
 
@@ -415,37 +429,50 @@ You should first verify your data. This implies :
 * You didn't filtered your data in a way that breaks the scale-free property. Classic wrong filter is usign only differentially expressed genes (see [question 2. from WGCNA package FAQ](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html))
 If you verified these causes, you may have set a fit_cut_off too high (default is 0.9 default).
 
+**4. Why did I got a warning/error on the power being too high or too low ?**
+Power fitting sometimes tend to low or high power. Peter Langfelder and Steve Horvath provide on their [FAQ about WGCNA](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html) a range of plausible power depending on the type of network (signed/unsigned) and the number of samples. 
 
-**4. Why do the first modules have so many genes as the last ones have very few?**
+| Number of samples | Unsigned and signed hybrid networks | Signed networks |
+|-------------------|-------------------------------------|-----------------|
+|  Less than 20     |  9                                  |  18             |
+|  20-30            |  8                                  |  16             |
+|  30-40            |  7                                  |  14             |
+|  more than 40     |  6                                  |  12             |
+
+GWENA issue a warning when the fitted power is too low or too high regarding this parameters.
+* High powers can come from a fitting threshold too strict, a data filtration breaking the scale-free topology property, an insufficient number of samples
+* Low powers can come from a strong heterogeneity in the data (confounding factor, subset of sample strongly different) which can be confirmed by a PCA analysis and corrected using ComBat (see the sva package) if it's a batch effect.
+
+**5. Why do the first modules have so many genes as the last ones have very few?**
 
 * **Resolution** is usually the main answer. As the number of sample by conditions decrease, the correlations tend to increase. This leads to highly correlated genes that ends up in the same modules. You could try another clustering method to split these huge modules, however, they often turn out to be artificial split which won't give significant biological integration.
-* **Expression drivers** can also impact it. If you have phenotipic variables strongly impacting your expression, this may result in a huge variation factor that will regroup genes impacted by it together
+* **Expression drivers** can also impact it. If you have phenotypic variables strongly impacting your expression, this may result in a huge variation factor that will regroup genes impacted by it together
 
 
-**5. Why GWENA doesn't provide normalization methods ?**
+**6. Why GWENA doesn't provide normalization methods ?**
 
 GWENA is design to support both RNA-seq and microarray data. However each of these technologies have its own normalization methods, partly because of the distribution of the expression (discrete against continuous). Also microarrays normalization steps aim to remove noise like mRNA quality variability, batch effect, background effect, etc. While RNA-seq normalization steps aim to account for differences of gene length, sequencing depths, GC content, etc. but can also take into account classic noise like batch effect. 
 
-Some of this normalization methods require metadata and specific constructor package in the case of microarrays. To avoid over-complexification of the input for this pipeline and since the experimenters are in the best position to know the best normalisations to apply, we prefer to ask for already normalized methods.
+Some of this normalization methods require metadata and specific constructor package in the case of microarrays. To avoid over-complexification of the input for this pipeline and since the experimenters are in the best position to know the best normalization to apply, we prefer to ask for already normalized methods.
 
 
-**6. Why forcing expression datasets to have no NA values?**
+**7. Why forcing expression datasets to have no NA values?**
 
 As you may know in R, missing values in cor and cov function by default propagate missing values in each column and row where there are found. Multiple options are available in these function to manage missing values. However some of them are not available for all type of correlations available, and not all imputations methods are wise to use (take a look at this article: [Pairwise-complete correlation considered dangerous](https://bwlewis.github.io/covar/missing.html)).
 Since WGCNA running requires no missing values, I prefere forcing to have a complete dataset. You have therefore the full understanding of the imputation you compute for your missing values. If you have no idea how to do it, see [Dealing with missing data:  Key assumptions and methods for applied analysis](https://www.bu.edu/sph/files/2014/05/Marina-tech-report.pdf) for general information about missing values imputation, and [Dealing with missing values in large-scale studies: microarray data imputation and beyond](https://academic.oup.com/bib/article/11/2/253/216449) for more transcriptomic-specific imputation.
 
 
-**7. Why did you wrapped multiple functions of WGCNA like `pickSoftThreshold` or `adjacency` ? Wasn't they already working?**
+**8. Why did you wrapped multiple functions of WGCNA like `pickSoftThreshold` or `adjacency` ? Wasn't they already working?**
 
 Short answer is "Yes they were". However, the parameters of these functions and their syntax didn't eased tehir use. Moreover, the current succession of functions to built modules repeated multiple times the correlation computation which takes quite some time. Also, I took the opportunity to integrate native sperman correlation.
 
 
-**8. Why didn't you use S3 class to create objects usable by your functions ?**
+**9. Why didn't you use S3 class to create objects usable by your functions ?**
 
 GWENA architecture is designed to be modular, meaning each step method is easily exchangeable for another method (i.e. changing the detection step which is a hierarchical cultering to a kmeans) as long as the input and output format are the same. Also using native data types ensure the ease of compatibility with other tools (i.e. using cytoscape for the visualization step instead of the GWENA's one).
 
 
-**9. Why the arg `network_type = "signed"` implies a modification of the similarity score even though it is already signed?**
+**10. Why the arg `network_type = "signed"` implies a modification of the similarity score even though it is already signed?**
 
 Since a correlation matrix is already signed, one could as what is this `similarity <- (1 + cor_mat) / 2` operation. It is simply because ulterior steps of estimating a scale-free index in WGCNA implies a log10 transformation. Therefore you can't have negative numbers. Because a correlation matrix have values in [0;1], the operation will keep the distribution and avoid negative values.
 
