@@ -342,7 +342,7 @@ build_net <- function(data_expr, fit_cut_off = 0.90, cor_func =
                              check.names = FALSE)
   n_samples <- nrow(data_expr)
   good_line <- approx_power %>% 
-    select(n_samples_min, n_samples_max, network_type) %>%
+    select(n_samples_min, n_samples_max, !!network_type) %>%
     filter(n_samples >= n_samples_min & n_samples < n_samples_max)
   
   if (as.logical(fit$power_value < good_line[network_type] * pct_power_ic)) {
