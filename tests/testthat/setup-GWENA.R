@@ -1,12 +1,13 @@
 # ===== setup ====
 
 #### Expression data.frames
-df_expr <- list(df_microarray = kuehne_expr[, 5000:7000],
+df_expr <- list(df_microarray = kuehne_expr[, 3000:5000],
+# df_expr <- list(df_microarray = kuehne_expr[, 5000:7000],
                 df_rnaseq = gtex_expr[, 5000:7000])
 
 #### SummarizedExperiment version of kuehne data
 se <- SummarizedExperiment::SummarizedExperiment(
-  assays = list(expr = t(kuehne_expr[, 5000:7000])),
+  assays = list(expr = t(df_expr$df_microarray)),
   colData = S4Vectors::DataFrame(kuehne_traits)
 )
 S4Vectors::metadata(se) <- list(
