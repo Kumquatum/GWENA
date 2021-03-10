@@ -464,7 +464,7 @@ Since WGCNA running requires no missing values, I prefere forcing to have a comp
 
 **8. Why did you wrapped multiple functions of WGCNA like `pickSoftThreshold` or `adjacency` ? Wasn't they already working?**
 
-Short answer is "Yes they were". However, the parameters of these functions and their syntax didn't eased tehir use. Moreover, the current succession of functions to built modules repeated multiple times the correlation computation which takes quite some time. Also, I took the opportunity to integrate native sperman correlation.
+Short answer is "Yes they were". However, the parameters of these functions and their syntax didn't eased their use. Moreover, the current succession of functions to built modules repeated multiple times the correlation computation which takes quite some time. This matrix along with the adjacency and TOM one are also re-usable in the `compare_conditions` function to save some ressources. Also, I took the opportunity to integrate native sperman correlation.
 
 
 **9. Why didn't you use S3 class to create objects usable by your functions ?**
@@ -477,9 +477,10 @@ GWENA architecture is designed to be modular, meaning each step method is easily
 Since a correlation matrix is already signed, one could as what is this `similarity <- (1 + cor_mat) / 2` operation. It is simply because ulterior steps of estimating a scale-free index in WGCNA implies a log10 transformation. Therefore you can't have negative numbers. Because a correlation matrix have values in [0;1], the operation will keep the distribution and avoid negative values.
 
 
-**10. Why `plot_expression_profiles()` computes a PCA for eigengenes instead of using eigengenes given by `detect_modules()`?**
+**11. Why is the plot returned by `plot_expression_profiles()` different if no eigengenes are provided or the eigengenes from `detect_modules` are provided ?**
 
-Eigenenes provided by `detect_modules` are from a SVD, and PCA is equivalent to performing the SVD on the centered data ([see 'Running PCA and SVD in R '](https://genomicsclass.github.io/book/pages/pca_svd.html)). Because expression profiles are using centered values (for clarity of representation), the PCA to represent eigengenes is more accurate.
+The differences you may observe between a plot with eigengenes provided or not will be a variation in the sign assignation (+ or -) for an eigengene and its related expression profiles. In other words, an eigengene on the + line in one case (let say eigengene provided) may be on the - line in the other one (no eigengene provided so). This comes from the use of an SVD in `detect_modules` and a PCA in plot_expression_profile. They both are equivalent as long as the SVD is performed on centered data ([see 'Running PCA and SVD in R '](https://genomicsclass.github.io/book/pages/pca_svd.html)), which it is. However the sign remain different due to the  the sign ambiguity in the singular value decomposition ([Bro et al. 2008](https://doi.org/10.1002/cem.1122)).
+
 
 
 

@@ -652,9 +652,17 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #' data with genes as column and samples as row.
 #' @param modules vector, id (whole number or string) of modules associated to
 #' each gene.
+#' @param eigengenes matrix or data.frame, eigeingenes of the provided modules.
+#' If null, new ones will be computed with a PCA.
 #' @param alpha_expr numeric, transparency of the expression lines. Must be a
 #' value betweem 0 (transparent) and 1 (opaque)
 #' @param ... additional parameters to pass to ggplot2::theme
+#'
+#' @details The sign of the eigengenes from \code{\link{detect_modules}} may 
+#' differ from the ones computed by the pca if no eigengenes is provided to 
+#' \code{\link{plot_expression_profiles}} and therefore the plot itself. This
+#' is du to the sign indeterminancy property from the singular value
+#' decomposition.
 #'
 #' @return A ggplot representing expression profile and eigengene by module
 #'
@@ -671,12 +679,12 @@ utils::globalVariables(c("module", "gene", "gene_gene", "expression_gene",
 #' df <- kuehne_expr[1:24, 1:350]
 #' net <- build_net(df, n_threads = 1)
 #' detection <- detect_modules(df, net$network, detailled_result = TRUE)
-#' plot_expression_profiles(df, detection$modules)
+#' plot_expression_profiles(df, detection$modules, detection$modules_eigengenes)
 #'
 #' @export
 
-plot_expression_profiles <- function(data_expr, modules, alpha_expr = 0.3, 
-                                     ...) {
+plot_expression_profiles <- function(data_expr, modules, eigengenes = NULL,
+                                     alpha_expr = 0.3, ...) {
   # Check
   if (methods::is(data_expr, "SummarizedExperiment")) {
     data_expr <- t(SummarizedExperiment::assay(data_expr))
@@ -693,6 +701,13 @@ plot_expression_profiles <- function(data_expr, modules, alpha_expr = 0.3,
   } else if (!is.list(modules) & length(modules) < 2) {
     warning("modules represent a single modules and only contains one",
     " gene name")
+  }
+  if (!is.null(eigengenes)) {
+    if (!is.data.frame(eigengenes) & !is.matrix(eigengenes))
+      stop("eigengenes must be a data.frame or a matrix")
+    if (length(modules) != ncol(eigengenes))
+      stop("eigengenes must have the same number of columns as the number of ",
+           "modules provided")
   }
   if (length(alpha_expr) != 1 | !is.numeric(alpha_expr))
     stop("alpha_expr should be a single number")
@@ -712,26 +727,40 @@ plot_expression_profiles <- function(data_expr, modules, alpha_expr = 0.3,
       dplyr::mutate(module = as.character(module))
   }
 
-  eigengenes <- df %>%
-    dplyr::left_join(data_expr %>%
-                       t %>%
-                       as.data.frame %>%
-                       tibble::rownames_to_column(var = "gene"),
-                     by = "gene") %>%
-    split.data.frame(.$module) %>%
-    lapply(function(y) y[,c(-1,-2)] %>%
-             t %>%
-             stats::prcomp(center = TRUE, scale.=TRUE) %>%
-             .$x %>%
-             .[, "PC1"] %>%
-             scale) %>%
-    as.data.frame(check.names = FALSE) %>%
-    tibble::rownames_to_column(var="sample") %>%
-    dplyr::mutate(gene = "eigengene") %>%
-    tidyr::pivot_longer(c(-gene, -sample),
-                        names_to = "module",
-                        values_to = "expression")
-
+  if (is.null(eigengenes)) {
+    eigengenes <- df %>%
+      dplyr::left_join(data_expr %>%
+                         t %>%
+                         as.data.frame %>%
+                         tibble::rownames_to_column(var = "gene"),
+                       by = "gene") %>%
+      split.data.frame(.$module) %>%
+      lapply(function(y) y[,c(-1,-2)] %>%
+               t %>%
+               stats::prcomp(center = TRUE, scale = TRUE) %>%
+               .$x %>%
+               .[, "PC1"] %>%
+               scale) %>%
+      as.data.frame(check.names = FALSE) %>%
+      tibble::rownames_to_column(var="sample") %>%
+      dplyr::mutate(gene = "eigengene") %>%
+      tidyr::pivot_longer(c(-gene, -sample),
+                          names_to = "module",
+                          values_to = "expression")
+  } else {
+    eigengenes <- eigengenes %>%
+      as.data.frame() %>%
+      scale() %>%
+      as.data.frame(check.names = FALSE) %>%
+      tibble::rownames_to_column(var="sample") %>%
+      dplyr::mutate(gene = "eigengene") %>%
+      tidyr::pivot_longer(c(-gene, -sample),
+                          names_to = "module",
+                          values_to = "expression") %>%
+      mutate(module = stringr::str_extract(module, "\\d+"))
+  }
+  
+  # Formating eigengenes and genes expression to be compatible for ggplot2
   plot_table <- df %>%
     dplyr::left_join(data_expr %>%
                        scale %>%
@@ -756,6 +785,7 @@ plot_expression_profiles <- function(data_expr, modules, alpha_expr = 0.3,
     dplyr::select(gene, module, sample, expression, cor_sign,
                   expression_eigengene)
 
+  # Plotting
   ggplot2::ggplot(plot_table,
                   ggplot2::aes(x=sample, y=expression, group=gene)) +
     ggplot2::geom_line(alpha = alpha_expr) +
