@@ -4,7 +4,13 @@
 \alias{plot_expression_profiles}
 \title{Modules expression profiles}
 \usage{
-plot_expression_profiles(data_expr, modules, alpha_expr = 0.3, ...)
+plot_expression_profiles(
+  data_expr,
+  modules,
+  eigengenes = NULL,
+  alpha_expr = 0.3,
+  ...
+)
 }
 \arguments{
 \item{data_expr}{matrix or data.frame or SummarizedExperiment, expression
@@ -12,6 +18,9 @@ data with genes as column and samples as row.}
 
 \item{modules}{vector, id (whole number or string) of modules associated to
 each gene.}
+
+\item{eigengenes}{matrix or data.frame, eigeingenes of the provided modules.
+If null, new ones will be computed with a PCA.}
 
 \item{alpha_expr}{numeric, transparency of the expression lines. Must be a
 value betweem 0 (transparent) and 1 (opaque)}
@@ -24,10 +33,17 @@ A ggplot representing expression profile and eigengene by module
 \description{
 Plot expression profiles for all modules with eigengene highlighted
 }
+\details{
+The sign of the eigengenes from \code{\link{detect_modules}} may 
+differ from the ones computed by the pca if no eigengenes is provided to 
+\code{\link{plot_expression_profiles}} and therefore the plot itself. This
+is du to the sign indeterminancy property from the singular value
+decomposition.
+}
 \examples{
 df <- kuehne_expr[1:24, 1:350]
 net <- build_net(df, n_threads = 1)
 detection <- detect_modules(df, net$network, detailled_result = TRUE)
-plot_expression_profiles(df, detection$modules)
+plot_expression_profiles(df, detection$modules, detection$modules_eigengenes)
 
 }

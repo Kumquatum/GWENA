@@ -479,7 +479,7 @@ Since a correlation matrix is already signed, one could as what is this `similar
 
 **11. Why is the plot returned by `plot_expression_profiles()` different if no eigengenes are provided or the eigengenes from `detect_modules` are provided ?**
 
-The differences you may observe between a plot with eigengenes provided or not will be a variation in the sign assignation (+ or -) for an eigengene and its related expression profiles. In other words, an eigengene on the + line in one case (let say eigengene provided) may be on the - line in the other one (no eigengene provided so). This comes from the use of an SVD in `detect_modules` and a PCA in plot_expression_profile. They both are equivalent as long as the SVD is performed on centered data ([see 'Running PCA and SVD in R '](https://genomicsclass.github.io/book/pages/pca_svd.html)), which it is. However the sign remain different due to the  the sign ambiguity in the singular value decomposition ([Bro et al. 2008](https://doi.org/10.1002/cem.1122)).
+The differences you may observe between a plot with eigengenes provided or not will be a variation in the sign assignation (+ or -) for an eigengene and its related expression profiles. In other words, an eigengene on the + line in one case (let say eigengene provided) may be on the - line in the other one (no eigengene provided so). This comes from the use of an SVD in `detect_modules` and a PCA in plot_expression_profile. They both are equivalent as long as the SVD is performed on centered data ([see 'Running PCA and SVD in R '](https://genomicsclass.github.io/book/pages/pca_svd.html)), which it is. However, the sign remain different due to the sign ambiguity in the singular value decomposition ([Bro et al. 2008](https://doi.org/10.1002/cem.1122)).
 
 
 
