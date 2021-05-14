@@ -27,7 +27,7 @@ if (!requireNamespace("devtools", quietly=TRUE))
 
 Installation can either be from:
 
-1. ~~the official version of the last Bioconductor release (recommended).~~ Will be available with Bioconductor 3.12
+1. the official version of the last Bioconductor release (recommended).
 ```R
 # BiocManager::install("GWENA") # Not yet available
 ```
