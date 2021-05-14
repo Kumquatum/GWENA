@@ -29,7 +29,7 @@ Installation can either be from:
 
 1. the official version of the last Bioconductor release (recommended).
 ```R
-# BiocManager::install("GWENA") # Not yet available
+BiocManager::install("GWENA")
 ```
 2. the last stable version from the Bioc Devel branch.
 ```R
