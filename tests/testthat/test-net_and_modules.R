@@ -131,6 +131,15 @@ test_that("good input return no error", {
   expect_error(build_net(se, n_threads = 1), NA)
 })
 
+test_that("all cor basic functions work", {
+  expect_error(build_net(df_expr$df_microarray, n_threads = 1, 
+                         cor_func = "pearson"), NA)
+  expect_error(suppressWarnings(build_net(df_expr$df_microarray, n_threads = 1, 
+                         cor_func = "spearman"), NA))
+  expect_error(build_net(df_expr$df_microarray, n_threads = 1, 
+                         cor_func = "bicor"), NA)
+})
+
 test_that("genes interactions strength is in [0;1]", {
   expect_gte(min(res_net$network %>% c), 0)
   expect_lte(max(res_net$network %>% c), 1)

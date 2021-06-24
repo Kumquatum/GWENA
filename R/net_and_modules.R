@@ -21,7 +21,7 @@
   } else if (cor_func == "spearman") {
     cor_func <- function(x) stats::cor(x, method = "spearman", use = "e")
   } else if (cor_func == "bicor") {
-    cor_func <- function(x) WGCNA::bicor(x, use = "e")
+    cor_func <- function(x) WGCNA::bicor(x)
   } else {
     stop("Should never be triggered")
   }
