@@ -4,8 +4,6 @@ author: "Gwenaëlle Lemoine"
 date: "`r Sys.Date()`"
 output:
   BiocStyle::html_document:
-  # prettydoc::html_pretty:
-    # theme: cayman
     toc: true
 vignette: >
   %\VignetteIndexEntry{GWENA-vignette}
