@@ -87,16 +87,16 @@ use permutation to validate results.
 }
 \details{
 \describe{
-  \item{}{Conditions will be based on names of data_expr_list. Please do not
+  \item{Conditions will be based on names of data_expr_list. Please do not
   use numbers for conditions names as modules are often named this way}
-  \item{}{The final comparison output is a combination of the permutation
+  \item{The final comparison output is a combination of the permutation
   test and the Z summary statistic. Comparison value is set to "preserved"
   when both return "preserved", "moderately preserved" when Z summary return
   it, "unpreserved" when permutation test is not significant and Z summary
   return "unpreserved", and "inconclusive" when the two values are opposite}
-  \item{}{To avoid recalculation, correlations matrices can be obtain by
+  \item{To avoid recalculation, correlations matrices can be obtain by
   setting \code{keep_cor_mat} in \code{\link[GWENA]{build_net}} to TRUE.}
-  \item{}{Description of the 7 topological features used for preservation
+  \item{Description of the 7 topological features used for preservation
   testing is available in \code{\link[NetRep]{modulePreservation}}.}
 }
 }

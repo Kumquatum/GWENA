@@ -146,16 +146,16 @@ z_summary <- function(observed_stat, permutations_array) {
 #'
 #' @details
 #' \describe{
-#'   \item{}{Conditions will be based on names of data_expr_list. Please do not
+#'   \item{Conditions will be based on names of data_expr_list. Please do not
 #'   use numbers for conditions names as modules are often named this way}
-#'   \item{}{The final comparison output is a combination of the permutation
+#'   \item{The final comparison output is a combination of the permutation
 #'   test and the Z summary statistic. Comparison value is set to "preserved"
 #'   when both return "preserved", "moderately preserved" when Z summary return
 #'   it, "unpreserved" when permutation test is not significant and Z summary
 #'   return "unpreserved", and "inconclusive" when the two values are opposite}
-#'   \item{}{To avoid recalculation, correlations matrices can be obtain by
+#'   \item{To avoid recalculation, correlations matrices can be obtain by
 #'   setting \code{keep_cor_mat} in \code{\link[GWENA]{build_net}} to TRUE.}
-#'   \item{}{Description of the 7 topological features used for preservation
+#'   \item{Description of the 7 topological features used for preservation
 #'   testing is available in \code{\link[NetRep]{modulePreservation}}.}
 #' }
 #'
@@ -548,7 +548,7 @@ plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05,
   })
   if (length(text_angle) != 1 | !is.numeric(text_angle))
     stop("text_angle should be a single number")
-  if (text_angle < -360 | text_angle > 360) 
+  if (text_angle < -360 | text_angle > 360)
     stop("text_angle should be a number between -360 and 360")
 
   df <- comparison_pvalues %>%
@@ -570,6 +570,6 @@ plot_comparison_stats <- function(comparison_pvalues, pvalue_th = 0.05,
                                   guide = "legend", breaks = breaks) +
     ggplot2::coord_equal() +
     ggplot2::theme_minimal() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = text_angle, 
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = text_angle,
                                                        hjust = 1))
 }
