@@ -71,7 +71,8 @@ join_gost <- function(gost_result) {
                       " (list element \u00B0", x, ")")}}
         } else {
           if (!identical(ref$meta$query_metadata[[name]],
-                         addon$meta$query_metadata[[name]]))
+                         addon$meta$query_metadata[[name]]) &
+                         name != "highlight")
             warning(name, " from query_metadata isn't identical between ",
             "reference and gost_result element n\u00B0", x, ".")
         }
@@ -304,7 +305,7 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 #' @param cor_func string, name of the correlation function to be used. Must be
 #' one of "pearson", "spearman", "kendall", "other". If "other", your_func must
 #' be provided
-#' @param your_func function returning a correlation matrix. Final values must 
+#' @param your_func function returning a correlation matrix. Final values must
 #' be in [-1;1] range
 #' @param id_col string or vector of string, optional name of the columns
 #' containing the common id between eigengenes and phenotypes.
@@ -327,7 +328,7 @@ plot_enrichment <- function(enrich_output, modules = "all", sources = "all",
 #' @export
 
 associate_phenotype <- function(
-  eigengenes, phenotypes, 
+  eigengenes, phenotypes,
   cor_func = c("pearson", "spearman", "kendall", "other"),
   your_func = NULL, id_col = NULL, ...) {
   # Checks
@@ -429,10 +430,10 @@ associate_phenotype <- function(
     if (!is.numeric(df[1,])) {
       model_mat <- stats::model.matrix(
         stats::formula(paste("~ ", dummy_name, "+ 0")),
-        data = df) %>% 
+        data = df) %>%
         .[match(rownames(df), rownames(.)),] %>%
         set_rownames(rownames(df))
-      
+
       colnames(model_mat) <- gsub(dummy_name, "", colnames(model_mat))
       return(model_mat)
     } else {
@@ -499,7 +500,7 @@ utils::globalVariables(c("eigengene", "pval", "phenotype"))
 #'
 #' @export
 
-plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05, 
+plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05,
                                    text_angle = 90, ...){
   # Checks
   if (!is.list(modules_phenotype)) stop("modules_phenotype must be a list")
@@ -522,7 +523,7 @@ plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05,
   if (pvalue_th <= 0 | pvalue_th >= 1) stop("pvalue_th must be in ]0;1[")
   if (length(text_angle) != 1 | !is.numeric(text_angle))
     stop("text_angle should be a single number")
-  if (text_angle < -360 | text_angle > 360) 
+  if (text_angle < -360 | text_angle > 360)
     stop("text_angle should be a number between -360 and 360")
 
   # Data preparation
@@ -548,7 +549,7 @@ plot_modules_phenotype <- function(modules_phenotype, pvalue_th = 0.05,
       ggplot2::geom_point(ggplot2::aes(colour = cor, size = signif)) +
       ggplot2::scale_color_gradient2() +
       ggplot2::theme_bw() +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = text_angle, 
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = text_angle,
                                                          hjust = 1),
                      ...) +
       ggplot2::xlab("Module") +

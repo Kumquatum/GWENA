@@ -94,9 +94,9 @@ test_that("module input is correctly checked", {
   expect_error(bio_enrich(42))
   expect_error(bio_enrich(1:42))
   expect_error(bio_enrich(matrix(1:9, 3)))
-  expect_error(bio_enrich(data.frame(a = c(letters[1:5], b = letters[6:10]))))
   expect_error(bio_enrich(list(c(res_detection$modules[4:5], c = 1:5))))
   expect_warning(bio_enrich("this is not modules"))
+  expect_message(bio_enrich(data.frame(a = c(letters[1:5], b = letters[6:10]))))
 })
 
 test_that("custom_gmt input is correctly checked", {
